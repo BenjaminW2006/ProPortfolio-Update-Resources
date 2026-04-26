@@ -55,32 +55,6 @@ export default function Portfolio() {
   return (
     <section id="portfolio" className="min-h-screen bg-slate-900 text-white pt-28 pb-24">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-blue-400 font-medium tracking-widest uppercase text-sm mb-4"
-          >
-            Our Work
-          </motion.p>
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-4xl md:text-5xl font-bold mb-6 font-serif"
-          >
-            Proof is in the Property.
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-lg text-slate-400 leading-relaxed"
-          >
-            Take a look at some of our recent projects around the Upstate area. We take pride in delivering clean, professional results every time.
-          </motion.p>
-        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
           {PROJECTS.map((project, index) => (
