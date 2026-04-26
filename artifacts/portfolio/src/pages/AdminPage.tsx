@@ -26,6 +26,7 @@ interface Project {
   date: string;
   location: string;
   description: string;
+  category: "interior" | "exterior" | null;
   coverObjectPath: string | null;
   createdAt: string;
 }
@@ -167,7 +168,7 @@ function CreateProjectForm({
 }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [form, setForm] = useState({ name: "", date: "", location: "", description: "" });
+  const [form, setForm] = useState({ name: "", date: "", location: "", description: "", category: "" as "" | "interior" | "exterior" });
   const [saving, setSaving] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -178,7 +179,7 @@ function CreateProjectForm({
       const res = await apiMutation("/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, category: form.category || null }),
       });
       if (!res.ok) throw new Error("Failed to create project");
       const project = (await res.json()) as Project;
@@ -224,6 +225,18 @@ function CreateProjectForm({
               placeholder="e.g. Greenville, SC"
               className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
             />
+          </div>
+          <div>
+            <label className="block text-slate-400 text-sm mb-1.5">Category</label>
+            <select
+              value={form.category}
+              onChange={(e) => setForm((f) => ({ ...f, category: e.target.value as "" | "interior" | "exterior" }))}
+              className="w-full h-10 rounded-md border border-slate-600 bg-slate-700 text-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">— No category —</option>
+              <option value="interior">Interior</option>
+              <option value="exterior">Exterior</option>
+            </select>
           </div>
           <div>
             <label className="block text-slate-400 text-sm mb-1.5">Description</label>
@@ -274,6 +287,7 @@ function EditProjectForm({
     date: project.date,
     location: project.location,
     description: project.description,
+    category: (project.category ?? "") as "" | "interior" | "exterior",
   });
   const [saving, setSaving] = useState(false);
 
@@ -284,7 +298,7 @@ function EditProjectForm({
       const res = await apiMutation(`/api/projects/${project.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, category: form.category || null }),
       });
       if (!res.ok) throw new Error("Failed to update project");
       const updated = (await res.json()) as Project;
@@ -325,6 +339,18 @@ function EditProjectForm({
             onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
             className="bg-slate-700 border-slate-600 text-white"
           />
+        </div>
+        <div>
+          <label className="block text-slate-400 text-sm mb-1.5">Category</label>
+          <select
+            value={form.category}
+            onChange={(e) => setForm((f) => ({ ...f, category: e.target.value as "" | "interior" | "exterior" }))}
+            className="w-full h-10 rounded-md border border-slate-600 bg-slate-700 text-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">— No category —</option>
+            <option value="interior">Interior</option>
+            <option value="exterior">Exterior</option>
+          </select>
         </div>
         <div>
           <label className="block text-slate-400 text-sm mb-1.5">Description</label>

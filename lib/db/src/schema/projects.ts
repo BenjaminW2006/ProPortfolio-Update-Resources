@@ -8,6 +8,7 @@ export const projectsTable = pgTable("projects", {
   date: text("date").notNull(),
   location: text("location").notNull(),
   description: text("description").notNull().default(""),
+  category: text("category"),
   coverObjectPath: text("cover_object_path"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

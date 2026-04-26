@@ -13,6 +13,7 @@ export const ProjectResponse = z.object({
   date: z.string(),
   location: z.string(),
   description: z.string(),
+  category: z.string().nullable(),
   coverObjectPath: z.string().nullable(),
   createdAt: z.coerce.date(),
 });
@@ -31,6 +32,7 @@ export const CreateProjectBody = z.object({
   date: z.string().min(1),
   location: z.string().min(1),
   description: z.string().default(""),
+  category: z.enum(["interior", "exterior"]).nullable().default(null),
 });
 export type CreateProjectBody = z.infer<typeof CreateProjectBody>;
 
@@ -39,6 +41,7 @@ export const UpdateProjectBody = z.object({
   date: z.string().min(1).optional(),
   location: z.string().min(1).optional(),
   description: z.string().optional(),
+  category: z.enum(["interior", "exterior"]).nullable().optional(),
   coverObjectPath: z.string().nullable().optional(),
 });
 export type UpdateProjectBody = z.infer<typeof UpdateProjectBody>;
