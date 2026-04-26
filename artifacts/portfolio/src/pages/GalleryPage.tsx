@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
-import { ImageIcon, Calendar } from "lucide-react";
+import { ImageIcon, Calendar, ArrowLeft } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 
@@ -139,6 +139,14 @@ export default function GalleryPage({ category }: { category?: "interior" | "ext
 
       <main className="flex-1 pt-28 pb-24">
         <div className="container mx-auto px-4 md:px-6">
+          {category && (
+            <Link href="/">
+              <span className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm cursor-pointer mb-8">
+                <ArrowLeft className="w-4 h-4" />
+                Back to Home
+              </span>
+            </Link>
+          )}
           <div className="mb-10">
             <h1 className="text-4xl md:text-5xl font-bold font-serif">{heading}</h1>
             <p className="text-slate-400 mt-3 text-lg">{sub}</p>
