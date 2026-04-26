@@ -7,23 +7,63 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 
+interface FormState {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  service: string;
+  message: string;
+}
+
+const emptyForm: FormState = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  service: "",
+  message: "",
+};
+
 export default function Contact() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [form, setForm] = useState<FormState>(emptyForm);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false);
-      (e.target as HTMLFormElement).reset();
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error ?? "Something went wrong. Please try again.");
+      }
+
+      setForm(emptyForm);
       toast({
         title: "Request Received",
         description: "Thanks for reaching out! We'll get back to you within 24 hours.",
       });
-    }, 1000);
+    } catch (err) {
+      toast({
+        title: "Submission Failed",
+        description: err instanceof Error ? err.message : "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -71,28 +111,62 @@ export default function Contact() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="firstName">First Name</Label>
-                    <Input id="firstName" required placeholder="John" />
+                    <Input
+                      id="firstName"
+                      name="firstName"
+                      required
+                      placeholder="John"
+                      value={form.firstName}
+                      onChange={handleChange}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="lastName">Last Name</Label>
-                    <Input id="lastName" required placeholder="Doe" />
+                    <Input
+                      id="lastName"
+                      name="lastName"
+                      required
+                      placeholder="Doe"
+                      value={form.lastName}
+                      onChange={handleChange}
+                    />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" required placeholder="john@example.com" />
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      required
+                      placeholder="john@example.com"
+                      value={form.email}
+                      onChange={handleChange}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="phone">Phone Number</Label>
-                    <Input id="phone" type="tel" required placeholder="(864) 555-0000" />
+                    <Input
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      required
+                      placeholder="(864) 555-0000"
+                      value={form.phone}
+                      onChange={handleChange}
+                    />
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="service">Primary Service Needed</Label>
-                  <Select required>
+                  <Select
+                    required
+                    value={form.service}
+                    onValueChange={(val) => setForm((prev) => ({ ...prev, service: val }))}
+                  >
                     <SelectTrigger id="service">
                       <SelectValue placeholder="Select a service" />
                     </SelectTrigger>
@@ -110,17 +184,20 @@ export default function Contact() {
 
                 <div className="space-y-2">
                   <Label htmlFor="message">Project Details</Label>
-                  <Textarea 
-                    id="message" 
-                    required 
+                  <Textarea
+                    id="message"
+                    name="message"
+                    required
                     placeholder="Tell us a bit about what you need help with..."
                     className="min-h-[120px]"
+                    value={form.message}
+                    onChange={handleChange}
                   />
                 </div>
 
-                <Button 
-                  type="submit" 
-                  size="lg" 
+                <Button
+                  type="submit"
+                  size="lg"
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg h-14"
                   disabled={isSubmitting}
                 >
