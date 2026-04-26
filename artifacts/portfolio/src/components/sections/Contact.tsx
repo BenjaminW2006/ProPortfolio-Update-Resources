@@ -75,7 +75,7 @@ export default function Contact() {
                 Ready to Get Started?
               </h2>
               <p className="text-lg text-slate-600 mb-8">
-                Fill out the form and we'll get back to you to schedule a free estimate.
+                Fill out the form below and we'll contact you within 24 hours to discuss your project.
               </p>
 
               <div className="bg-blue-50 p-8 rounded-2xl border border-blue-100">
