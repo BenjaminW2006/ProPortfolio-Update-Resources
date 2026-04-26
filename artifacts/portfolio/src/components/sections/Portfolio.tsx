@@ -1,29 +1,57 @@
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 
-const projects = [
+interface ImageRecord {
+  slot: string;
+  objectPath: string;
+}
+
+const PROJECTS = [
   {
+    slot: "project-deck-restoration",
     title: "Deck Restoration",
     category: "Carpentry & Staining",
-    image: "/images/deck-repair.png"
+    fallback: "/images/deck-repair.png",
   },
   {
+    slot: "project-exterior-paint",
     title: "Exterior House Painting",
     category: "Painting",
-    image: "/images/exterior-paint.png"
+    fallback: "/images/exterior-paint.png",
   },
   {
+    slot: "project-driveway-cleaning",
     title: "Driveway Cleaning",
     category: "Pressure Washing",
-    image: "/images/pressure-washing.png"
+    fallback: "/images/pressure-washing.png",
   },
   {
+    slot: "project-custom-trim",
     title: "Custom Trim Work",
     category: "Carpentry",
-    image: "/images/carpentry.png"
-  }
+    fallback: "/images/carpentry.png",
+  },
 ];
 
 export default function Portfolio() {
+  const { data: images = [] } = useQuery<ImageRecord[]>({
+    queryKey: ["images"],
+    queryFn: async () => {
+      const res = await fetch("/api/images");
+      if (!res.ok) return [];
+      return res.json();
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const imageMap = Object.fromEntries(images.map((img) => [img.slot, img]));
+
+  function getImageSrc(slot: string, fallback: string): string {
+    const record = imageMap[slot];
+    if (record) return `/api/storage${record.objectPath}`;
+    return fallback;
+  }
+
   return (
     <section id="portfolio" className="min-h-screen bg-slate-900 text-white pt-28 pb-24">
       <div className="container mx-auto px-4 md:px-6">
@@ -55,7 +83,7 @@ export default function Portfolio() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-          {projects.map((project, index) => (
+          {PROJECTS.map((project, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 30 }}
@@ -64,7 +92,7 @@ export default function Portfolio() {
               className="group relative overflow-hidden rounded-2xl aspect-[4/3] bg-slate-800"
             >
               <img
-                src={project.image}
+                src={getImageSrc(project.slot, project.fallback)}
                 alt={project.title}
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />

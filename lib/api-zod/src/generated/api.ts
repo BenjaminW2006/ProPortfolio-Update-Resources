@@ -14,3 +14,92 @@ import * as zod from "zod";
 export const HealthCheckResponse = zod.object({
   status: zod.string(),
 });
+
+/**
+ * Returns a presigned GCS URL for direct upload. The client sends JSON
+metadata here, then uploads the file directly to the returned URL.
+
+ * @summary Request a presigned URL for file upload
+ */
+
+export const RequestUploadUrlBody = zod.object({
+  name: zod.string().min(1).describe("Original file name."),
+  size: zod.number().min(1).describe("File size in bytes."),
+  contentType: zod
+    .string()
+    .min(1)
+    .describe("MIME type of the file (e.g. image\/jpeg)."),
+});
+
+export const RequestUploadUrlResponse = zod.object({
+  uploadURL: zod.string().url().describe("Presigned GCS URL for PUT upload."),
+  objectPath: zod
+    .string()
+    .describe("Normalized object path (e.g. \/objects\/uploads\/uuid)."),
+  metadata: zod
+    .object({
+      name: zod.string().min(1).describe("Original file name."),
+      size: zod.number().min(1).describe("File size in bytes."),
+      contentType: zod
+        .string()
+        .min(1)
+        .describe("MIME type of the file (e.g. image\/jpeg)."),
+    })
+    .optional(),
+});
+
+/**
+ * Unconditionally public — no authentication or ACL checks.
+Searches PUBLIC_OBJECT_SEARCH_PATHS for the given file path.
+
+ * @summary Serve a public asset from PUBLIC_OBJECT_SEARCH_PATHS
+ */
+export const GetPublicObjectParams = zod.object({
+  filePath: zod.coerce
+    .string()
+    .describe("Relative file path within the public search paths."),
+});
+
+/**
+ * Serves object entities uploaded via presigned URLs.
+
+ * @summary Serve an object entity from PRIVATE_OBJECT_DIR
+ */
+export const GetStorageObjectParams = zod.object({
+  objectPath: zod.coerce
+    .string()
+    .describe("Object path within the private object dir."),
+});
+
+/**
+ * Returns all current slot to objectPath mappings.
+ * @summary Get all image slot assignments
+ */
+export const GetImagesResponseItem = zod.object({
+  slot: zod.string().describe("The image slot key."),
+  objectPath: zod.string().describe("The object path for the image."),
+  uploadedAt: zod.coerce.date().optional(),
+});
+export const GetImagesResponse = zod.array(GetImagesResponseItem);
+
+/**
+ * Saves or updates the image objectPath for a given slot.
+ * @summary Save a new objectPath for a slot
+ */
+export const SetImageSlotParams = zod.object({
+  slot: zod.coerce
+    .string()
+    .describe("The image slot key (e.g. hero-bg, project-deck-restoration)."),
+});
+
+export const SetImageSlotBody = zod.object({
+  objectPath: zod
+    .string()
+    .describe("The object path returned from the upload endpoint."),
+});
+
+export const SetImageSlotResponse = zod.object({
+  slot: zod.string().describe("The image slot key."),
+  objectPath: zod.string().describe("The object path for the image."),
+  uploadedAt: zod.coerce.date().optional(),
+});

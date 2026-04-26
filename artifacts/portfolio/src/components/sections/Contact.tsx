@@ -81,12 +81,12 @@ export default function Contact() {
               <div className="bg-blue-50 p-8 rounded-2xl border border-blue-100">
                 <h3 className="font-bold text-slate-900 mb-4 text-xl">Service Area</h3>
                 <p className="text-slate-600 leading-relaxed">
-                  We proudly serve the Upstate Palmetto region, including:
+                  We proudly serve the Upstate of South Carolina
                   <br /><br />
                   </p>
                 <div className="mt-8 pt-6 border-t border-blue-200">
                   <p className="text-slate-600 mb-2">Need immediate assistance?</p>
-                  <p className="text-2xl font-bold text-blue-900">(864) 555-0198</p>
+                  <p className="text-2xl font-bold text-blue-900">(864) 434-2842</p>
                 </div>
               </div>
             </motion.div>
