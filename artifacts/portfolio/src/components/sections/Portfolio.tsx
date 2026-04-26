@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import logo from "@assets/Upstate_Palmetto_Property_Services_Logo_(1)_1777217420385.png";
 
 const projects = [
   {
@@ -26,16 +25,17 @@ const projects = [
 
 export default function Portfolio() {
   return (
-    <section id="portfolio" className="relative min-h-screen bg-slate-900 text-white pt-28 pb-24 overflow-hidden">
-      {/* Palm tree background watermark */}
-      <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
+    <section id="portfolio" className="relative min-h-screen text-white pt-28 pb-24 overflow-hidden">
+      {/* Logo background */}
+      <div className="absolute inset-0 z-0">
         <img
-          src={logo}
+          src="/images/logo-bg.png"
           alt=""
           aria-hidden="true"
-          className="absolute left-1/2 top-0 -translate-x-1/2 w-[900px] max-w-none opacity-[0.12]"
-          style={{ filter: "brightness(0) invert(1)", mixBlendMode: "overlay" }}
+          className="w-full h-full object-cover object-center"
         />
+        {/* Dark overlay so text stays readable */}
+        <div className="absolute inset-0 bg-slate-900/80" />
       </div>
 
       <div className="relative z-10 container mx-auto px-4 md:px-6">
