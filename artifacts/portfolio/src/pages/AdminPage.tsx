@@ -5,40 +5,28 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, Trash2, LogOut, ImageIcon, Loader2, CheckCircle2 } from "lucide-react";
 
-const SLOTS = [
+const CATEGORIES = [
   {
-    key: "hero-bg",
-    label: "Hero Background",
-    description: "Main full-screen background photo",
-    fallback: "/images/hero-bg.jpg",
+    key: "interior",
+    label: "Interior",
+    slots: Array.from({ length: 6 }, (_, i) => ({
+      key: `interior-${i + 1}` as const,
+      label: `Interior Photo ${i + 1}`,
+      description: "Interior gallery image",
+    })),
   },
   {
-    key: "project-deck-restoration",
-    label: "Deck Restoration",
-    description: "Portfolio card image",
-    fallback: "/images/deck-repair.png",
-  },
-  {
-    key: "project-exterior-paint",
-    label: "Exterior House Painting",
-    description: "Portfolio card image",
-    fallback: "/images/exterior-paint.png",
-  },
-  {
-    key: "project-driveway-cleaning",
-    label: "Driveway Cleaning",
-    description: "Portfolio card image",
-    fallback: "/images/pressure-washing.png",
-  },
-  {
-    key: "project-custom-trim",
-    label: "Custom Trim Work",
-    description: "Portfolio card image",
-    fallback: "/images/carpentry.png",
+    key: "exterior",
+    label: "Exterior",
+    slots: Array.from({ length: 6 }, (_, i) => ({
+      key: `exterior-${i + 1}` as const,
+      label: `Exterior Photo ${i + 1}`,
+      description: "Exterior gallery image",
+    })),
   },
 ] as const;
 
-type SlotKey = (typeof SLOTS)[number]["key"];
+const SLOTS = CATEGORIES.flatMap((c) => c.slots);
 
 interface ImageRecord {
   slot: string;
@@ -221,31 +209,23 @@ function SlotCard({
     }
   };
 
-  const imageSrc = record ? getCloudImageUrl(record.objectPath) : slot.fallback;
+  const imageSrc = record ? getCloudImageUrl(record.objectPath) : null;
 
   return (
     <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
       <div className="relative aspect-video bg-slate-900">
-        <img
-          src={imageSrc}
-          alt={slot.label}
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).style.display = "none";
-            const parent = e.currentTarget.parentElement;
-            if (parent) {
-              const placeholder = parent.querySelector(".img-placeholder") as HTMLElement | null;
-              if (placeholder) placeholder.style.display = "flex";
-            }
-          }}
-        />
-        <div
-          className="img-placeholder w-full h-full absolute inset-0 flex-col items-center justify-center text-slate-600 gap-2"
-          style={{ display: "none" }}
-        >
-          <ImageIcon className="w-10 h-10" />
-          <span className="text-sm">No image available</span>
-        </div>
+        {imageSrc ? (
+          <img
+            src={imageSrc}
+            alt={slot.label}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full absolute inset-0 flex flex-col items-center justify-center text-slate-600 gap-2">
+            <ImageIcon className="w-10 h-10" />
+            <span className="text-sm">No image uploaded</span>
+          </div>
+        )}
 
         {uploading && (
           <div className="absolute inset-0 bg-slate-900/80 flex flex-col items-center justify-center gap-3">
@@ -387,8 +367,7 @@ export default function AdminPage() {
         <div className="mb-8">
           <h2 className="text-2xl font-bold font-serif mb-2">Site Images</h2>
           <p className="text-slate-400">
-            Upload a new image to replace any slot. Changes go live immediately — no redeploy needed.
-            If no custom image is uploaded, the site uses its built-in default photo.
+            Upload photos to each category. Changes go live immediately — no redeploy needed.
           </p>
         </div>
 
@@ -397,14 +376,24 @@ export default function AdminPage() {
             <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {SLOTS.map((slot) => (
-              <SlotCard
-                key={slot.key}
-                slot={slot}
-                record={imageMap[slot.key]}
-                onSuccess={() => queryClient.invalidateQueries({ queryKey: ["images"] })}
-              />
+          <div className="space-y-12">
+            {CATEGORIES.map((category) => (
+              <div key={category.key}>
+                <h2 className="text-xl font-bold font-serif mb-1">{category.label}</h2>
+                <p className="text-slate-400 text-sm mb-6">
+                  Upload up to 6 photos for the {category.label.toLowerCase()} gallery.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {category.slots.map((slot) => (
+                    <SlotCard
+                      key={slot.key}
+                      slot={slot}
+                      record={imageMap[slot.key]}
+                      onSuccess={() => queryClient.invalidateQueries({ queryKey: ["images"] })}
+                    />
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         )}
