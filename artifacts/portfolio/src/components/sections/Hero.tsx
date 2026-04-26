@@ -1,0 +1,55 @@
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
+
+export default function Hero() {
+  return (
+    <section id="hero" className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden">
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-slate-900/70 mix-blend-multiply z-10" />
+        <img
+          src="/images/hero-bg.png"
+          alt="Beautiful Southern Home"
+          className="w-full h-full object-cover"
+        />
+      </div>
+
+      <div className="container relative z-20 mx-auto px-4 md:px-6">
+        <div className="max-w-3xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm text-white text-sm font-medium mb-6">
+              <CheckCircle2 className="w-4 h-4 text-blue-400" />
+              <span>Locally Owned & Operated in Upstate SC</span>
+            </div>
+            
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6 font-serif">
+              Hard Work. <br />
+              Done Right. <br />
+              <span className="text-blue-400">Every Time.</span>
+            </h1>
+            
+            <p className="text-lg md:text-xl text-slate-200 mb-8 max-w-2xl leading-relaxed">
+              Your trusted neighbors for professional handyman and property maintenance services. From small repairs to major updates, we show up, work hard, and stand behind what we do.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white text-lg h-14 px-8" asChild>
+                <a href="#contact">
+                  Get a Free Quote <ArrowRight className="ml-2 w-5 h-5" />
+                </a>
+              </Button>
+              <Button size="lg" variant="outline" className="bg-white/10 hover:bg-white/20 text-white border-white/30 text-lg h-14 px-8 backdrop-blur-sm" asChild>
+                <a href="#services">Our Services</a>
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}

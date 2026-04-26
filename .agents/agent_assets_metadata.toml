@@ -1,0 +1,32 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "PxDTBNPGuFZzkpjT4gBpq"
+uri = "file://artifacts/portfolio/public/images/hero-bg.png"
+type = "image"
+title = "Beautiful Southern home exterior"
+
+[[generated]]
+id = "8qKIMuHd3nHRI_xXG1Uxe"
+uri = "file://artifacts/portfolio/public/images/deck-repair.png"
+type = "image"
+title = "Deck repair construction"
+
+[[generated]]
+id = "nVjs7GUSxFSYBka1aKz2y"
+uri = "file://artifacts/portfolio/public/images/exterior-paint.png"
+type = "image"
+title = "Fresh exterior paint"
+
+[[generated]]
+id = "m-iakpCOPLp-f9kvhvrDm"
+uri = "file://artifacts/portfolio/public/images/pressure-washing.png"
+type = "image"
+title = "Pressure washing driveway"
+
+[[generated]]
+id = "sbCwkgOPZnrT5G-veW3lL"
+uri = "file://artifacts/portfolio/public/images/carpentry.png"
+type = "image"
+title = "Carpentry trim work"
