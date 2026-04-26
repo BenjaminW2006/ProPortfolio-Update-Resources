@@ -2,9 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 
 interface FormState {
@@ -12,8 +10,6 @@ interface FormState {
   lastName: string;
   email: string;
   phone: string;
-  service: string;
-  message: string;
 }
 
 const emptyForm: FormState = {
@@ -21,8 +17,6 @@ const emptyForm: FormState = {
   lastName: "",
   email: "",
   phone: "",
-  service: "",
-  message: "",
 };
 
 export default function Contact() {
@@ -30,7 +24,7 @@ export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState<FormState>(emptyForm);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
@@ -81,7 +75,7 @@ export default function Contact() {
                 Ready to Get Started?
               </h2>
               <p className="text-lg text-slate-600 mb-8">
-                Fill out the form below with some details about your project, and we'll get back to you to schedule a free estimate.
+                Fill out the form and we'll get back to you to schedule a free estimate.
               </p>
 
               <div className="bg-blue-50 p-8 rounded-2xl border border-blue-100">
@@ -158,41 +152,6 @@ export default function Contact() {
                       onChange={handleChange}
                     />
                   </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="service">Primary Service Needed</Label>
-                  <Select
-                    required
-                    value={form.service}
-                    onValueChange={(val) => setForm((prev) => ({ ...prev, service: val }))}
-                  >
-                    <SelectTrigger id="service">
-                      <SelectValue placeholder="Select a service" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="handyman">General Handyman</SelectItem>
-                      <SelectItem value="painting">Painting</SelectItem>
-                      <SelectItem value="pressure-washing">Pressure Washing</SelectItem>
-                      <SelectItem value="carpentry">Carpentry & Woodwork</SelectItem>
-                      <SelectItem value="deck-fence">Deck & Fence Repair</SelectItem>
-                      <SelectItem value="gutter">Gutter Cleaning</SelectItem>
-                      <SelectItem value="other">Other / Multiple</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="message">Project Details</Label>
-                  <Textarea
-                    id="message"
-                    name="message"
-                    required
-                    placeholder="Tell us a bit about what you need help with..."
-                    className="min-h-[120px]"
-                    value={form.message}
-                    onChange={handleChange}
-                  />
                 </div>
 
                 <Button
