@@ -18,6 +18,7 @@ interface ProjectDetail {
   date: string;
   location: string;
   description: string;
+  category: "interior" | "exterior" | null;
   coverObjectPath: string | null;
   createdAt: string;
   images: ProjectImage[];
@@ -153,16 +154,26 @@ export default function ProjectDetailPage() {
     ? project.images.map((img) => getImageUrl(img.objectPath))
     : [];
 
+  const backHref =
+    project?.category === "interior" ? "/gallery/interior" :
+    project?.category === "exterior" ? "/gallery/exterior" :
+    "/gallery";
+
+  const backLabel =
+    project?.category === "interior" ? "Interior Projects" :
+    project?.category === "exterior" ? "Exterior Projects" :
+    "All Projects";
+
   return (
     <div className="min-h-screen bg-slate-900 text-white flex flex-col">
       <Navbar />
 
       <main className="flex-1 pt-28 pb-24">
         <div className="container mx-auto px-4 md:px-6">
-          <Link href="/gallery">
+          <Link href={backHref}>
             <span className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm cursor-pointer mb-8">
               <ArrowLeft className="w-4 h-4" />
-              All Projects
+              {backLabel}
             </span>
           </Link>
 
