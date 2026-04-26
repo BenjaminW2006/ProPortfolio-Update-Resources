@@ -1,61 +1,97 @@
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { Home, TreePine } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
-const tiles = [
+interface Project {
+  id: number;
+  name: string;
+  category: "interior" | "exterior" | null;
+  coverObjectPath: string | null;
+}
+
+const CATEGORIES = [
   {
+    key: "interior" as const,
     label: "Interior",
+    description: "Kitchen, bathroom, trim, and indoor projects",
     href: "/gallery/interior",
-    icon: Home,
-    description: "Drywall, painting, trim, flooring, and more",
-    gradient: "from-slate-800 to-slate-900",
-    accent: "group-hover:text-blue-300",
-    border: "hover:border-blue-500/50",
   },
   {
+    key: "exterior" as const,
     label: "Exterior",
+    description: "Decks, siding, painting, and outdoor work",
     href: "/gallery/exterior",
-    icon: TreePine,
-    description: "Decks, siding, pressure washing, landscaping, and more",
-    gradient: "from-slate-800 to-slate-900",
-    accent: "group-hover:text-emerald-300",
-    border: "hover:border-emerald-500/50",
   },
 ];
 
-export default function Portfolio() {
-  return (
-    <section id="portfolio" className="min-h-screen bg-slate-900 text-white pt-28 pb-24 flex items-center">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="mb-12 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold font-serif">Our Work</h2>
-          <p className="text-slate-400 mt-3 text-lg">Tap a category to browse completed projects.</p>
-        </div>
+function getImageUrl(objectPath: string): string {
+  return `/api/storage${objectPath}`;
+}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
-          {tiles.map((tile, i) => {
-            const Icon = tile.icon;
+export default function Portfolio() {
+  const { data: projects = [] } = useQuery<Project[]>({
+    queryKey: ["projects"],
+    queryFn: async () => {
+      const res = await fetch("/api/projects");
+      if (!res.ok) return [];
+      return res.json();
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  function getCover(category: "interior" | "exterior"): string | null {
+    const match = projects.find((p) => p.category === category && p.coverObjectPath);
+    return match?.coverObjectPath ? getImageUrl(match.coverObjectPath) : null;
+  }
+
+  function getCount(category: "interior" | "exterior"): number {
+    return projects.filter((p) => p.category === category).length;
+  }
+
+  return (
+    <section id="portfolio" className="min-h-screen bg-slate-900 text-white pt-28 pb-24">
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+          {CATEGORIES.map((category, i) => {
+            const cover = getCover(category.key);
+            const count = getCount(category.key);
+
             return (
               <motion.div
-                key={tile.label}
-                initial={{ opacity: 0, y: 28 }}
+                key={category.key}
+                initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: i * 0.12 }}
               >
-                <Link href={tile.href}>
+                <Link href={category.href}>
                   <span
-                    className={`group block rounded-3xl overflow-hidden bg-gradient-to-br ${tile.gradient} border border-slate-700 ${tile.border} transition-all duration-300 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 shadow-xl hover:shadow-2xl hover:-translate-y-1`}
+                    className="group relative block aspect-[4/3] rounded-2xl overflow-hidden cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+                    aria-label={`Open ${category.label} gallery`}
                   >
-                    <div className="flex flex-col items-center justify-center py-20 px-8 gap-5 text-center">
-                      <div className="w-16 h-16 rounded-2xl bg-slate-700/60 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                        <Icon className="w-8 h-8 text-slate-300" />
-                      </div>
-                      <div>
-                        <h3 className={`text-3xl font-bold font-serif text-white ${tile.accent} transition-colors`}>
-                          {tile.label}
-                        </h3>
-                        <p className="text-slate-400 mt-2 text-sm leading-relaxed">{tile.description}</p>
-                      </div>
+                    {cover ? (
+                      <img
+                        src={cover}
+                        alt={category.label}
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-slate-800" />
+                    )}
+
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent transition-opacity duration-300 group-hover:from-black/90" />
+
+                    <div className="absolute inset-0 flex flex-col justify-end p-8">
+                      <h2 className="text-3xl md:text-4xl font-bold font-serif text-white mb-2 group-hover:-translate-y-1 transition-transform duration-300">
+                        {category.label}
+                      </h2>
+                      <p className="text-slate-300 text-sm mb-4 group-hover:-translate-y-1 transition-transform duration-300 delay-[20ms]">
+                        {category.description}
+                      </p>
+                      <span className="inline-flex items-center gap-2 text-blue-300 text-sm font-medium group-hover:-translate-y-1 transition-transform duration-300 delay-[40ms]">
+                        {count > 0 ? `View ${count} project${count !== 1 ? "s" : ""}` : "View gallery"}
+                        <ChevronRight className="w-4 h-4" />
+                      </span>
                     </div>
                   </span>
                 </Link>
