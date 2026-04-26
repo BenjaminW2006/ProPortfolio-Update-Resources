@@ -13,13 +13,11 @@ const CATEGORIES = [
     key: "interior",
     label: "Interior",
     description: "Kitchen, bathroom, trim, and indoor projects",
-    slots: Array.from({ length: 6 }, (_, i) => `interior-${i + 1}`),
   },
   {
     key: "exterior",
     label: "Exterior",
     description: "Decks, siding, painting, and outdoor work",
-    slots: Array.from({ length: 6 }, (_, i) => `exterior-${i + 1}`),
   },
 ] as const;
 
@@ -38,15 +36,18 @@ export default function Portfolio() {
     imageRecords.map((r) => [r.slot, `/api/storage${r.objectPath}`])
   );
 
-  function getCoverImage(slots: readonly string[]): string | null {
-    for (const slot of slots) {
-      if (imageMap[slot]) return imageMap[slot];
-    }
-    return null;
+  function getCoverImage(key: string): string | null {
+    if (imageMap[`${key}-cover`]) return imageMap[`${key}-cover`];
+    const first = imageRecords.find(
+      (r) => r.slot.startsWith(`${key}-`) && r.slot !== `${key}-cover`
+    );
+    return first ? `/api/storage${first.objectPath}` : null;
   }
 
-  function getCount(slots: readonly string[]): number {
-    return slots.filter((slot) => imageMap[slot]).length;
+  function getCount(key: string): number {
+    return imageRecords.filter(
+      (r) => r.slot.startsWith(`${key}-`) && r.slot !== `${key}-cover`
+    ).length;
   }
 
   return (
@@ -54,8 +55,8 @@ export default function Portfolio() {
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
           {CATEGORIES.map((category, i) => {
-            const cover = getCoverImage(category.slots);
-            const count = getCount(category.slots);
+            const cover = getCoverImage(category.key);
+            const count = getCount(category.key);
 
             return (
               <motion.div

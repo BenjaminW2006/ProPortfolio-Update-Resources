@@ -11,18 +11,10 @@ interface ImageRecord {
   objectPath: string;
 }
 
-const CATEGORY_CONFIG = {
-  interior: {
-    label: "Interior",
-    slots: Array.from({ length: 6 }, (_, i) => `interior-${i + 1}`),
-  },
-  exterior: {
-    label: "Exterior",
-    slots: Array.from({ length: 6 }, (_, i) => `exterior-${i + 1}`),
-  },
-} as const;
-
-type CategoryKey = keyof typeof CATEGORY_CONFIG;
+const CATEGORY_CONFIG: Record<string, { label: string }> = {
+  interior: { label: "Interior" },
+  exterior: { label: "Exterior" },
+};
 
 function Lightbox({
   images,
@@ -132,7 +124,7 @@ function Lightbox({
 
 export default function GalleryPage() {
   const params = useParams<{ category: string }>();
-  const category = params.category as CategoryKey;
+  const category = params.category ?? "";
   const config = CATEGORY_CONFIG[category];
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
@@ -154,13 +146,10 @@ export default function GalleryPage() {
     );
   }
 
-  const imageMap = Object.fromEntries(
-    imageRecords.map((r) => [r.slot, `/api/storage${r.objectPath}`])
-  );
-
-  const images = config.slots.flatMap((slot) =>
-    imageMap[slot] ? [imageMap[slot]] : []
-  );
+  const images = imageRecords
+    .filter((r) => r.slot.startsWith(`${category}-`) && r.slot !== `${category}-cover`)
+    .sort((a, b) => a.slot.localeCompare(b.slot))
+    .map((r) => `/api/storage${r.objectPath}`);
 
   return (
     <div className="min-h-screen bg-slate-900 text-white flex flex-col">
