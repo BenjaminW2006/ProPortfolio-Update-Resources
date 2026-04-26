@@ -1,10 +1,7 @@
 import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
-import logo from "@assets/Upstate_Palmetto_Property_Services_Logo_(1)_1777217420385.png";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -22,32 +19,11 @@ export default function Navbar() {
           : "bg-slate-900/80 backdrop-blur-sm py-4"
       }`}
     >
-      <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
-        <a href="#" className="flex items-center gap-3">
-          <img
-            src={logo}
-            alt="Upstate Palmetto Property Services"
-            className="h-12 w-auto object-contain"
-          />
-        </a>
-
-        <span className="hidden md:block text-slate-300 text-sm font-medium tracking-wide">
+      <div className="container mx-auto px-4 md:px-6 flex items-center justify-center">
+        <span className="text-white text-lg font-semibold tracking-wide">
           Upstate Palmetto Property Services
         </span>
-
-        <button
-          className="md:hidden p-2 text-slate-300"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
       </div>
-
-      {mobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 bg-slate-900 border-t border-slate-800 shadow-lg py-4 px-4">
-          <p className="text-slate-300 text-center font-medium">Upstate Palmetto Property Services</p>
-        </div>
-      )}
     </nav>
   );
 }
