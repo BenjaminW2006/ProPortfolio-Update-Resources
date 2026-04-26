@@ -83,8 +83,7 @@ export default function Contact() {
                 <p className="text-slate-600 leading-relaxed">
                   We proudly serve the Upstate Palmetto region, including:
                   <br /><br />
-                  <span className="font-medium text-blue-800">Greenville • Spartanburg • Anderson • Easley • Greer • Taylors • Simpsonville</span>
-                </p>
+                  </p>
                 <div className="mt-8 pt-6 border-t border-blue-200">
                   <p className="text-slate-600 mb-2">Need immediate assistance?</p>
                   <p className="text-2xl font-bold text-blue-900">(864) 555-0198</p>
