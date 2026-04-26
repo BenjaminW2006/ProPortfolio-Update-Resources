@@ -25,28 +25,8 @@ const projects = [
 
 export default function Portfolio() {
   return (
-    <section id="portfolio" className="relative min-h-screen text-white pt-28 pb-24 overflow-hidden">
-      {/* Page background */}
-      <div className="absolute inset-0 z-0 bg-slate-900" />
-
-      {/* Logo background — at native size with mask to feather edges */}
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage: "url(/images/logo-bg.png)",
-          backgroundRepeat: "no-repeat",
-          backgroundPosition: "center top",
-          backgroundSize: "500px 500px",
-          maskImage: "radial-gradient(ellipse 38% 44% at 50% 18%, black 25%, transparent 65%)",
-          WebkitMaskImage: "radial-gradient(ellipse 38% 44% at 50% 18%, black 25%, transparent 65%)",
-          opacity: 0.55,
-        }}
-      />
-
-      {/* Dark overlay for text readability */}
-      <div className="absolute inset-0 z-0 bg-slate-900/55" />
-
-      <div className="relative z-10 container mx-auto px-4 md:px-6">
+    <section id="portfolio" className="min-h-screen bg-slate-900 text-white pt-28 pb-24">
+      <div className="container mx-auto px-4 md:px-6">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <motion.p
             initial={{ opacity: 0, y: 10 }}
