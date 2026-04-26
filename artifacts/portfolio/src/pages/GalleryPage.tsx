@@ -113,8 +113,13 @@ function ProjectGroups({ projects }: { projects: Project[] }) {
   );
 }
 
-export default function GalleryPage() {
-  const { data: projects = [], isLoading } = useQuery<Project[]>({
+const CATEGORY_TITLES: Record<string, { heading: string; sub: string }> = {
+  interior: { heading: "Interior Projects", sub: "Indoor work completed by Upstate Palmetto Property Services." },
+  exterior: { heading: "Exterior Projects", sub: "Outdoor work completed by Upstate Palmetto Property Services." },
+};
+
+export default function GalleryPage({ category }: { category?: "interior" | "exterior" }) {
+  const { data: allProjects = [], isLoading } = useQuery<Project[]>({
     queryKey: ["projects"],
     queryFn: async () => {
       const res = await fetch("/api/projects");
@@ -124,6 +129,14 @@ export default function GalleryPage() {
     staleTime: 5 * 60 * 1000,
   });
 
+  const projects = category
+    ? allProjects.filter((p) => p.category === category)
+    : allProjects;
+
+  const { heading, sub } = category
+    ? CATEGORY_TITLES[category]
+    : { heading: "Our Work", sub: "Browse completed projects from Upstate Palmetto Property Services." };
+
   return (
     <div className="min-h-screen bg-slate-900 text-white flex flex-col">
       <Navbar />
@@ -131,8 +144,8 @@ export default function GalleryPage() {
       <main className="flex-1 pt-28 pb-24">
         <div className="container mx-auto px-4 md:px-6">
           <div className="mb-10">
-            <h1 className="text-4xl md:text-5xl font-bold font-serif">Our Work</h1>
-            <p className="text-slate-400 mt-3 text-lg">Browse completed projects from Upstate Palmetto Property Services.</p>
+            <h1 className="text-4xl md:text-5xl font-bold font-serif">{heading}</h1>
+            <p className="text-slate-400 mt-3 text-lg">{sub}</p>
           </div>
 
           {isLoading ? (
@@ -145,6 +158,8 @@ export default function GalleryPage() {
               <p className="text-xl">No projects yet</p>
               <p className="text-sm text-slate-700">Check back soon for completed work.</p>
             </div>
+          ) : category ? (
+            <ProjectGrid projects={projects} />
           ) : (
             <ProjectGroups projects={projects} />
           )}
