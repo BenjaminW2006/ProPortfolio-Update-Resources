@@ -10,18 +10,25 @@ interface Project {
   coverObjectPath: string | null;
 }
 
+interface ImageSlot {
+  slot: string;
+  objectPath: string;
+}
+
 const CATEGORIES = [
   {
     key: "interior" as const,
     label: "Interior",
     description: "Kitchen, bathroom, trim, and indoor projects",
     href: "/gallery/interior",
+    slot: "tile-interior",
   },
   {
     key: "exterior" as const,
     label: "Exterior",
     description: "Decks, siding, painting, and outdoor work",
     href: "/gallery/exterior",
+    slot: "tile-exterior",
   },
 ];
 
@@ -40,9 +47,21 @@ export default function Portfolio() {
     staleTime: 5 * 60 * 1000,
   });
 
-  function getCover(category: "interior" | "exterior"): string | null {
-    const match = projects.find((p) => p.category === category && p.coverObjectPath);
-    return match?.coverObjectPath ? getImageUrl(match.coverObjectPath) : null;
+  const { data: imageSlots = [] } = useQuery<ImageSlot[]>({
+    queryKey: ["tile-images"],
+    queryFn: async () => {
+      const res = await fetch("/api/images");
+      if (!res.ok) return [];
+      return res.json();
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  function getCover(category: "interior" | "exterior", slot: string): string | null {
+    const slotMatch = imageSlots.find((s) => s.slot === slot);
+    if (slotMatch) return getImageUrl(slotMatch.objectPath);
+    const projectMatch = projects.find((p) => p.category === category && p.coverObjectPath);
+    return projectMatch?.coverObjectPath ? getImageUrl(projectMatch.coverObjectPath) : null;
   }
 
   function getCount(category: "interior" | "exterior"): number {
@@ -54,7 +73,7 @@ export default function Portfolio() {
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
           {CATEGORIES.map((category, i) => {
-            const cover = getCover(category.key);
+            const cover = getCover(category.key, category.slot);
             const count = getCount(category.key);
 
             return (

@@ -765,6 +765,115 @@ function ProjectManageView({
   );
 }
 
+interface ImageSlot {
+  slot: string;
+  objectPath: string;
+}
+
+function TileCoverUpload({ slot, label }: { slot: string; label: string }) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  const { data: images = [] } = useQuery<ImageSlot[]>({
+    queryKey: ["tile-images"],
+    queryFn: async () => {
+      const res = await apiCall("/api/images");
+      if (!res.ok) return [];
+      return res.json();
+    },
+    staleTime: 0,
+  });
+
+  const current = images.find((img) => img.slot === slot) ?? null;
+
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Invalid file", description: "Please select an image.", variant: "destructive" });
+      return;
+    }
+    setUploading(true);
+    setProgress(0);
+    try {
+      const objectPath = await uploadFile(file, setProgress);
+      const res = await apiMutation(`/api/images/${slot}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ objectPath }),
+      });
+      if (!res.ok) throw new Error("Failed to save tile cover");
+      queryClient.invalidateQueries({ queryKey: ["tile-images"] });
+      toast({ title: `${label} tile cover updated!` });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Upload failed";
+      toast({ title: "Upload failed", description: msg, variant: "destructive" });
+    } finally {
+      setUploading(false);
+      setProgress(0);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const removeCover = async () => {
+    try {
+      await apiMutation(`/api/images/${slot}`, { method: "DELETE" });
+      queryClient.invalidateQueries({ queryKey: ["tile-images"] });
+      toast({ title: `${label} tile cover removed` });
+    } catch {
+      toast({ title: "Error", description: "Failed to remove cover.", variant: "destructive" });
+    }
+  };
+
+  return (
+    <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
+      <div className="relative aspect-[4/3] bg-slate-900">
+        {current ? (
+          <img src={getImageUrl(current.objectPath)} alt={label} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center text-slate-600 gap-2">
+            <ImageIcon className="w-10 h-10" />
+            <span className="text-xs">No cover set</span>
+          </div>
+        )}
+      </div>
+      <div className="p-4">
+        <p className="text-white font-semibold font-serif mb-3">{label} Tile</p>
+        <div className="flex gap-2 flex-wrap">
+          <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-slate-600 text-slate-200 hover:bg-slate-700 hover:text-white"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+          >
+            {uploading ? (
+              <><Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />{progress}%</>
+            ) : (
+              <><Upload className="w-3.5 h-3.5 mr-2" />{current ? "Replace" : "Upload"}</>
+            )}
+          </Button>
+          {current && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-red-900/50 text-red-400 hover:bg-red-900/20 hover:text-red-300"
+              onClick={removeCover}
+            >
+              <Trash2 className="w-3.5 h-3.5 mr-2" />
+              Remove
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ProjectListView({
   onSelectProject,
   onCreateNew,
@@ -772,6 +881,7 @@ function ProjectListView({
   onSelectProject: (id: number) => void;
   onCreateNew: () => void;
 }) {
+  const [search, setSearch] = useState("");
   const { data: projects = [], isLoading } = useQuery<Project[]>({
     queryKey: ["admin-projects"],
     queryFn: async () => {
@@ -782,82 +892,103 @@ function ProjectListView({
     staleTime: 0,
   });
 
+  const filtered = search.trim()
+    ? projects.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
+    : projects;
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold font-serif">Projects</h2>
-        <Button
-          className="bg-blue-600 hover:bg-blue-700"
-          onClick={onCreateNew}
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          New Project
-        </Button>
+    <div className="space-y-10">
+      <div>
+        <h2 className="text-2xl font-bold font-serif mb-4">Gallery Tile Covers</h2>
+        <p className="text-slate-400 text-sm mb-5">These images appear on the home page tiles.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl">
+          <TileCoverUpload slot="tile-interior" label="Interior" />
+          <TileCoverUpload slot="tile-exterior" label="Exterior" />
+        </div>
       </div>
 
-      {isLoading ? (
-        <div className="flex items-center justify-center py-24">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
-        </div>
-      ) : projects.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 text-slate-600 gap-4 border-2 border-dashed border-slate-700 rounded-2xl">
-          <ImageIcon className="w-14 h-14" />
-          <p className="text-lg text-slate-500">No projects yet</p>
-          <Button
-            className="bg-blue-600 hover:bg-blue-700"
-            onClick={onCreateNew}
-          >
+      <div className="space-y-6">
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-2xl font-bold font-serif shrink-0">Projects</h2>
+          <div className="flex items-center gap-3 flex-1 max-w-sm">
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search projects…"
+              className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-500"
+            />
+          </div>
+          <Button className="bg-blue-600 hover:bg-blue-700 shrink-0" onClick={onCreateNew}>
             <Plus className="w-4 h-4 mr-2" />
-            Create Your First Project
+            New Project
           </Button>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {projects.map((project) => (
-            <div
-              key={project.id}
-              className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden hover:border-slate-500 transition-colors"
-            >
-              <div className="relative aspect-[4/3] bg-slate-900 overflow-hidden">
-                {project.coverObjectPath ? (
-                  <img
-                    src={getImageUrl(project.coverObjectPath)}
-                    alt={project.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-slate-700">
-                    <ImageIcon className="w-12 h-12" />
+
+        {isLoading ? (
+          <div className="flex items-center justify-center py-24">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
+          </div>
+        ) : projects.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24 text-slate-600 gap-4 border-2 border-dashed border-slate-700 rounded-2xl">
+            <ImageIcon className="w-14 h-14" />
+            <p className="text-lg text-slate-500">No projects yet</p>
+            <Button className="bg-blue-600 hover:bg-blue-700" onClick={onCreateNew}>
+              <Plus className="w-4 h-4 mr-2" />
+              Create Your First Project
+            </Button>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-slate-600 gap-3">
+            <p className="text-slate-500">No projects match "{search}"</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {filtered.map((project) => (
+              <div
+                key={project.id}
+                className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden hover:border-slate-500 transition-colors"
+              >
+                <div className="relative aspect-[4/3] bg-slate-900 overflow-hidden">
+                  {project.coverObjectPath ? (
+                    <img
+                      src={getImageUrl(project.coverObjectPath)}
+                      alt={project.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-slate-700">
+                      <ImageIcon className="w-12 h-12" />
+                    </div>
+                  )}
+                </div>
+                <div className="p-4">
+                  <h3 className="text-white font-semibold font-serif">{project.name}</h3>
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1.5 text-slate-400 text-sm">
+                    <span className="flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 shrink-0" />
+                      {project.date}
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 shrink-0" />
+                      {project.location}
+                    </span>
                   </div>
-                )}
-              </div>
-              <div className="p-4">
-                <h3 className="text-white font-semibold font-serif">{project.name}</h3>
-                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1.5 text-slate-400 text-sm">
-                  <span className="flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 shrink-0" />
-                    {project.date}
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 shrink-0" />
-                    {project.location}
-                  </span>
-                </div>
-                <div className="mt-3">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="w-full border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white"
-                    onClick={() => onSelectProject(project.id)}
-                  >
-                    Manage
-                  </Button>
+                  <div className="mt-3">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-full border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white"
+                      onClick={() => onSelectProject(project.id)}
+                    >
+                      Manage
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
