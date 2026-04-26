@@ -1,102 +1,118 @@
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, ImageIcon, MapPin, Calendar } from "lucide-react";
 
-interface ImageRecord {
-  slot: string;
-  objectPath: string;
+interface Project {
+  id: number;
+  name: string;
+  date: string;
+  location: string;
+  description: string;
+  coverObjectPath: string | null;
+  createdAt: string;
 }
 
-const CATEGORIES = [
-  {
-    key: "interior",
-    label: "Interior",
-    description: "Kitchen, bathroom, trim, and indoor projects",
-  },
-  {
-    key: "exterior",
-    label: "Exterior",
-    description: "Decks, siding, painting, and outdoor work",
-  },
-] as const;
+function getImageUrl(objectPath: string): string {
+  return `/api/storage${objectPath}`;
+}
 
 export default function Portfolio() {
-  const { data: imageRecords = [] } = useQuery<ImageRecord[]>({
-    queryKey: ["images"],
+  const { data: projects = [] } = useQuery<Project[]>({
+    queryKey: ["projects"],
     queryFn: async () => {
-      const res = await fetch("/api/images");
+      const res = await fetch("/api/projects");
       if (!res.ok) return [];
       return res.json();
     },
     staleTime: 5 * 60 * 1000,
   });
 
-  const imageMap = Object.fromEntries(
-    imageRecords.map((r) => [r.slot, `/api/storage${r.objectPath}`])
-  );
-
-  function getCoverImage(key: string): string | null {
-    if (imageMap[`${key}-cover`]) return imageMap[`${key}-cover`];
-    const first = imageRecords.find(
-      (r) => r.slot.startsWith(`${key}-`) && r.slot !== `${key}-cover`
-    );
-    return first ? `/api/storage${first.objectPath}` : null;
-  }
-
-  function getCount(key: string): number {
-    return imageRecords.filter(
-      (r) => r.slot.startsWith(`${key}-`) && r.slot !== `${key}-cover`
-    ).length;
-  }
+  const recent = projects.slice(0, 4);
 
   return (
     <section id="portfolio" className="min-h-screen bg-slate-900 text-white pt-28 pb-24">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-          {CATEGORIES.map((category, i) => {
-            const cover = getCoverImage(category.key);
-            const count = getCount(category.key);
+        <div className="flex items-end justify-between mb-10">
+          <div>
+            <h2 className="text-4xl md:text-5xl font-bold font-serif">Our Work</h2>
+          </div>
+          {projects.length > 0 && (
+            <Link href="/gallery">
+              <span className="hidden sm:inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors text-sm font-medium cursor-pointer">
+                View all projects
+                <ChevronRight className="w-4 h-4" />
+              </span>
+            </Link>
+          )}
+        </div>
 
-            return (
-              <motion.div
-                key={category.key}
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: i * 0.12 }}
-              >
-                <Link href={`/gallery/${category.key}`}>
-                  <span className="group relative aspect-[4/3] rounded-2xl overflow-hidden cursor-pointer block focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400">
-                    {cover ? (
-                      <img
-                        src={cover}
-                        alt={category.label}
-                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 bg-slate-800" />
-                    )}
+        {recent.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24 text-slate-700 gap-4">
+            <ImageIcon className="w-16 h-16" />
+            <p className="text-xl text-slate-600">No projects yet</p>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6">
+              {recent.map((project, i) => (
+                <motion.div
+                  key={project.id}
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                >
+                  <Link href={`/gallery/project/${project.id}`}>
+                    <span className="group block rounded-2xl overflow-hidden bg-slate-800 border border-slate-700 hover:border-slate-500 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400">
+                      <div className="relative aspect-[4/3] overflow-hidden bg-slate-900">
+                        {project.coverObjectPath ? (
+                          <img
+                            src={getImageUrl(project.coverObjectPath)}
+                            alt={project.name}
+                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center text-slate-700">
+                            <ImageIcon className="w-12 h-12" />
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                        <div className="absolute bottom-0 left-0 right-0 p-4">
+                          <h3 className="text-white font-semibold font-serif text-lg leading-tight group-hover:text-blue-300 transition-colors">
+                            {project.name}
+                          </h3>
+                        </div>
+                      </div>
+                      <div className="px-4 py-3">
+                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-slate-400 text-sm">
+                          <span className="flex items-center gap-1.5">
+                            <Calendar className="w-3.5 h-3.5 shrink-0" />
+                            {project.date}
+                          </span>
+                          <span className="flex items-center gap-1.5">
+                            <MapPin className="w-3.5 h-3.5 shrink-0" />
+                            {project.location}
+                          </span>
+                        </div>
+                      </div>
+                    </span>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
 
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent transition-opacity duration-300 group-hover:from-black/90" />
-
-                    <div className="absolute inset-0 flex flex-col justify-end p-8">
-                      <h2 className="text-3xl md:text-4xl font-bold font-serif text-white mb-2 group-hover:-translate-y-1 transition-transform duration-300">
-                        {category.label}
-                      </h2>
-                      <p className="text-slate-300 text-sm mb-4 group-hover:-translate-y-1 transition-transform duration-300 delay-[20ms]">
-                        {category.description}
-                      </p>
-                      <span className="inline-flex items-center gap-2 text-blue-300 text-sm font-medium group-hover:-translate-y-1 transition-transform duration-300 delay-[40ms]">
-                        {count > 0 ? `View ${count} photo${count !== 1 ? "s" : ""}` : "View gallery"}
-                        <ChevronRight className="w-4 h-4" />
-                      </span>
-                    </div>
+            {projects.length > 4 && (
+              <div className="mt-10 text-center">
+                <Link href="/gallery">
+                  <span className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors font-medium cursor-pointer">
+                    View all {projects.length} projects
+                    <ChevronRight className="w-4 h-4" />
                   </span>
                 </Link>
-              </motion.div>
-            );
-          })}
-        </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </section>
   );

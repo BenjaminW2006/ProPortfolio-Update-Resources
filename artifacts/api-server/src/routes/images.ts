@@ -1,7 +1,7 @@
 import { Router, type IRouter, type Request, type Response, type NextFunction } from "express";
 import { db } from "@workspace/db";
 import { siteImagesTable } from "@workspace/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, isNotNull } from "drizzle-orm";
 import { GetImagesResponse, SetImageSlotBody, SetImageSlotResponse, SetImageSlotParams } from "@workspace/api-zod";
 
 const router: IRouter = Router();
@@ -50,8 +50,8 @@ router.get("/admin/ping", requireAdminSession, (_req: Request, res: Response) =>
 
 router.get("/images", async (req: Request, res: Response) => {
   try {
-    const rows = await db.select().from(siteImagesTable);
-    res.json(GetImagesResponse.parse(rows.map((r) => ({ slot: r.slot, objectPath: r.objectPath }))));
+    const rows = await db.select().from(siteImagesTable).where(isNotNull(siteImagesTable.slot));
+    res.json(GetImagesResponse.parse(rows.map((r) => ({ slot: r.slot!, objectPath: r.objectPath }))));
   } catch (error) {
     req.log.error({ err: error }, "Error fetching image slots");
     res.status(500).json({ error: "Failed to fetch images" });
