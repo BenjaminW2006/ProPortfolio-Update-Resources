@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
-import { ImageIcon, MapPin, Calendar } from "lucide-react";
+import { ImageIcon, Calendar } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 
@@ -52,10 +52,6 @@ function ProjectCard({ project }: { project: Project }) {
               <span className="flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5 shrink-0" />
                 {project.date}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 shrink-0" />
-                {project.location}
               </span>
             </div>
           </div>

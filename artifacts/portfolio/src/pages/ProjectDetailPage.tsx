@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams, Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight, X, ImageIcon, ArrowLeft, MapPin, Calendar } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, ImageIcon, ArrowLeft, Calendar } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 
@@ -183,10 +183,6 @@ export default function ProjectDetailPage() {
                   <span className="flex items-center gap-2">
                     <Calendar className="w-4 h-4 shrink-0" />
                     {project.date}
-                  </span>
-                  <span className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 shrink-0" />
-                    {project.location}
                   </span>
                 </div>
                 {project.description && (
