@@ -28,6 +28,15 @@ function getImageUrl(objectPath: string): string {
   return `/api/storage${objectPath}`;
 }
 
+function formatDate(raw: string): string {
+  if (!raw) return "";
+  const d = new Date(raw);
+  if (!isNaN(d.getTime())) {
+    return d.toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
+  }
+  return raw;
+}
+
 function Lightbox({
   images,
   startIndex,
@@ -193,7 +202,7 @@ export default function ProjectDetailPage() {
                 <div className="flex flex-wrap gap-x-6 gap-y-2 text-slate-400 text-base mb-4">
                   <span className="flex items-center gap-2">
                     <Calendar className="w-4 h-4 shrink-0" />
-                    {project.date}
+                    {formatDate(project.date)}
                   </span>
                 </div>
                 {project.description && (

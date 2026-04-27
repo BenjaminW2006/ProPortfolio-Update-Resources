@@ -23,6 +23,15 @@ function getImageUrl(objectPath: string): string {
   return `/api/storage${objectPath}`;
 }
 
+function formatDate(raw: string): string {
+  if (!raw) return "";
+  const d = new Date(raw);
+  if (!isNaN(d.getTime())) {
+    return d.toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
+  }
+  return raw;
+}
+
 function ProjectCard({ project }: { project: Project }) {
   return (
     <motion.div
@@ -51,7 +60,7 @@ function ProjectCard({ project }: { project: Project }) {
             <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-slate-400 text-sm">
               <span className="flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5 shrink-0" />
-                {project.date}
+                {formatDate(project.date)}
               </span>
             </div>
           </div>

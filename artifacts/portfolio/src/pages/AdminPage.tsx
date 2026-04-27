@@ -62,6 +62,26 @@ function getImageUrl(objectPath: string): string {
   return `/api/storage${objectPath}`;
 }
 
+function formatDate(raw: string): string {
+  if (!raw) return "";
+  const d = new Date(raw);
+  if (!isNaN(d.getTime())) {
+    return d.toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
+  }
+  return raw;
+}
+
+function toDateInputValue(raw: string): string {
+  if (!raw) return "";
+  const iso = /^\d{4}-\d{2}-\d{2}$/.test(raw) ? raw : null;
+  if (iso) return iso;
+  const d = new Date(raw);
+  if (!isNaN(d.getTime())) {
+    return d.toISOString().slice(0, 10);
+  }
+  return "";
+}
+
 async function uploadFile(
   file: File,
   onProgress?: (pct: number) => void
@@ -210,11 +230,11 @@ function CreateProjectForm({
           </div>
           <div>
             <label className="block text-slate-400 text-sm mb-1.5">Date *</label>
-            <Input
+            <input
+              type="date"
               value={form.date}
               onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
-              placeholder="e.g. March 2024"
-              className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
+              className="w-full h-10 rounded-md border border-slate-600 bg-slate-700 text-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 [color-scheme:dark]"
             />
           </div>
           <div>
@@ -284,7 +304,7 @@ function EditProjectForm({
   const queryClient = useQueryClient();
   const [form, setForm] = useState({
     name: project.name,
-    date: project.date,
+    date: toDateInputValue(project.date),
     location: project.location,
     description: project.description,
     category: (project.category ?? "") as "" | "interior" | "exterior",
@@ -326,10 +346,11 @@ function EditProjectForm({
         </div>
         <div>
           <label className="block text-slate-400 text-sm mb-1.5">Date *</label>
-          <Input
+          <input
+            type="date"
             value={form.date}
             onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
-            className="bg-slate-700 border-slate-600 text-white"
+            className="w-full h-10 rounded-md border border-slate-600 bg-slate-700 text-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 [color-scheme:dark]"
           />
         </div>
         <div>
@@ -694,7 +715,7 @@ function ProjectManageView({
               <div className="flex flex-wrap gap-x-5 gap-y-1 mt-2 text-slate-400 text-sm">
                 <span className="flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5" />
-                  {project.date}
+                  {formatDate(project.date)}
                 </span>
                 <span className="flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5" />
@@ -966,7 +987,7 @@ function ProjectListView({
                   <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1.5 text-slate-400 text-sm">
                     <span className="flex items-center gap-1.5">
                       <Calendar className="w-3.5 h-3.5 shrink-0" />
-                      {project.date}
+                      {formatDate(project.date)}
                     </span>
                     <span className="flex items-center gap-1.5">
                       <MapPin className="w-3.5 h-3.5 shrink-0" />
