@@ -1,3 +1,19 @@
-<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="180" height="180" rx="36" fill="#FF3C00"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Navy background with rounded corners -->
+  <rect width="32" height="32" rx="7" fill="#0f172a"/>
+  <!-- Palm tree trunk -->
+  <path d="M15 28 Q14 22 13 18 Q15 17 17 18 Q16 22 17 28 Z" fill="white"/>
+  <!-- Left fronds -->
+  <path d="M14 18 Q10 14 6 16 Q8 11 13 14 Z" fill="white"/>
+  <path d="M14 17 Q9 15 7 11 Q11 10 14 15 Z" fill="white"/>
+  <path d="M14 16 Q11 10 9 7 Q13 8 15 14 Z" fill="white"/>
+  <!-- Right fronds -->
+  <path d="M16 18 Q20 14 24 16 Q22 11 17 14 Z" fill="white"/>
+  <path d="M16 17 Q21 15 23 11 Q19 10 16 15 Z" fill="white"/>
+  <path d="M16 16 Q19 10 21 7 Q17 8 15 14 Z" fill="white"/>
+  <!-- Top center frond -->
+  <path d="M15 16 Q15 10 15 6 Q17 9 17 15 Z" fill="white"/>
+  <!-- Coconuts -->
+  <circle cx="14" cy="18" r="1.2" fill="#94a3b8"/>
+  <circle cx="16" cy="18" r="1.2" fill="#94a3b8"/>
 </svg>
