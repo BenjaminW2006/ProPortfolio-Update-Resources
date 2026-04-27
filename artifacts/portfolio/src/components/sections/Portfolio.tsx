@@ -101,13 +101,10 @@ export default function Portfolio() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent transition-opacity duration-300 group-hover:from-black/90" />
 
                     <div className="absolute inset-0 flex flex-col justify-end p-8">
-                      <h2 className="text-3xl md:text-4xl font-bold font-serif text-white mb-2 group-hover:-translate-y-1 transition-transform duration-300">
+                      <h2 className="text-3xl md:text-4xl font-bold font-serif text-white mb-4 group-hover:-translate-y-1 transition-transform duration-300">
                         {category.label}
                       </h2>
-                      <p className="text-slate-300 text-sm mb-4 group-hover:-translate-y-1 transition-transform duration-300 delay-[20ms]">
-                        {category.description}
-                      </p>
-                      <span className="inline-flex items-center gap-2 text-blue-300 text-sm font-medium group-hover:-translate-y-1 transition-transform duration-300 delay-[40ms]">
+                      <span className="inline-flex items-center gap-2 text-blue-300 text-sm font-medium group-hover:-translate-y-1 transition-transform duration-300 delay-[20ms]">
                         {count > 0 ? `View ${count} project${count !== 1 ? "s" : ""}` : "View gallery"}
                         <ChevronRight className="w-4 h-4" />
                       </span>
