@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useSiteSettings } from "@/context/SiteSettingsContext";
 
 export default function Hero() {
@@ -15,11 +15,6 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm text-white text-sm font-medium mb-6">
-              <CheckCircle2 className="w-4 h-4 text-site-accent" />
-              <span>Locally Owned & Operated in {settings.serviceArea}</span>
-            </div>
-
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6 font-serif">
               {settings.tagline1} <br />
               {settings.tagline2} <br />
