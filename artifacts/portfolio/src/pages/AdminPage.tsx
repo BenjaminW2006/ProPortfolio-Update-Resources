@@ -1307,6 +1307,16 @@ function SettingsView() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-8">
+      <div className="fixed bottom-6 right-6 z-50">
+        <Button
+          className="bg-blue-600 hover:bg-blue-700 shadow-lg shadow-black/40 px-6 h-11 rounded-full"
+          onClick={handleSave}
+          disabled={saving}
+        >
+          {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Check className="w-4 h-4 mr-2" />}
+          Save Settings
+        </Button>
+      </div>
       <div>
         <h2 className="text-2xl font-bold font-serif mb-1">Company Information</h2>
         <p className="text-slate-400 text-sm">Changes update the live website immediately after saving.</p>
