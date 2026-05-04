@@ -74,4 +74,6 @@ export interface SiteSettings {
   showTestimonials: boolean;
   /** Whether the initial setup wizard has been completed. */
   setupComplete: boolean;
+  /** URL of the uploaded logo image, or null if no logo is set. */
+  logoUrl: string | null;
 }

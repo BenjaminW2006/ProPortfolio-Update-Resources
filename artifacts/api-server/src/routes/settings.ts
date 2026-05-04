@@ -182,7 +182,9 @@ router.patch("/settings", requireAdminSession, requireCsrfHeader, async (req: Re
         set: { data: dataStr, updatedAt: new Date() },
       });
     const { adminPasswordHash: _h, ...safe } = validated.data;
-    res.json(safe);
+    const [logoRowPatch] = await db.select().from(siteImagesTable).where(eq(siteImagesTable.slot, "logo"));
+    const logoUrlPatch = logoRowPatch ? `/api/storage${logoRowPatch.objectPath}` : null;
+    res.json({ ...safe, logoUrl: logoUrlPatch });
   } catch (error) {
     req.log.error({ err: error }, "Error updating settings");
     res.status(500).json({ error: "Failed to update settings" });
@@ -199,7 +201,9 @@ router.post("/settings/reset", requireAdminSession, requireCsrfHeader, async (re
         target: siteSettingsTable.id,
         set: { data: dataStr, updatedAt: new Date() },
       });
-    res.json(DEFAULT_SETTINGS);
+    const [logoRowReset] = await db.select().from(siteImagesTable).where(eq(siteImagesTable.slot, "logo"));
+    const logoUrlReset = logoRowReset ? `/api/storage${logoRowReset.objectPath}` : null;
+    res.json({ ...DEFAULT_SETTINGS, logoUrl: logoUrlReset });
   } catch (error) {
     req.log.error({ err: error }, "Error resetting settings");
     res.status(500).json({ error: "Failed to reset settings" });
