@@ -23,7 +23,6 @@ export default function Navbar() {
   const navLinks = [
     ...(settings.showAbout ? [{ href: "/", label: "About" }] : []),
     ...(settings.showGalleries ? [{ href: "/gallery", label: "Gallery" }] : []),
-    { href: "/contact", label: "Contact" },
   ];
 
   const linkClass = (path: string) =>
