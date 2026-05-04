@@ -247,8 +247,8 @@ router.post("/settings/first-run", requireCsrfHeader, async (req: Request, res: 
         set: { data: dataStr, updatedAt: new Date() },
       });
 
-    const { adminPasswordHash: _h, adminEmail: _e, ...safe } = validated.data;
-    res.json(safe);
+    const { adminPasswordHash: savedHash, adminEmail: _e, ...safe } = validated.data;
+    res.json({ ...safe, hasAdminPassword: Boolean(savedHash) });
   } catch (error) {
     req.log.error({ err: error }, "Error during first-run setup");
     res.status(500).json({ error: "Failed to save setup" });

@@ -165,7 +165,9 @@ export default function SetupWizard({ onDone }: SetupWizardProps = {}) {
         throw new Error(body.error ?? "Failed to save");
       }
       const updated = (await res.json()) as SiteSettings;
+      // Ensure the cache reflects the new hasAdminPassword state immediately
       queryClient.setQueryData(["site-settings"], updated);
+      queryClient.invalidateQueries({ queryKey: ["site-settings"] });
       queryClient.invalidateQueries({ queryKey: ["admin-settings"] });
       if (onDone) onDone();
     } catch (e) {
