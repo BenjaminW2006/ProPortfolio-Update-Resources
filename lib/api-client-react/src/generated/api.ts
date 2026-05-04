@@ -29,6 +29,34 @@ import type {
 import { customFetch } from "../custom-fetch";
 import type { ErrorType, BodyType } from "../custom-fetch";
 
+// https://stackoverflow.com/questions/49579094/typescript-conditional-types-filter-out-readonly-properties-pick-only-requir/49579497#49579497
+type IfEquals<X, Y, A = X, B = never> =
+  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? A : B;
+
+type WritableKeys<T> = {
+  [P in keyof T]-?: IfEquals<
+    { [Q in P]: T[P] },
+    { -readonly [Q in P]: T[P] },
+    P
+  >;
+}[keyof T];
+
+type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
+  k: infer I,
+) => void
+  ? I
+  : never;
+type DistributeReadOnlyOverUnions<T> = T extends any ? NonReadonly<T> : never;
+
+type Writable<T> = Pick<T, WritableKeys<T>>;
+type NonReadonly<T> = [T] extends [UnionToIntersection<T>]
+  ? {
+      [P in keyof Writable<T>]: T[P] extends object
+        ? NonReadonly<NonNullable<T[P]>>
+        : T[P];
+    }
+  : DistributeReadOnlyOverUnions<T>;
+
 type AwaitedInput<T> = PromiseLike<T> | T;
 
 type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
@@ -467,7 +495,7 @@ export const getUpdateSettingsUrl = () => {
 };
 
 export const updateSettings = async (
-  siteSettings: SiteSettings,
+  siteSettings: NonReadonly<SiteSettings>,
   options?: RequestInit,
 ): Promise<SiteSettings> => {
   return customFetch<SiteSettings>(getUpdateSettingsUrl(), {
@@ -485,14 +513,14 @@ export const getUpdateSettingsMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof updateSettings>>,
     TError,
-    { data: BodyType<SiteSettings> },
+    { data: BodyType<NonReadonly<SiteSettings>> },
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof updateSettings>>,
   TError,
-  { data: BodyType<SiteSettings> },
+  { data: BodyType<NonReadonly<SiteSettings>> },
   TContext
 > => {
   const mutationKey = ["updateSettings"];
@@ -506,7 +534,7 @@ export const getUpdateSettingsMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof updateSettings>>,
-    { data: BodyType<SiteSettings> }
+    { data: BodyType<NonReadonly<SiteSettings>> }
   > = (props) => {
     const { data } = props ?? {};
 
@@ -519,7 +547,7 @@ export const getUpdateSettingsMutationOptions = <
 export type UpdateSettingsMutationResult = NonNullable<
   Awaited<ReturnType<typeof updateSettings>>
 >;
-export type UpdateSettingsMutationBody = BodyType<SiteSettings>;
+export type UpdateSettingsMutationBody = BodyType<NonReadonly<SiteSettings>>;
 export type UpdateSettingsMutationError = ErrorType<ErrorEnvelope>;
 
 /**
@@ -532,14 +560,14 @@ export const useUpdateSettings = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof updateSettings>>,
     TError,
-    { data: BodyType<SiteSettings> },
+    { data: BodyType<NonReadonly<SiteSettings>> },
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationResult<
   Awaited<ReturnType<typeof updateSettings>>,
   TError,
-  { data: BodyType<SiteSettings> },
+  { data: BodyType<NonReadonly<SiteSettings>> },
   TContext
 > => {
   return useMutation(getUpdateSettingsMutationOptions(options));

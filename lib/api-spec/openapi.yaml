@@ -455,4 +455,5 @@ components:
         logoUrl:
           type: string
           nullable: true
-          description: URL of the uploaded logo image, or null if no logo is set.
+          readOnly: true
+          description: URL of the uploaded logo image, or null if no logo is set. Server-computed; not accepted in request bodies.
