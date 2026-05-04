@@ -95,18 +95,27 @@ function ManagerSignInPage() {
   const logoImageUrl = logoUrl ?? `${window.location.origin}${basePath}/logo.svg`;
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4">
-      <div className="flex flex-col items-center gap-1">
+      <div className="flex flex-col items-center w-[440px] max-w-full">
         {companyName && (
-          <p className="text-slate-400 text-sm font-medium tracking-wide uppercase mb-1">
-            {companyName}
-          </p>
+          <div className="w-full bg-slate-800 rounded-t-2xl border border-b-0 border-slate-700 px-8 py-3 text-center">
+            <p className="text-slate-300 text-sm font-medium tracking-widest uppercase">
+              {companyName}
+            </p>
+          </div>
         )}
         <SignIn
           routing="path"
           path={`${basePath}/manager/sign-in`}
           signUpUrl={`${basePath}/manager/sign-in`}
           forceRedirectUrl={`${basePath}/manager`}
-          appearance={{ options: { logoImageUrl } }}
+          appearance={{
+            options: { logoImageUrl },
+            elements: {
+              cardBox: companyName
+                ? "bg-slate-800 rounded-t-none rounded-b-2xl w-[440px] max-w-full overflow-hidden shadow-2xl border border-slate-700"
+                : undefined,
+            },
+          }}
         />
       </div>
     </div>
