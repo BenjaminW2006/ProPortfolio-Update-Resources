@@ -82,7 +82,7 @@ export default function Portfolio() {
                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     ) : (
-                      <div className="absolute inset-0 bg-site" />
+                      <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-800" />
                     )}
 
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent transition-opacity duration-300 group-hover:from-black/90" />
