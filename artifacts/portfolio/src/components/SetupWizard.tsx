@@ -237,6 +237,11 @@ export default function SetupWizard() {
                       Your site is personalized and ready. Head to the admin panel to upload photos, manage projects, add customer reviews, and customize your colors.
                     </p>
                   </div>
+                  {error && (
+                    <p className="text-red-400 text-sm bg-red-900/20 border border-red-800/40 rounded-lg px-3 py-2">
+                      {error}
+                    </p>
+                  )}
                   <div className="flex flex-col gap-3 pt-2">
                     <Button
                       className="bg-blue-600 hover:bg-blue-700 w-full h-12"
@@ -249,11 +254,7 @@ export default function SetupWizard() {
                     <Button
                       variant="ghost"
                       className="text-slate-400 hover:text-white hover:bg-slate-700 w-full"
-                      onClick={() => {
-                        void handleFinish().then(() => {
-                          window.location.href = "/admin";
-                        });
-                      }}
+                      onClick={() => { window.location.href = "/admin"; }}
                       disabled={saving}
                     >
                       Go to Admin Panel instead

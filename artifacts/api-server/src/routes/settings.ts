@@ -189,9 +189,14 @@ router.post("/settings/reset", requireAdminSession, requireCsrfHeader, async (re
 router.post("/settings/first-run", requireCsrfHeader, async (req: Request, res: Response) => {
   try {
     const current = await getCurrentSettings();
-    // Allow re-run from the admin panel (admin session) or initial first-run (setupComplete=false)
-    // For the login-page "Set up your site" link, unauthenticated re-runs are permitted
-    const merged = { ...current, ...(req.body as Partial<SiteSettings>), setupComplete: true };
+    if (current.setupComplete && !req.session.isAdmin) {
+      res.status(403).json({ error: "Setup already complete. Please sign in to the admin panel before re-running setup." });
+      return;
+    }
+    const body = req.body as Partial<SiteSettings>;
+    // Strip sensitive fields from first-run payloads — password hash is only set via the dedicated reset endpoints
+    delete (body as Record<string, unknown>).adminPasswordHash;
+    const merged = { ...current, ...body, setupComplete: true };
     const validated = SiteSettingsSchema.safeParse(merged);
     if (!validated.success) {
       res.status(400).json({ error: "Invalid settings" });
