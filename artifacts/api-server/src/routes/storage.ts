@@ -34,6 +34,13 @@ function requireCsrfHeader(req: Request, res: Response, next: NextFunction): voi
  * The client sends JSON metadata (name, size, contentType) — NOT the file.
  * Then uploads the file directly to the returned presigned URL.
  */
+const ALLOWED_IMAGE_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+]);
+
 router.post("/storage/uploads/request-url", requireAdminSession, requireCsrfHeader, async (req: Request, res: Response) => {
   const parsed = RequestUploadUrlBody.safeParse(req.body);
   if (!parsed.success) {
@@ -41,9 +48,14 @@ router.post("/storage/uploads/request-url", requireAdminSession, requireCsrfHead
     return;
   }
 
-  try {
-    const { name, size, contentType } = parsed.data;
+  const { name, size, contentType } = parsed.data;
 
+  if (!ALLOWED_IMAGE_TYPES.has(contentType)) {
+    res.status(400).json({ error: "Only image uploads are allowed (jpeg, png, webp, gif)." });
+    return;
+  }
+
+  try {
     const uploadURL = await objectStorageService.getObjectEntityUploadURL();
     const objectPath = objectStorageService.normalizeObjectEntityPath(uploadURL);
 

@@ -1,4 +1,5 @@
 import { Router, type IRouter, type Request, type Response, type NextFunction } from "express";
+import { rateLimit } from "express-rate-limit";
 import { db } from "@workspace/db";
 import { siteImagesTable, siteSettingsTable } from "@workspace/db/schema";
 import { eq, isNotNull } from "drizzle-orm";
@@ -6,6 +7,17 @@ import { GetImagesResponse, SetImageSlotBody, SetImageSlotResponse, SetImageSlot
 import bcrypt from "bcryptjs";
 
 const router: IRouter = Router();
+
+// Strict rate limit on the login endpoint — 10 attempts per 15 minutes per IP.
+// This blocks brute-force password attacks without affecting normal usage.
+const loginRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many login attempts. Please wait 15 minutes and try again." },
+  skipSuccessfulRequests: true,
+});
 
 function requireAdminSession(req: Request, res: Response, next: NextFunction): void {
   if (req.session.isAdmin) {
@@ -23,7 +35,7 @@ function requireCsrfHeader(req: Request, res: Response, next: NextFunction): voi
   res.status(403).json({ error: "CSRF check failed" });
 }
 
-router.post("/admin/login", requireCsrfHeader, async (req: Request, res: Response) => {
+router.post("/admin/login", loginRateLimiter, requireCsrfHeader, async (req: Request, res: Response) => {
   const adminPassword = process.env.ADMIN_PASSWORD;
   if (!adminPassword) {
     req.log.warn("ADMIN_PASSWORD not set — rejecting admin login");
