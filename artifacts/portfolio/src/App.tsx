@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Switch, Route, Router as WouterRouter, useParams, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
-import { ClerkProvider, SignIn, useClerk } from "@clerk/react";
+import { ClerkProvider, SignIn, SignUp, useClerk } from "@clerk/react";
 import { useSiteSettings } from "@/context/SiteSettingsContext";
 import { shadcn } from "@clerk/themes";
 import { Toaster } from "@/components/ui/toaster";
@@ -106,7 +106,39 @@ function ManagerSignInPage() {
         <SignIn
           routing="path"
           path={`${basePath}/manager/sign-in`}
-          signUpUrl={`${basePath}/manager/sign-in`}
+          signUpUrl={`${basePath}/manager/sign-up`}
+          forceRedirectUrl={`${basePath}/manager`}
+          appearance={{
+            options: { logoImageUrl },
+            elements: {
+              cardBox: companyName
+                ? "bg-slate-800 rounded-t-none rounded-b-2xl w-[440px] max-w-full overflow-hidden shadow-2xl border border-slate-700"
+                : undefined,
+            },
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function ManagerSignUpPage() {
+  const { companyName, logoUrl } = useSiteSettings();
+  const logoImageUrl = logoUrl ?? `${window.location.origin}${basePath}/logo.svg`;
+  return (
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4">
+      <div className="flex flex-col items-center w-[440px] max-w-full">
+        {companyName && (
+          <div className="w-full bg-slate-800 rounded-t-2xl border border-b-0 border-slate-700 px-8 py-3 text-center">
+            <p className="text-slate-300 text-sm font-medium tracking-widest uppercase">
+              {companyName}
+            </p>
+          </div>
+        )}
+        <SignUp
+          routing="path"
+          path={`${basePath}/manager/sign-up`}
+          signInUrl={`${basePath}/manager/sign-in`}
           forceRedirectUrl={`${basePath}/manager`}
           appearance={{
             options: { logoImageUrl },
@@ -153,6 +185,7 @@ function Router() {
       <Route path="/gallery/:key" component={GalleryRoute} />
       <Route path="/gallery" component={DefaultGallery} />
       <Route path="/manager/sign-in/*?" component={ManagerSignInPage} />
+      <Route path="/manager/sign-up/*?" component={ManagerSignUpPage} />
       <Route path="/manager" component={AdminPage} />
       <Route component={NotFound} />
     </Switch>
@@ -168,7 +201,7 @@ function ClerkProviderWithRoutes() {
       proxyUrl={clerkProxyUrl}
       appearance={clerkAppearance}
       signInUrl={`${basePath}/manager/sign-in`}
-      signUpUrl={`${basePath}/manager/sign-in`}
+      signUpUrl={`${basePath}/manager/sign-up`}
       localization={{
         signIn: {
           start: {
