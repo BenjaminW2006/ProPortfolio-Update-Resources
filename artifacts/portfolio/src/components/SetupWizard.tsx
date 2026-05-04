@@ -68,7 +68,11 @@ function Field({ label, value, onChange, placeholder, hint, multiline }: FieldPr
   );
 }
 
-export default function SetupWizard() {
+interface SetupWizardProps {
+  onDone?: () => void;
+}
+
+export default function SetupWizard({ onDone }: SetupWizardProps = {}) {
   const [step, setStep] = useState(0);
   const [data, setData] = useState<WizardData>(INITIAL);
   const [saving, setSaving] = useState(false);
@@ -100,6 +104,8 @@ export default function SetupWizard() {
       }
       const updated = (await res.json()) as SiteSettings;
       queryClient.setQueryData(["site-settings"], updated);
+      queryClient.invalidateQueries({ queryKey: ["admin-settings"] });
+      if (onDone) onDone();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong");
       setSaving(false);

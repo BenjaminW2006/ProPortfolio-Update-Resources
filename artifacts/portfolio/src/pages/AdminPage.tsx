@@ -24,6 +24,7 @@ import {
   EyeOff,
 } from "lucide-react";
 import { DEFAULT_SETTINGS, useSiteSettings, type SiteSettings } from "@/context/SiteSettingsContext";
+import SetupWizard from "@/components/SetupWizard";
 
 interface Project {
   id: number;
@@ -121,11 +122,12 @@ async function uploadFile(
   return objectPath;
 }
 
-function LoginForm({ onLogin }: { onLogin: () => void }) {
+function LoginForm({ onLogin }: { onLogin: (setupRequested?: boolean) => void }) {
   const [input, setInput] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showForgot, setShowForgot] = useState(false);
+  const [showSetupNote, setShowSetupNote] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetLoading, setResetLoading] = useState(false);
   const [resetSent, setResetSent] = useState(false);
@@ -144,7 +146,7 @@ function LoginForm({ onLogin }: { onLogin: () => void }) {
       });
       if (res.ok) {
         sessionStorage.setItem("admin_logged_in", "1");
-        onLogin();
+        onLogin(showSetupNote);
       } else {
         const data = (await res.json().catch(() => ({}))) as ApiErrorResponse;
         setError(data.error ?? "Incorrect password. Please try again.");
@@ -190,6 +192,11 @@ function LoginForm({ onLogin }: { onLogin: () => void }) {
 
         {!showForgot ? (
           <form onSubmit={handleSubmit} className="space-y-4">
+            {showSetupNote && (
+              <div className="text-sm text-blue-300 bg-blue-900/20 border border-blue-700/40 rounded-lg px-3 py-2">
+                Sign in to re-run the setup wizard.
+              </div>
+            )}
             <Input
               type="password"
               placeholder="Admin password"
@@ -215,10 +222,13 @@ function LoginForm({ onLogin }: { onLogin: () => void }) {
               >
                 Forgot password?
               </button>
-              <a
-                href="/setup"
+              <button
+                type="button"
+                onClick={() => setShowSetupNote(true)}
                 className="text-slate-500 hover:text-slate-300 text-sm transition-colors"
-              >Get Started!</a>
+              >
+                Set up your site
+              </button>
             </div>
           </form>
         ) : resetSent ? (
@@ -1777,6 +1787,7 @@ type View =
 
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
+  const [showSetup, setShowSetup] = useState(false);
   const [view, setView] = useState<View>({ type: "list" });
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -1797,6 +1808,7 @@ export default function AdminPage() {
     await apiMutation("/api/admin/logout", { method: "POST" }).catch(() => {});
     sessionStorage.removeItem("admin_logged_in");
     setAuthenticated(false);
+    setShowSetup(false);
     queryClient.clear();
     toast({ title: "Signed out" });
   };
@@ -1809,7 +1821,33 @@ export default function AdminPage() {
     );
   }
 
-  if (!authenticated) return <LoginForm onLogin={() => setAuthenticated(true)} />;
+  if (!authenticated) {
+    return (
+      <LoginForm
+        onLogin={(setupRequested) => {
+          setAuthenticated(true);
+          if (setupRequested) setShowSetup(true);
+        }}
+      />
+    );
+  }
+
+  if (showSetup) {
+    return (
+      <div className="min-h-screen bg-slate-900">
+        <div className="max-w-xl mx-auto pt-8 px-4">
+          <button
+            type="button"
+            onClick={() => setShowSetup(false)}
+            className="text-slate-400 hover:text-white text-sm flex items-center gap-1 mb-4 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" /> Back to admin
+          </button>
+        </div>
+        <SetupWizard onDone={() => setShowSetup(false)} />
+      </div>
+    );
+  }
 
   const activeTab = view.type === "settings" ? "settings" : "projects";
 

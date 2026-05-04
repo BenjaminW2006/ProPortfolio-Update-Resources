@@ -30,7 +30,6 @@ function Router() {
       <Route path="/gallery" component={DefaultGallery} />
       <Route path="/admin/reset-password" component={ResetPasswordPage} />
       <Route path="/admin" component={AdminPage} />
-      <Route path="/setup" component={SetupWizard} />
       <Route component={NotFound} />
     </Switch>
   );
