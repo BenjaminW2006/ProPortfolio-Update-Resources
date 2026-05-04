@@ -155,7 +155,8 @@ function LoginForm({ onLogin }: { onLogin: () => void }) {
           <div className="w-14 h-14 bg-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <ImageIcon className="w-7 h-7 text-blue-400" />
           </div>
-          <h1 className="text-2xl font-bold text-white font-serif">Admin Panel</h1>
+          <h1 className="text-2xl font-bold text-white font-serif">Company Dashboard
+</h1>
           <p className="text-slate-400 text-sm mt-2">Upstate Palmetto Property Services</p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -1151,7 +1152,6 @@ function SettingsView() {
         <h2 className="text-2xl font-bold font-serif mb-1">Site Settings</h2>
         <p className="text-slate-400 text-sm">Changes update the live website immediately after saving.</p>
       </div>
-
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
         <h3 className="text-base font-semibold font-serif text-slate-200">Company Info</h3>
         {field("Company Name", form.companyName, (v) => setForm((f) => f ? { ...f, companyName: v } : f))}
@@ -1159,7 +1159,6 @@ function SettingsView() {
         {field("Email", form.email, (v) => setForm((f) => f ? { ...f, email: v } : f), "company@example.com")}
         {field("Service Area", form.serviceArea, (v) => setForm((f) => f ? { ...f, serviceArea: v } : f), "Upstate South Carolina")}
       </div>
-
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
         <div>
           <h3 className="text-base font-semibold font-serif text-slate-200">Hero Taglines</h3>
@@ -1169,7 +1168,6 @@ function SettingsView() {
         {field("Line 2", form.tagline2, (v) => setForm((f) => f ? { ...f, tagline2: v } : f))}
         {field("Line 3 (highlighted in blue)", form.tagline3, (v) => setForm((f) => f ? { ...f, tagline3: v } : f))}
       </div>
-
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
         <div>
           <h3 className="text-base font-semibold font-serif text-slate-200">Colors</h3>
@@ -1212,7 +1210,6 @@ function SettingsView() {
           <span>Live preview — this bar uses your chosen colors.</span>
         </div>
       </div>
-
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
         <div className="flex items-center justify-between">
           <div>
@@ -1287,7 +1284,6 @@ function SettingsView() {
           )}
         </div>
       </div>
-
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
         <div className="flex items-center justify-between">
           <div>
@@ -1349,7 +1345,6 @@ function SettingsView() {
           )}
         </div>
       </div>
-
       <div className="flex items-center justify-between gap-4 pb-4">
         <Button className="bg-blue-600 hover:bg-blue-700 px-8" onClick={handleSave} disabled={saving}>
           {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Check className="w-4 h-4 mr-2" />}
