@@ -174,7 +174,7 @@ export default function ProjectDetailPage() {
     "All Projects";
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white flex flex-col">
+    <div className="min-h-screen bg-site text-site flex flex-col">
       <Navbar />
 
       <main className="flex-1 pt-28 pb-24">

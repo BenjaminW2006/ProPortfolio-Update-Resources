@@ -37,11 +37,14 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-slate-900/98 backdrop-blur-sm shadow-lg py-3"
-          : "bg-slate-900/80 backdrop-blur-sm py-4"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-sm ${
+        isScrolled ? "shadow-lg py-3" : "py-4"
       }`}
+      style={{
+        backgroundColor: isScrolled
+          ? "color-mix(in srgb, var(--site-bg) 98%, transparent)"
+          : "color-mix(in srgb, var(--site-bg) 82%, transparent)",
+      }}
     >
       <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
         <Link href="/">
@@ -86,7 +89,7 @@ export default function Navbar() {
       </div>
 
       {menuOpen && (
-        <div id="mobile-nav-menu" className="md:hidden bg-slate-900/98 backdrop-blur-sm border-t border-white/10 px-4 pb-4 pt-2">
+        <div id="mobile-nav-menu" className="md:hidden backdrop-blur-sm border-t border-white/10 px-4 pb-4 pt-2" style={{ backgroundColor: "color-mix(in srgb, var(--site-bg) 98%, transparent)" }}>
           <Link href="/">
             <span className={mobileNavLinkClass("/")}>Home</span>
           </Link>

@@ -143,7 +143,7 @@ export default function GalleryPage({ category }: { category?: "interior" | "ext
     : { heading: "Our Work", sub: "Browse completed projects from Upstate Palmetto Property Services." };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white flex flex-col">
+    <div className="min-h-screen bg-site text-site flex flex-col">
       <Navbar />
 
       <main className="flex-1 pt-28 pb-24">

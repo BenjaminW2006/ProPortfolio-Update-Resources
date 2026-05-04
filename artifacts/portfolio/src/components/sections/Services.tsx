@@ -51,7 +51,7 @@ export default function Services() {
               transition={{ duration: 0.5, delay: (index % 4) * 0.1 }}
               className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow group"
             >
-              <div className="w-16 h-16 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
+              <div className="service-icon w-16 h-16 rounded-xl flex items-center justify-center mb-6">
                 {ICONS[index % ICONS.length]}
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-3">{service.title}</h3>

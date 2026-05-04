@@ -75,6 +75,14 @@ export const GetStorageObjectParams = zod.object({
  * Returns the current site settings (company info, taglines, services list). Public endpoint.
  * @summary Get site settings
  */
+export const getSettingsResponseColorBgRegExp = new RegExp("^#[0-9A-Fa-f]{6}$");
+export const getSettingsResponseColorTextRegExp = new RegExp(
+  "^#[0-9A-Fa-f]{6}$",
+);
+export const getSettingsResponseColorAccentRegExp = new RegExp(
+  "^#[0-9A-Fa-f]{6}$",
+);
+
 export const GetSettingsResponse = zod.object({
   companyName: zod
     .string()
@@ -93,12 +101,32 @@ export const GetSettingsResponse = zod.object({
       }),
     )
     .describe("List of services offered."),
+  colorBg: zod
+    .string()
+    .regex(getSettingsResponseColorBgRegExp)
+    .describe("Page background color as a hex value (e.g. #0f172a)."),
+  colorText: zod
+    .string()
+    .regex(getSettingsResponseColorTextRegExp)
+    .describe("Primary text color as a hex value (e.g. #f1f5f9)."),
+  colorAccent: zod
+    .string()
+    .regex(getSettingsResponseColorAccentRegExp)
+    .describe("Accent\/brand color as a hex value (e.g. #2563eb)."),
 });
 
 /**
  * Saves updated site settings. Requires admin session and the x-csrf-protection: 1 header.
  * @summary Update site settings
  */
+export const updateSettingsBodyColorBgRegExp = new RegExp("^#[0-9A-Fa-f]{6}$");
+export const updateSettingsBodyColorTextRegExp = new RegExp(
+  "^#[0-9A-Fa-f]{6}$",
+);
+export const updateSettingsBodyColorAccentRegExp = new RegExp(
+  "^#[0-9A-Fa-f]{6}$",
+);
+
 export const UpdateSettingsBody = zod.object({
   companyName: zod
     .string()
@@ -117,7 +145,29 @@ export const UpdateSettingsBody = zod.object({
       }),
     )
     .describe("List of services offered."),
+  colorBg: zod
+    .string()
+    .regex(updateSettingsBodyColorBgRegExp)
+    .describe("Page background color as a hex value (e.g. #0f172a)."),
+  colorText: zod
+    .string()
+    .regex(updateSettingsBodyColorTextRegExp)
+    .describe("Primary text color as a hex value (e.g. #f1f5f9)."),
+  colorAccent: zod
+    .string()
+    .regex(updateSettingsBodyColorAccentRegExp)
+    .describe("Accent\/brand color as a hex value (e.g. #2563eb)."),
 });
+
+export const updateSettingsResponseColorBgRegExp = new RegExp(
+  "^#[0-9A-Fa-f]{6}$",
+);
+export const updateSettingsResponseColorTextRegExp = new RegExp(
+  "^#[0-9A-Fa-f]{6}$",
+);
+export const updateSettingsResponseColorAccentRegExp = new RegExp(
+  "^#[0-9A-Fa-f]{6}$",
+);
 
 export const UpdateSettingsResponse = zod.object({
   companyName: zod
@@ -137,12 +187,34 @@ export const UpdateSettingsResponse = zod.object({
       }),
     )
     .describe("List of services offered."),
+  colorBg: zod
+    .string()
+    .regex(updateSettingsResponseColorBgRegExp)
+    .describe("Page background color as a hex value (e.g. #0f172a)."),
+  colorText: zod
+    .string()
+    .regex(updateSettingsResponseColorTextRegExp)
+    .describe("Primary text color as a hex value (e.g. #f1f5f9)."),
+  colorAccent: zod
+    .string()
+    .regex(updateSettingsResponseColorAccentRegExp)
+    .describe("Accent\/brand color as a hex value (e.g. #2563eb)."),
 });
 
 /**
  * Resets all site settings to factory defaults. Requires admin session and the x-csrf-protection: 1 header.
  * @summary Reset site settings to defaults
  */
+export const resetSettingsResponseColorBgRegExp = new RegExp(
+  "^#[0-9A-Fa-f]{6}$",
+);
+export const resetSettingsResponseColorTextRegExp = new RegExp(
+  "^#[0-9A-Fa-f]{6}$",
+);
+export const resetSettingsResponseColorAccentRegExp = new RegExp(
+  "^#[0-9A-Fa-f]{6}$",
+);
+
 export const ResetSettingsResponse = zod.object({
   companyName: zod
     .string()
@@ -161,6 +233,18 @@ export const ResetSettingsResponse = zod.object({
       }),
     )
     .describe("List of services offered."),
+  colorBg: zod
+    .string()
+    .regex(resetSettingsResponseColorBgRegExp)
+    .describe("Page background color as a hex value (e.g. #0f172a)."),
+  colorText: zod
+    .string()
+    .regex(resetSettingsResponseColorTextRegExp)
+    .describe("Primary text color as a hex value (e.g. #f1f5f9)."),
+  colorAccent: zod
+    .string()
+    .regex(resetSettingsResponseColorAccentRegExp)
+    .describe("Accent\/brand color as a hex value (e.g. #2563eb)."),
 });
 
 /**

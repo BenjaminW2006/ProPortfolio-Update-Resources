@@ -1,4 +1,4 @@
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, useContext, useEffect, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 export interface ServiceItem {
@@ -15,6 +15,9 @@ export interface SiteSettings {
   email: string;
   serviceArea: string;
   services: ServiceItem[];
+  colorBg: string;
+  colorText: string;
+  colorAccent: string;
 }
 
 export const DEFAULT_SETTINGS: SiteSettings = {
@@ -35,6 +38,9 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     { title: "Property Maintenance", description: "Recurring scheduled maintenance for landlords, property managers, and homeowners who want peace of mind." },
     { title: "Minor Landscaping", description: "Shrub trimming, mulch installation, yard cleanup, and basic exterior aesthetic improvements." },
   ],
+  colorBg: "#0f172a",
+  colorText: "#f1f5f9",
+  colorAccent: "#2563eb",
 };
 
 const SiteSettingsContext = createContext<SiteSettings>(DEFAULT_SETTINGS);
@@ -51,8 +57,17 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     retry: false,
   });
 
+  const settings = data ?? DEFAULT_SETTINGS;
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty("--site-bg", settings.colorBg);
+    root.style.setProperty("--site-text", settings.colorText);
+    root.style.setProperty("--site-accent", settings.colorAccent);
+  }, [settings.colorBg, settings.colorText, settings.colorAccent]);
+
   return (
-    <SiteSettingsContext.Provider value={data ?? DEFAULT_SETTINGS}>
+    <SiteSettingsContext.Provider value={settings}>
       {children}
     </SiteSettingsContext.Provider>
   );

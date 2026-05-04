@@ -76,4 +76,19 @@ export interface SiteSettings {
   serviceArea: string;
   /** List of services offered. */
   services: SiteService[];
+  /**
+   * Page background color as a hex value (e.g. #0f172a).
+   * @pattern ^#[0-9A-Fa-f]{6}$
+   */
+  colorBg: string;
+  /**
+   * Primary text color as a hex value (e.g. #f1f5f9).
+   * @pattern ^#[0-9A-Fa-f]{6}$
+   */
+  colorText: string;
+  /**
+   * Accent/brand color as a hex value (e.g. #2563eb).
+   * @pattern ^#[0-9A-Fa-f]{6}$
+   */
+  colorAccent: string;
 }

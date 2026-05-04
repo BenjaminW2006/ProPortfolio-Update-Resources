@@ -11,6 +11,8 @@ const ServiceSchema = z.object({
   description: z.string(),
 });
 
+const hexColor = z.string().regex(/^#[0-9A-Fa-f]{6}$/);
+
 const SiteSettingsSchema = z.object({
   companyName: z.string(),
   tagline1: z.string(),
@@ -20,6 +22,9 @@ const SiteSettingsSchema = z.object({
   email: z.string(),
   serviceArea: z.string(),
   services: z.array(ServiceSchema),
+  colorBg: hexColor.default("#0f172a"),
+  colorText: hexColor.default("#f1f5f9"),
+  colorAccent: hexColor.default("#2563eb"),
 });
 
 type SiteSettings = z.infer<typeof SiteSettingsSchema>;
@@ -32,6 +37,9 @@ const DEFAULT_SETTINGS: SiteSettings = {
   phone: "(864) 434-2842",
   email: "Upstate-Palmetto@outlook.com",
   serviceArea: "Upstate South Carolina",
+  colorBg: "#0f172a",
+  colorText: "#f1f5f9",
+  colorAccent: "#2563eb",
   services: [
     { title: "General Handyman", description: "Fixing what's broken. Door repairs, fixture installation, drywall patching, and everyday maintenance around the house." },
     { title: "Painting", description: "Interior and exterior painting, trim work, deck staining, and touch-ups with meticulous attention to detail." },

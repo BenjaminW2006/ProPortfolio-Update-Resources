@@ -2,6 +2,30 @@
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
 
+/* Site-configurable color custom properties — defaults match slate-900/slate-100/blue-600 */
+:root {
+  --site-bg: #0f172a;
+  --site-text: #f1f5f9;
+  --site-accent: #2563eb;
+}
+
+.bg-site { background-color: var(--site-bg) !important; }
+.text-site { color: var(--site-text) !important; }
+.text-site-accent { color: var(--site-accent) !important; }
+.bg-site-accent { background-color: var(--site-accent) !important; }
+.border-site-accent { border-color: var(--site-accent) !important; }
+
+/* Service card icon – accent-tinted bg, accent-colored icon; inverts on group hover */
+.service-icon {
+  background-color: color-mix(in srgb, var(--site-accent) 12%, white);
+  color: var(--site-accent);
+  transition: background-color 0.3s, color 0.3s;
+}
+.group:hover .service-icon {
+  background-color: var(--site-accent);
+  color: white;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

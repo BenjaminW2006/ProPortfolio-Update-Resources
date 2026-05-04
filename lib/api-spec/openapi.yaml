@@ -335,7 +335,7 @@ components:
           description: Short description of the service.
     SiteSettings:
       type: object
-      required: [companyName, tagline1, tagline2, tagline3, phone, email, serviceArea, services]
+      required: [companyName, tagline1, tagline2, tagline3, phone, email, serviceArea, services, colorBg, colorText, colorAccent]
       properties:
         companyName:
           type: string
@@ -363,3 +363,15 @@ components:
           items:
             $ref: "#/components/schemas/SiteService"
           description: List of services offered.
+        colorBg:
+          type: string
+          pattern: "^#[0-9A-Fa-f]{6}$"
+          description: "Page background color as a hex value (e.g. #0f172a)."
+        colorText:
+          type: string
+          pattern: "^#[0-9A-Fa-f]{6}$"
+          description: "Primary text color as a hex value (e.g. #f1f5f9)."
+        colorAccent:
+          type: string
+          pattern: "^#[0-9A-Fa-f]{6}$"
+          description: "Accent/brand color as a hex value (e.g. #2563eb)."
