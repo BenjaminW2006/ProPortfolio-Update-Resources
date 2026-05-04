@@ -1338,6 +1338,23 @@ function SettingsView() {
     </div>
   );
 
+  const sectionToggle = (value: boolean, onChange: (v: boolean) => void) => (
+    <button
+      type="button"
+      onClick={() => onChange(!value)}
+      aria-label={value ? "Hide section" : "Show section"}
+      className={`relative inline-flex h-5 w-9 flex-shrink-0 items-center rounded-full transition-colors ${
+        value ? "bg-blue-600" : "bg-slate-600"
+      }`}
+    >
+      <span
+        className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${
+          value ? "translate-x-[18px]" : "translate-x-[2px]"
+        }`}
+      />
+    </button>
+  );
+
   const textareaField = (
     label: string,
     value: string,
@@ -1398,19 +1415,28 @@ function SettingsView() {
         </div>
       </div>
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
-        <h3 className="text-base font-semibold font-serif text-slate-200">Hero Section</h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-base font-semibold font-serif text-slate-200">Hero Section</h3>
+          {sectionToggle(form.showHero ?? true, (v) => setForm((f) => f ? { ...f, showHero: v } : f))}
+        </div>
         {field("Tagline — Line 1", form.tagline1, (v) => setForm((f) => f ? { ...f, tagline1: v } : f), "Quality Work.")}
         {field("Tagline — Line 2", form.tagline2, (v) => setForm((f) => f ? { ...f, tagline2: v } : f), "Done Right.")}
         {field("Tagline — Line 3", form.tagline3, (v) => setForm((f) => f ? { ...f, tagline3: v } : f), "Every Time.")}
         {textareaField("Hero Subtitle", form.heroSubtitle, (v) => setForm((f) => f ? { ...f, heroSubtitle: v } : f))}
       </div>
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
-        <h3 className="text-base font-semibold font-serif text-slate-200">About Section</h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-base font-semibold font-serif text-slate-200">About Section</h3>
+          {sectionToggle(form.showAbout ?? true, (v) => setForm((f) => f ? { ...f, showAbout: v } : f))}
+        </div>
         {field("About Title", form.aboutTitle, (v) => setForm((f) => f ? { ...f, aboutTitle: v } : f))}
         {textareaField("About Text", form.aboutText, (v) => setForm((f) => f ? { ...f, aboutText: v } : f))}
       </div>
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
-        <h3 className="text-base font-semibold font-serif text-slate-200">Services Section</h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-base font-semibold font-serif text-slate-200">Services Section</h3>
+          {sectionToggle(form.showServices ?? true, (v) => setForm((f) => f ? { ...f, showServices: v } : f))}
+        </div>
         {field("Section Heading", form.servicesHeading, (v) => setForm((f) => f ? { ...f, servicesHeading: v } : f))}
         {textareaField("Section Subtitle", form.servicesSubtitle, (v) => setForm((f) => f ? { ...f, servicesSubtitle: v } : f))}
       </div>
