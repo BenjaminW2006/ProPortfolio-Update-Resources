@@ -1628,7 +1628,7 @@ export default function AdminPage() {
         <div className="container mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-6">
             <div>
-              <h1 className="font-bold text-lg font-serif leading-tight">Project Manager</h1>
+              <h1 className="font-bold text-lg font-serif leading-tight">Company Manager</h1>
               <p className="text-slate-400 text-xs">{companyName}</p>
             </div>
             <nav className="hidden sm:flex items-center gap-1">
@@ -1659,7 +1659,6 @@ export default function AdminPage() {
           </Button>
         </div>
       </header>
-
       <main className="container mx-auto px-4 md:px-6 py-10">
         {view.type === "list" && (
           <ProjectListView
