@@ -14,6 +14,8 @@ tags:
     description: Object storage upload and serving endpoints.
   - name: images
     description: Site image slot management.
+  - name: settings
+    description: Site settings (company info, taglines, services list).
 paths:
   /healthz:
     get:
@@ -130,6 +132,80 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorEnvelope'
+  /settings:
+    get:
+      operationId: getSettings
+      tags: [settings]
+      summary: Get site settings
+      description: Returns the current site settings (company info, taglines, services list). Public endpoint.
+      responses:
+        "200":
+          description: Current site settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteSettings"
+    patch:
+      operationId: updateSettings
+      tags: [settings]
+      summary: Update site settings
+      description: Saves updated site settings. Requires admin session and X-CSRF-Token header.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SiteSettings"
+      responses:
+        "200":
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteSettings"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+  /settings/reset:
+    post:
+      operationId: resetSettings
+      tags: [settings]
+      summary: Reset site settings to defaults
+      description: Resets all site settings to factory defaults. Requires admin session and X-CSRF-Token header.
+      responses:
+        "200":
+          description: Default settings restored
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteSettings"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
   /images:
     get:
       operationId: getImages
@@ -247,3 +323,43 @@ components:
         objectPath:
           type: string
           description: The object path returned from the upload endpoint.
+    SiteService:
+      type: object
+      required: [title, description]
+      properties:
+        title:
+          type: string
+          description: Service name (e.g. "Deck Repairs").
+        description:
+          type: string
+          description: Short description of the service.
+    SiteSettings:
+      type: object
+      required: [companyName, tagline1, tagline2, tagline3, phone, email, serviceArea, services]
+      properties:
+        companyName:
+          type: string
+          description: Business name shown in the navbar and footer.
+        tagline1:
+          type: string
+          description: First hero tagline word/phrase.
+        tagline2:
+          type: string
+          description: Second hero tagline word/phrase.
+        tagline3:
+          type: string
+          description: Third hero tagline word/phrase.
+        phone:
+          type: string
+          description: Contact phone number.
+        email:
+          type: string
+          description: Contact email address.
+        serviceArea:
+          type: string
+          description: Geographic service area description.
+        services:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteService"
+          description: List of services offered.

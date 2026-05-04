@@ -10,5 +10,7 @@ export * from "./errorEnvelope";
 export * from "./healthStatus";
 export * from "./imageSlot";
 export * from "./setImageSlotRequest";
+export * from "./siteService";
+export * from "./siteSettings";
 export * from "./uploadUrlRequest";
 export * from "./uploadUrlResponse";

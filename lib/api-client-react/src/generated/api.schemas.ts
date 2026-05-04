@@ -51,3 +51,29 @@ export interface SetImageSlotRequest {
   /** The object path returned from the upload endpoint. */
   objectPath: string;
 }
+
+export interface SiteService {
+  /** Service name (e.g. "Deck Repairs"). */
+  title: string;
+  /** Short description of the service. */
+  description: string;
+}
+
+export interface SiteSettings {
+  /** Business name shown in the navbar and footer. */
+  companyName: string;
+  /** First hero tagline word/phrase. */
+  tagline1: string;
+  /** Second hero tagline word/phrase. */
+  tagline2: string;
+  /** Third hero tagline word/phrase. */
+  tagline3: string;
+  /** Contact phone number. */
+  phone: string;
+  /** Contact email address. */
+  email: string;
+  /** Geographic service area description. */
+  serviceArea: string;
+  /** List of services offered. */
+  services: SiteService[];
+}

@@ -72,6 +72,98 @@ export const GetStorageObjectParams = zod.object({
 });
 
 /**
+ * Returns the current site settings (company info, taglines, services list). Public endpoint.
+ * @summary Get site settings
+ */
+export const GetSettingsResponse = zod.object({
+  companyName: zod
+    .string()
+    .describe("Business name shown in the navbar and footer."),
+  tagline1: zod.string().describe("First hero tagline word\/phrase."),
+  tagline2: zod.string().describe("Second hero tagline word\/phrase."),
+  tagline3: zod.string().describe("Third hero tagline word\/phrase."),
+  phone: zod.string().describe("Contact phone number."),
+  email: zod.string().describe("Contact email address."),
+  serviceArea: zod.string().describe("Geographic service area description."),
+  services: zod
+    .array(
+      zod.object({
+        title: zod.string().describe('Service name (e.g. \"Deck Repairs\").'),
+        description: zod.string().describe("Short description of the service."),
+      }),
+    )
+    .describe("List of services offered."),
+});
+
+/**
+ * Saves updated site settings. Requires admin session and X-CSRF-Token header.
+ * @summary Update site settings
+ */
+export const UpdateSettingsBody = zod.object({
+  companyName: zod
+    .string()
+    .describe("Business name shown in the navbar and footer."),
+  tagline1: zod.string().describe("First hero tagline word\/phrase."),
+  tagline2: zod.string().describe("Second hero tagline word\/phrase."),
+  tagline3: zod.string().describe("Third hero tagline word\/phrase."),
+  phone: zod.string().describe("Contact phone number."),
+  email: zod.string().describe("Contact email address."),
+  serviceArea: zod.string().describe("Geographic service area description."),
+  services: zod
+    .array(
+      zod.object({
+        title: zod.string().describe('Service name (e.g. \"Deck Repairs\").'),
+        description: zod.string().describe("Short description of the service."),
+      }),
+    )
+    .describe("List of services offered."),
+});
+
+export const UpdateSettingsResponse = zod.object({
+  companyName: zod
+    .string()
+    .describe("Business name shown in the navbar and footer."),
+  tagline1: zod.string().describe("First hero tagline word\/phrase."),
+  tagline2: zod.string().describe("Second hero tagline word\/phrase."),
+  tagline3: zod.string().describe("Third hero tagline word\/phrase."),
+  phone: zod.string().describe("Contact phone number."),
+  email: zod.string().describe("Contact email address."),
+  serviceArea: zod.string().describe("Geographic service area description."),
+  services: zod
+    .array(
+      zod.object({
+        title: zod.string().describe('Service name (e.g. \"Deck Repairs\").'),
+        description: zod.string().describe("Short description of the service."),
+      }),
+    )
+    .describe("List of services offered."),
+});
+
+/**
+ * Resets all site settings to factory defaults. Requires admin session and X-CSRF-Token header.
+ * @summary Reset site settings to defaults
+ */
+export const ResetSettingsResponse = zod.object({
+  companyName: zod
+    .string()
+    .describe("Business name shown in the navbar and footer."),
+  tagline1: zod.string().describe("First hero tagline word\/phrase."),
+  tagline2: zod.string().describe("Second hero tagline word\/phrase."),
+  tagline3: zod.string().describe("Third hero tagline word\/phrase."),
+  phone: zod.string().describe("Contact phone number."),
+  email: zod.string().describe("Contact email address."),
+  serviceArea: zod.string().describe("Geographic service area description."),
+  services: zod
+    .array(
+      zod.object({
+        title: zod.string().describe('Service name (e.g. \"Deck Repairs\").'),
+        description: zod.string().describe("Short description of the service."),
+      }),
+    )
+    .describe("List of services offered."),
+});
+
+/**
  * Returns all current slot to objectPath mappings.
  * @summary Get all image slot assignments
  */
