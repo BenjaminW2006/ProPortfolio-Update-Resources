@@ -26,6 +26,31 @@ import {
 import { DEFAULT_SETTINGS, useSiteSettings, type SiteSettings } from "@/context/SiteSettingsContext";
 import SetupWizard from "@/components/SetupWizard";
 
+function AutoTextarea({ value, onChange, placeholder, className }: {
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  placeholder?: string;
+  className?: string;
+}) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + "px";
+  }, [value]);
+  return (
+    <textarea
+      ref={ref}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      rows={1}
+      className={`w-full rounded-md border border-slate-600 bg-slate-700 px-3 py-2 text-sm text-white placeholder:text-slate-500 resize-none overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500 ${className ?? ""}`}
+    />
+  );
+}
+
 interface Project {
   id: number;
   name: string;
@@ -367,13 +392,10 @@ function CreateProjectForm({
           </div>
           <div>
             <label className="block text-slate-400 text-sm mb-1.5">Description</label>
-            <textarea
+            <AutoTextarea
               value={form.description}
               onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-              onInput={(e) => { const t = e.currentTarget; t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; }}
               placeholder="Brief description of the work done"
-              rows={1}
-              className="w-full rounded-md border border-slate-600 bg-slate-700 px-3 py-2 text-sm text-white placeholder:text-slate-500 resize-none overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
@@ -486,12 +508,9 @@ function EditProjectForm({
         </div>
         <div>
           <label className="block text-slate-400 text-sm mb-1.5">Description</label>
-          <textarea
+          <AutoTextarea
             value={form.description}
             onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-            onInput={(e) => { const t = e.currentTarget; t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; }}
-            rows={1}
-            className="w-full rounded-md border border-slate-600 bg-slate-700 px-3 py-2 text-sm text-white placeholder:text-slate-500 resize-none overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       </div>
