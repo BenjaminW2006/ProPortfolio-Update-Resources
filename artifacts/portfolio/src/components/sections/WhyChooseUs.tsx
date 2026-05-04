@@ -32,11 +32,6 @@ export default function WhyChooseUs() {
               transition={{ duration: 0.6 }}
               className="relative rounded-2xl overflow-hidden shadow-2xl"
             >
-              <img
-                src="/images/carpentry.png"
-                alt="Quality work in progress"
-                className="w-full h-auto object-cover aspect-[4/3]"
-              />
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-slate-900/90 to-transparent p-8">
                 <p className="text-white font-medium text-lg">"{aboutQuote}"</p>
               </div>
