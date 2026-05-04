@@ -47,6 +47,7 @@ export interface SiteSettings {
   setupComplete: boolean;
   adminEmail: string;
   hasAdminPassword: boolean;
+  logoUrl: string | null;
 }
 
 export const DEFAULT_SETTINGS: SiteSettings = {
@@ -94,6 +95,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   setupComplete: false,
   adminEmail: "",
   hasAdminPassword: false,
+  logoUrl: null,
 };
 
 const SiteSettingsContext = createContext<SiteSettings>(DEFAULT_SETTINGS);

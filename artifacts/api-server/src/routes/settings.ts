@@ -1,6 +1,6 @@
 import { Router, type IRouter, type Request, type Response, type NextFunction } from "express";
 import { db } from "@workspace/db";
-import { siteSettingsTable } from "@workspace/db/schema";
+import { siteSettingsTable, siteImagesTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
@@ -140,8 +140,11 @@ router.get("/settings", async (req: Request, res: Response) => {
     const raw = await getCurrentSettings();
     // Strip private fields — never expose these to unauthenticated callers
     const { adminPasswordHash, adminEmail: _e, ...settings } = raw;
+    // Fetch logo slot for the public navbar
+    const [logoRow] = await db.select().from(siteImagesTable).where(eq(siteImagesTable.slot, "logo"));
+    const logoUrl = logoRow ? `/api/storage${logoRow.objectPath}` : null;
     // Expose a safe boolean so the frontend knows whether admin setup is complete
-    res.json({ ...settings, hasAdminPassword: Boolean(adminPasswordHash) });
+    res.json({ ...settings, hasAdminPassword: Boolean(adminPasswordHash), logoUrl });
   } catch (error) {
     req.log.error({ err: error }, "Error fetching settings");
     res.status(500).json({ error: "Failed to fetch settings" });

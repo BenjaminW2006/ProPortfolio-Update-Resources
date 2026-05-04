@@ -996,6 +996,110 @@ function TileCoverUpload({ slot, label }: { slot: string; label: string }) {
   );
 }
 
+function LogoUpload() {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  const { data: images = [] } = useQuery<ImageSlot[]>({
+    queryKey: ["logo-image"],
+    queryFn: async () => {
+      const res = await apiCall("/api/images");
+      if (!res.ok) return [];
+      return res.json();
+    },
+    staleTime: 0,
+  });
+
+  const current = images.find((img) => img.slot === "logo") ?? null;
+
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Invalid file", description: "Please select an image.", variant: "destructive" });
+      return;
+    }
+    setUploading(true);
+    setProgress(0);
+    try {
+      const objectPath = await uploadFile(file, setProgress);
+      const res = await apiMutation("/api/images/logo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ objectPath }),
+      });
+      if (!res.ok) throw new Error("Failed to save logo");
+      queryClient.invalidateQueries({ queryKey: ["logo-image"] });
+      queryClient.invalidateQueries({ queryKey: ["site-settings"] });
+      toast({ title: "Logo updated!" });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Upload failed";
+      toast({ title: "Upload failed", description: msg, variant: "destructive" });
+    } finally {
+      setUploading(false);
+      setProgress(0);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const removeLogo = async () => {
+    try {
+      await apiMutation("/api/images/logo", { method: "DELETE" });
+      queryClient.invalidateQueries({ queryKey: ["logo-image"] });
+      queryClient.invalidateQueries({ queryKey: ["site-settings"] });
+      toast({ title: "Logo removed" });
+    } catch {
+      toast({ title: "Error", description: "Failed to remove logo.", variant: "destructive" });
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-4">
+      <div className="w-16 h-16 rounded-xl border border-slate-600 bg-slate-900 flex items-center justify-center overflow-hidden shrink-0">
+        {current ? (
+          <img src={getImageUrl(current.objectPath)} alt="Logo" className="w-full h-full object-contain p-1" />
+        ) : (
+          <ImageIcon className="w-7 h-7 text-slate-600" />
+        )}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-slate-300 text-sm font-medium mb-1">{current ? "Logo uploaded" : "No logo uploaded"}</p>
+        <p className="text-slate-500 text-xs mb-2">Appears in the navbar. PNG or SVG with transparency works best.</p>
+        <div className="flex gap-2 flex-wrap">
+          <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-slate-600 text-slate-200 hover:bg-slate-700 hover:text-white"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+          >
+            {uploading ? (
+              <><Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />{progress}%</>
+            ) : (
+              <><Upload className="w-3.5 h-3.5 mr-2" />{current ? "Replace" : "Upload"}</>
+            )}
+          </Button>
+          {current && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-red-900/50 text-red-400 hover:bg-red-900/20 hover:text-red-300"
+              onClick={removeLogo}
+            >
+              <Trash2 className="w-3.5 h-3.5 mr-2" />
+              Remove
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ProjectListView({
   onSelectProject,
   onCreateNew,
@@ -1413,6 +1517,13 @@ function SettingsView() {
       <div>
         <h2 className="text-2xl font-bold font-serif mb-1">Company Information</h2>
         <p className="text-slate-400 text-sm">Changes update the live website immediately after saving.</p>
+      </div>
+      <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
+        <div>
+          <h3 className="text-base font-semibold font-serif text-slate-200">Logo</h3>
+          <p className="text-slate-500 text-xs mt-0.5">Upload a logo to display in the navbar. PNG or SVG with a transparent background works best.</p>
+        </div>
+        <LogoUpload />
       </div>
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
         <h3 className="text-base font-semibold font-serif text-slate-200">Company Info</h3>

@@ -3,6 +3,7 @@ import { Link, useLocation } from "wouter";
 import { GiPalmTree } from "react-icons/gi";
 import { Menu, X } from "lucide-react";
 import { useSiteSettings } from "@/context/SiteSettingsContext";
+import { ImageIcon } from "lucide-react";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -48,7 +49,15 @@ export default function Navbar() {
         <div className="flex items-center justify-between px-4 py-2.5">
           <Link href="/">
             <span className="flex items-center gap-2 text-white font-semibold tracking-wide cursor-pointer hover:opacity-90 transition-opacity">
-              <GiPalmTree className="text-xl shrink-0" />
+              {settings.logoUrl ? (
+                <img
+                  src={settings.logoUrl}
+                  alt={settings.companyName}
+                  className="h-7 w-auto max-w-[120px] object-contain shrink-0"
+                />
+              ) : (
+                <GiPalmTree className="text-xl shrink-0" />
+              )}
               <span className="text-sm">{settings.companyName}</span>
             </span>
           </Link>
