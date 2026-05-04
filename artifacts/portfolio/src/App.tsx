@@ -1,4 +1,4 @@
-import { Switch, Route, Router as WouterRouter, useParams } from "wouter";
+import { Switch, Route, Router as WouterRouter, useParams, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -36,6 +36,7 @@ function Router() {
 }
 
 function AppContent() {
+  const [location] = useLocation();
   const { data: settings, isLoading } = useQuery<SiteSettings>({
     queryKey: ["site-settings"],
     queryFn: async () => {
@@ -55,8 +56,11 @@ function AppContent() {
     );
   }
 
+  // Admin routes handle their own auth and setup flow — never intercept them
+  const isAdminRoute = location.startsWith("/admin");
+
   // Show wizard on first visit OR if no admin password has been set yet
-  if (!settings?.setupComplete || !settings?.hasAdminPassword) {
+  if (!isAdminRoute && (!settings?.setupComplete || !settings?.hasAdminPassword)) {
     return <SetupWizard />;
   }
 
