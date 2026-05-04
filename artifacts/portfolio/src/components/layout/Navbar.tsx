@@ -3,7 +3,6 @@ import { Link, useLocation } from "wouter";
 import { GiPalmTree } from "react-icons/gi";
 import { Menu, X } from "lucide-react";
 import { useSiteSettings } from "@/context/SiteSettingsContext";
-import { ImageIcon } from "lucide-react";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);

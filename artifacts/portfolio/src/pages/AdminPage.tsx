@@ -1022,6 +1022,10 @@ function LogoUpload() {
       toast({ title: "Invalid file", description: "Please select an image.", variant: "destructive" });
       return;
     }
+    if (file.size > 10 * 1024 * 1024) {
+      toast({ title: "File too large", description: "Logo must be 10 MB or smaller.", variant: "destructive" });
+      return;
+    }
     setUploading(true);
     setProgress(0);
     try {

@@ -41,6 +41,8 @@ const ALLOWED_IMAGE_TYPES = new Set([
   "image/gif",
 ]);
 
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10 MB
+
 router.post("/storage/uploads/request-url", requireAdminSession, requireCsrfHeader, async (req: Request, res: Response) => {
   const parsed = RequestUploadUrlBody.safeParse(req.body);
   if (!parsed.success) {
@@ -52,6 +54,11 @@ router.post("/storage/uploads/request-url", requireAdminSession, requireCsrfHead
 
   if (!ALLOWED_IMAGE_TYPES.has(contentType)) {
     res.status(400).json({ error: "Only image uploads are allowed (jpeg, png, webp, gif)." });
+    return;
+  }
+
+  if (size > MAX_IMAGE_BYTES) {
+    res.status(400).json({ error: "File too large. Maximum size is 10 MB." });
     return;
   }
 
