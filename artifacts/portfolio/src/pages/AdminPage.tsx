@@ -132,7 +132,7 @@ function LoginForm({ onLogin }: { onLogin: (setupRequested?: boolean) => void })
   const [resetLoading, setResetLoading] = useState(false);
   const [resetSent, setResetSent] = useState(false);
   const [resetError, setResetError] = useState("");
-  const { companyName } = useSiteSettings();
+  const { companyName, logoUrl } = useSiteSettings();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -181,9 +181,17 @@ function LoginForm({ onLogin }: { onLogin: (setupRequested?: boolean) => void })
     <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
       <div className="w-full max-w-sm bg-slate-800 rounded-2xl p-8 shadow-2xl border border-slate-700">
         <div className="text-center mb-8">
-          <div className="w-14 h-14 bg-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <ImageIcon className="w-7 h-7 text-blue-400" />
-          </div>
+          {logoUrl ? (
+            <img
+              src={logoUrl}
+              alt={companyName}
+              className="h-14 w-auto max-w-[160px] object-contain mx-auto mb-4"
+            />
+          ) : (
+            <div className="w-14 h-14 bg-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <ImageIcon className="w-7 h-7 text-blue-400" />
+            </div>
+          )}
           <h1 className="text-2xl font-bold text-white font-serif">
             {companyName || "Company Manager"}
           </h1>
@@ -1537,7 +1545,7 @@ function SettingsView() {
             onClick={() => setForm((f) => f ? { ...f, showAbout: !f.showAbout } : f)}
             className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border font-medium shrink-0 transition-colors ${form.showAbout ? "border-slate-600 text-slate-400 hover:border-slate-500 hover:text-slate-300" : "border-orange-800/60 bg-orange-900/20 text-orange-400 hover:bg-orange-900/30"}`}
           >
-            {form.showAbout ? <><Eye className="w-3 h-3" /> Visible</> : <><EyeOff className="w-3 h-3" /> N/A</>}
+            {form.showAbout ? <><Eye className="w-3 h-3" /> Visible</> : <><EyeOff className="w-3 h-3" /> Hidden</>}
           </button>
         </div>
         {!form.showAbout && (
@@ -1599,7 +1607,7 @@ function SettingsView() {
               onClick={() => setForm((f) => f ? { ...f, showGalleries: !f.showGalleries } : f)}
               className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border font-medium transition-colors ${form.showGalleries ? "border-slate-600 text-slate-400 hover:border-slate-500 hover:text-slate-300" : "border-orange-800/60 bg-orange-900/20 text-orange-400 hover:bg-orange-900/30"}`}
             >
-              {form.showGalleries ? <><Eye className="w-3 h-3" /> Visible</> : <><EyeOff className="w-3 h-3" /> N/A</>}
+              {form.showGalleries ? <><Eye className="w-3 h-3" /> Visible</> : <><EyeOff className="w-3 h-3" /> Hidden</>}
             </button>
             <Button type="button" size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={addGallery}>
               <Plus className="w-3.5 h-3.5 mr-1.5" />
@@ -1685,7 +1693,7 @@ function SettingsView() {
               onClick={() => setForm((f) => f ? { ...f, showServices: !f.showServices } : f)}
               className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border font-medium transition-colors ${form.showServices ? "border-slate-600 text-slate-400 hover:border-slate-500 hover:text-slate-300" : "border-orange-800/60 bg-orange-900/20 text-orange-400 hover:bg-orange-900/30"}`}
             >
-              {form.showServices ? <><Eye className="w-3 h-3" /> Visible</> : <><EyeOff className="w-3 h-3" /> N/A</>}
+              {form.showServices ? <><Eye className="w-3 h-3" /> Visible</> : <><EyeOff className="w-3 h-3" /> Hidden</>}
             </button>
             <Button type="button" size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={addService}>
               <Plus className="w-3.5 h-3.5 mr-1.5" />
