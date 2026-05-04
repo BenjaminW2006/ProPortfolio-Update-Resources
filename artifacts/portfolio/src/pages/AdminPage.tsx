@@ -1433,10 +1433,7 @@ function SettingsView() {
         {textareaField("About Text", form.aboutText, (v) => setForm((f) => f ? { ...f, aboutText: v } : f))}
       </div>
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-base font-semibold font-serif text-slate-200">Services Section</h3>
-          {sectionToggle(form.showServices ?? true, (v) => setForm((f) => f ? { ...f, showServices: v } : f))}
-        </div>
+        <h3 className="text-base font-semibold font-serif text-slate-200">Services Section</h3>
         {field("Section Heading", form.servicesHeading, (v) => setForm((f) => f ? { ...f, servicesHeading: v } : f))}
         {textareaField("Section Subtitle", form.servicesSubtitle, (v) => setForm((f) => f ? { ...f, servicesSubtitle: v } : f))}
       </div>
