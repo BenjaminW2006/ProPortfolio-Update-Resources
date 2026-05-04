@@ -36,8 +36,8 @@ function ProjectCard({ project }: { project: Project }) {
       variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } }}
     >
       <Link href={`/gallery/project/${project.id}`}>
-        <span className="group block cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 rounded-2xl">
-          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-slate-900 border border-slate-700 group-hover:border-slate-500 transition-colors">
+        <span className="group block rounded-2xl overflow-hidden bg-slate-800 border border-slate-700 hover:border-slate-500 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400">
+          <div className="relative aspect-[4/3] overflow-hidden bg-slate-900">
             {project.coverObjectPath ? (
               <img
                 src={getImageUrl(project.coverObjectPath)}
@@ -51,14 +51,16 @@ function ProjectCard({ project }: { project: Project }) {
             )}
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
           </div>
-          <div className="mt-3 px-1">
-            <h2 className="text-base font-semibold font-serif text-white group-hover:text-site-accent transition-colors truncate">
+          <div className="p-5">
+            <h2 className="text-lg font-semibold font-serif text-white group-hover:text-site-accent transition-colors">
               {project.name}
             </h2>
-            <span className="flex items-center gap-1.5 text-slate-400 text-sm mt-0.5">
-              <Calendar className="w-3.5 h-3.5 shrink-0" />
-              {formatDate(project.date)}
-            </span>
+            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-slate-400 text-sm">
+              <span className="flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 shrink-0" />
+                {formatDate(project.date)}
+              </span>
+            </div>
           </div>
         </span>
       </Link>
