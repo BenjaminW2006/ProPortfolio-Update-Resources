@@ -1,9 +1,8 @@
 import { motion } from "framer-motion";
-import { ShieldCheck, Clock, MapPin, BadgeCheck } from "lucide-react";
 import { useSiteSettings } from "@/context/SiteSettingsContext";
 
 export default function WhyChooseUs() {
-  const { aboutTitle, aboutText, aboutQuote, serviceArea } = useSiteSettings();
+  const { aboutTitle, aboutText, aboutQuote } = useSiteSettings();
 
   return (
     <section id="why-choose-us" className="py-24 bg-white">
@@ -22,48 +21,6 @@ export default function WhyChooseUs() {
               <p className="text-lg text-slate-600 mb-8 leading-relaxed">
                 {aboutText}
               </p>
-
-              <div className="space-y-6">
-                <div className="flex gap-4">
-                  <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
-                    <ShieldCheck className="w-6 h-6 text-blue-700" />
-                  </div>
-                  <div>
-                    <h4 className="text-xl font-bold text-slate-900 mb-1">Licensed & Insured</h4>
-                    <p className="text-slate-600">Full coverage for your peace of mind. We take the risk out of every job.</p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
-                    <Clock className="w-6 h-6 text-blue-700" />
-                  </div>
-                  <div>
-                    <h4 className="text-xl font-bold text-slate-900 mb-1">Punctual & Respectful</h4>
-                    <p className="text-slate-600">We show up when we say we will, and we treat your property like our own.</p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
-                    <MapPin className="w-6 h-6 text-blue-700" />
-                  </div>
-                  <div>
-                    <h4 className="text-xl font-bold text-slate-900 mb-1">Local to {serviceArea}</h4>
-                    <p className="text-slate-600">We live here, we work here. We care about the reputation we build in our community.</p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
-                    <BadgeCheck className="w-6 h-6 text-blue-700" />
-                  </div>
-                  <div>
-                    <h4 className="text-xl font-bold text-slate-900 mb-1">Guaranteed Quality</h4>
-                    <p className="text-slate-600">We aren't finished until the job is done to your satisfaction and our standards.</p>
-                  </div>
-                </div>
-              </div>
             </motion.div>
           </div>
 
