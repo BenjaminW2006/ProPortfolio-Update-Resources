@@ -10,6 +10,7 @@ import ContactPage from "@/pages/ContactPage";
 import AdminPage from "@/pages/AdminPage";
 import GalleryPage from "@/pages/GalleryPage";
 import ProjectDetailPage from "@/pages/ProjectDetailPage";
+import ResetPasswordPage from "@/pages/ResetPasswordPage";
 
 const GalleryRoute = () => {
   const params = useParams<{ key: string }>();
@@ -27,7 +28,9 @@ function Router() {
       <Route path="/gallery/project/:id" component={ProjectDetailPage} />
       <Route path="/gallery/:key" component={GalleryRoute} />
       <Route path="/gallery" component={DefaultGallery} />
+      <Route path="/admin/reset-password" component={ResetPasswordPage} />
       <Route path="/admin" component={AdminPage} />
+      <Route path="/setup" component={SetupWizard} />
       <Route component={NotFound} />
     </Switch>
   );

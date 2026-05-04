@@ -125,6 +125,12 @@ function LoginForm({ onLogin }: { onLogin: () => void }) {
   const [input, setInput] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
+  const [resetError, setResetError] = useState("");
+  const { companyName } = useSiteSettings();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -150,6 +156,25 @@ function LoginForm({ onLogin }: { onLogin: () => void }) {
     }
   };
 
+  const handleResetRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetError("");
+    setResetLoading(true);
+    try {
+      await fetch("/api/admin/reset-password/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-csrf-protection": "1" },
+        body: JSON.stringify({ email: resetEmail }),
+        credentials: "include",
+      });
+      setResetSent(true);
+    } catch {
+      setResetError("Unable to reach server. Please try again.");
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
       <div className="w-full max-w-sm bg-slate-800 rounded-2xl p-8 shadow-2xl border border-slate-700">
@@ -157,29 +182,87 @@ function LoginForm({ onLogin }: { onLogin: () => void }) {
           <div className="w-14 h-14 bg-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <ImageIcon className="w-7 h-7 text-blue-400" />
           </div>
-          <h1 className="text-2xl font-bold text-white font-serif">Company Dashboard
-</h1>
-          <p className="text-slate-400 text-sm mt-2">Upstate Palmetto Property Services</p>
+          <h1 className="text-2xl font-bold text-white font-serif">
+            {companyName || "Company Dashboard"}
+          </h1>
+          <p className="text-slate-400 text-sm mt-2">Admin Panel</p>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            type="password"
-            placeholder="Admin password"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
-            autoFocus
-          />
-          {error && <p className="text-red-400 text-sm">{error}</p>}
-          <Button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700"
-            disabled={loading || !input.trim()}
-          >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-            Sign In
-          </Button>
-        </form>
+
+        {!showForgot ? (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input
+              type="password"
+              placeholder="Admin password"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
+              autoFocus
+            />
+            {error && <p className="text-red-400 text-sm">{error}</p>}
+            <Button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700"
+              disabled={loading || !input.trim()}
+            >
+              {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              Sign In
+            </Button>
+            <div className="flex items-center justify-between pt-1">
+              <button
+                type="button"
+                onClick={() => setShowForgot(true)}
+                className="text-slate-500 hover:text-slate-300 text-sm transition-colors"
+              >
+                Forgot password?
+              </button>
+              <a
+                href="/setup"
+                className="text-slate-500 hover:text-slate-300 text-sm transition-colors"
+              >Get Started!</a>
+            </div>
+          </form>
+        ) : resetSent ? (
+          <div className="space-y-4 text-center">
+            <p className="text-slate-300 text-sm">
+              If that email matches your admin account, a reset link is on its way. Check your inbox.
+            </p>
+            <Button
+              variant="ghost"
+              className="w-full text-slate-400 hover:text-white hover:bg-slate-700"
+              onClick={() => { setShowForgot(false); setResetSent(false); setResetEmail(""); }}
+            >
+              Back to sign in
+            </Button>
+          </div>
+        ) : (
+          <form onSubmit={handleResetRequest} className="space-y-4">
+            <p className="text-slate-400 text-sm">Enter the admin email address to receive a reset link.</p>
+            <Input
+              type="email"
+              placeholder="admin@example.com"
+              value={resetEmail}
+              onChange={(e) => setResetEmail(e.target.value)}
+              className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
+              autoFocus
+            />
+            {resetError && <p className="text-red-400 text-sm">{resetError}</p>}
+            <Button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700"
+              disabled={resetLoading || !resetEmail.trim()}
+            >
+              {resetLoading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+              Send reset link
+            </Button>
+            <button
+              type="button"
+              onClick={() => { setShowForgot(false); setResetError(""); }}
+              className="w-full text-slate-500 hover:text-slate-300 text-sm transition-colors text-center"
+            >
+              Back to sign in
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );
@@ -1327,6 +1410,17 @@ function SettingsView() {
         {field("Phone", form.phone, (v) => setForm((f) => f ? { ...f, phone: v } : f), "(864) 555-0000")}
         {field("Email", form.email, (v) => setForm((f) => f ? { ...f, email: v } : f), "company@example.com")}
         {field("Service Area", form.serviceArea, (v) => setForm((f) => f ? { ...f, serviceArea: v } : f), "e.g. Austin, Texas")}
+        <div>
+          <label className="block text-slate-400 text-sm mb-1">Admin Recovery Email</label>
+          <p className="text-slate-500 text-xs mb-1.5">Used for password reset emails. Keep this private.</p>
+          <Input
+            type="email"
+            value={form.adminEmail ?? ""}
+            onChange={(e) => setForm((f) => f ? { ...f, adminEmail: e.target.value } : f)}
+            placeholder="your@email.com"
+            className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 text-sm"
+          />
+        </div>
       </div>
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
         <div className="flex items-start justify-between gap-3">

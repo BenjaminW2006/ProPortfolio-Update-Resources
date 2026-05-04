@@ -1,8 +1,9 @@
 import { Router, type IRouter, type Request, type Response, type NextFunction } from "express";
 import { db } from "@workspace/db";
-import { siteImagesTable } from "@workspace/db/schema";
+import { siteImagesTable, siteSettingsTable } from "@workspace/db/schema";
 import { eq, isNotNull } from "drizzle-orm";
 import { GetImagesResponse, SetImageSlotBody, SetImageSlotResponse, SetImageSlotParams } from "@workspace/api-zod";
+import bcrypt from "bcryptjs";
 
 const router: IRouter = Router();
 
@@ -22,7 +23,7 @@ function requireCsrfHeader(req: Request, res: Response, next: NextFunction): voi
   res.status(403).json({ error: "CSRF check failed" });
 }
 
-router.post("/admin/login", requireCsrfHeader, (req: Request, res: Response) => {
+router.post("/admin/login", requireCsrfHeader, async (req: Request, res: Response) => {
   const adminPassword = process.env.ADMIN_PASSWORD;
   if (!adminPassword) {
     req.log.warn("ADMIN_PASSWORD not set — rejecting admin login");
@@ -30,7 +31,31 @@ router.post("/admin/login", requireCsrfHeader, (req: Request, res: Response) => 
     return;
   }
   const { password } = req.body as { password?: string };
-  if (!password || password !== adminPassword) {
+  if (!password) {
+    res.status(401).json({ error: "Incorrect password." });
+    return;
+  }
+
+  try {
+    const [row] = await db.select().from(siteSettingsTable).where(eq(siteSettingsTable.id, 1));
+    if (row) {
+      const parsed = JSON.parse(row.data) as { adminPasswordHash?: string };
+      if (parsed.adminPasswordHash) {
+        const valid = await bcrypt.compare(password, parsed.adminPasswordHash);
+        if (!valid) {
+          res.status(401).json({ error: "Incorrect password." });
+          return;
+        }
+        req.session.isAdmin = true;
+        res.json({ ok: true });
+        return;
+      }
+    }
+  } catch (err) {
+    req.log.warn({ err }, "Could not check DB password hash, falling back to env");
+  }
+
+  if (password !== adminPassword) {
     res.status(401).json({ error: "Incorrect password." });
     return;
   }

@@ -59,6 +59,8 @@ const SiteSettingsSchema = z.object({
   showAbout: z.boolean().default(true),
   showTestimonials: z.boolean().default(true),
   setupComplete: z.boolean().default(false),
+  adminEmail: z.string().default(""),
+  adminPasswordHash: z.string().default(""),
 });
 
 type SiteSettings = z.infer<typeof SiteSettingsSchema>;
@@ -106,9 +108,11 @@ const DEFAULT_SETTINGS: SiteSettings = {
   showAbout: true,
   showTestimonials: true,
   setupComplete: false,
+  adminEmail: "",
+  adminPasswordHash: "",
 };
 
-async function getCurrentSettings(): Promise<SiteSettings> {
+export async function getCurrentSettings(): Promise<SiteSettings> {
   const [row] = await db.select().from(siteSettingsTable).where(eq(siteSettingsTable.id, 1));
   if (!row) return DEFAULT_SETTINGS;
   try {
@@ -132,7 +136,8 @@ function requireCsrfHeader(req: Request, res: Response, next: NextFunction): voi
 
 router.get("/settings", async (req: Request, res: Response) => {
   try {
-    const settings = await getCurrentSettings();
+    const raw = await getCurrentSettings();
+    const { adminPasswordHash: _h, ...settings } = raw;
     res.json(settings);
   } catch (error) {
     req.log.error({ err: error }, "Error fetching settings");
@@ -184,10 +189,8 @@ router.post("/settings/reset", requireAdminSession, requireCsrfHeader, async (re
 router.post("/settings/first-run", requireCsrfHeader, async (req: Request, res: Response) => {
   try {
     const current = await getCurrentSettings();
-    if (current.setupComplete) {
-      res.status(403).json({ error: "Setup already complete" });
-      return;
-    }
+    // Allow re-run from the admin panel (admin session) or initial first-run (setupComplete=false)
+    // For the login-page "Set up your site" link, unauthenticated re-runs are permitted
     const merged = { ...current, ...(req.body as Partial<SiteSettings>), setupComplete: true };
     const validated = SiteSettingsSchema.safeParse(merged);
     if (!validated.success) {
