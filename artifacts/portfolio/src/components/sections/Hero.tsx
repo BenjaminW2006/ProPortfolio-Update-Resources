@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
 
 interface ImageRecord {
   slot: string;
@@ -26,10 +27,10 @@ function useCloudImage(slot: string, fallback: string): string {
 
 export default function Hero() {
   const heroBg = useCloudImage("hero-bg", "/images/hero-bg.png");
+  const settings = useSiteSettings();
 
   return (
     <section id="hero" className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden">
-      {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-slate-900/70 mix-blend-multiply z-10" />
         <img
@@ -48,22 +49,22 @@ export default function Hero() {
           >
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 backdrop-blur-sm text-white text-sm font-medium mb-6">
               <CheckCircle2 className="w-4 h-4 text-blue-400" />
-              <span>Locally Owned & Operated in Upstate SC</span>
+              <span>Locally Owned & Operated in {settings.serviceArea}</span>
             </div>
-            
+
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6 font-serif">
-              Hard Work. <br />
-              Done Right. <br />
-              <span className="text-blue-400">Every Time.</span>
+              {settings.tagline1} <br />
+              {settings.tagline2} <br />
+              <span className="text-blue-400">{settings.tagline3}</span>
             </h1>
-            
+
             <p className="text-lg md:text-xl text-slate-200 mb-8 max-w-2xl leading-relaxed">
               Your trusted neighbors for professional handyman and property maintenance services. From small repairs to major updates, we show up, work hard, and stand behind what we do.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-4">
               <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white text-lg h-14 px-8" asChild>
-                <a href="#contact">
+                <a href="/contact">
                   Get a Free Quote <ArrowRight className="ml-2 w-5 h-5" />
                 </a>
               </Button>

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -18,7 +18,10 @@ import {
   Calendar,
   FileText,
   Star,
+  Settings,
+  FolderOpen,
 } from "lucide-react";
+import { DEFAULT_SETTINGS, type SiteSettings } from "@/context/SiteSettingsContext";
 
 interface Project {
   id: number;
@@ -1014,10 +1017,236 @@ function ProjectListView({
   );
 }
 
+function SettingsView() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [saving, setSaving] = useState(false);
+  const [resetting, setResetting] = useState(false);
+  const [confirmReset, setConfirmReset] = useState(false);
+
+  const { data: current, isLoading } = useQuery<SiteSettings>({
+    queryKey: ["site-settings"],
+    queryFn: async () => {
+      const res = await apiCall("/api/settings");
+      if (!res.ok) return DEFAULT_SETTINGS;
+      return res.json() as Promise<SiteSettings>;
+    },
+    staleTime: 0,
+  });
+
+  const [form, setForm] = useState<SiteSettings | null>(null);
+
+  useEffect(() => {
+    if (current && !form) setForm(current);
+  }, [current, form]);
+
+  if (isLoading || !form) {
+    return (
+      <div className="flex items-center justify-center py-32">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
+      </div>
+    );
+  }
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const res = await apiMutation("/api/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error("Failed to save");
+      const updated = (await res.json()) as SiteSettings;
+      queryClient.setQueryData(["site-settings"], updated);
+      toast({ title: "Settings saved!" });
+    } catch {
+      toast({ title: "Error", description: "Failed to save settings.", variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleReset = async () => {
+    setResetting(true);
+    try {
+      const res = await apiMutation("/api/settings/reset", { method: "POST" });
+      if (!res.ok) throw new Error("Failed to reset");
+      const defaults = (await res.json()) as SiteSettings;
+      setForm(defaults);
+      queryClient.setQueryData(["site-settings"], defaults);
+      setConfirmReset(false);
+      toast({ title: "Settings reset to defaults" });
+    } catch {
+      toast({ title: "Error", description: "Failed to reset settings.", variant: "destructive" });
+    } finally {
+      setResetting(false);
+    }
+  };
+
+  const addService = () =>
+    setForm((f) => f ? { ...f, services: [...f.services, { title: "", description: "" }] } : f);
+
+  const removeService = (i: number) =>
+    setForm((f) => f ? { ...f, services: f.services.filter((_, idx) => idx !== i) } : f);
+
+  const moveService = (i: number, dir: -1 | 1) =>
+    setForm((f) => {
+      if (!f) return f;
+      const s = [...f.services];
+      const n = i + dir;
+      if (n < 0 || n >= s.length) return f;
+      [s[i], s[n]] = [s[n], s[i]];
+      return { ...f, services: s };
+    });
+
+  const updateService = (i: number, field: "title" | "description", val: string) =>
+    setForm((f) =>
+      f ? { ...f, services: f.services.map((s, idx) => idx === i ? { ...s, [field]: val } : s) } : f
+    );
+
+  const field = (
+    label: string,
+    value: string,
+    onChange: (v: string) => void,
+    placeholder?: string
+  ) => (
+    <div>
+      <label className="block text-slate-400 text-sm mb-1.5">{label}</label>
+      <Input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
+      />
+    </div>
+  );
+
+  return (
+    <div className="max-w-2xl space-y-8">
+      <div>
+        <h2 className="text-2xl font-bold font-serif mb-1">Site Settings</h2>
+        <p className="text-slate-400 text-sm">Changes update the live website immediately after saving.</p>
+      </div>
+
+      <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
+        <h3 className="text-base font-semibold font-serif text-slate-200">Company Info</h3>
+        {field("Company Name", form.companyName, (v) => setForm((f) => f ? { ...f, companyName: v } : f))}
+        {field("Phone", form.phone, (v) => setForm((f) => f ? { ...f, phone: v } : f), "(864) 555-0000")}
+        {field("Email", form.email, (v) => setForm((f) => f ? { ...f, email: v } : f), "company@example.com")}
+        {field("Service Area", form.serviceArea, (v) => setForm((f) => f ? { ...f, serviceArea: v } : f), "Upstate South Carolina")}
+      </div>
+
+      <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
+        <div>
+          <h3 className="text-base font-semibold font-serif text-slate-200">Hero Taglines</h3>
+          <p className="text-slate-500 text-xs mt-0.5">Three lines shown as the large headline on the home page.</p>
+        </div>
+        {field("Line 1", form.tagline1, (v) => setForm((f) => f ? { ...f, tagline1: v } : f))}
+        {field("Line 2", form.tagline2, (v) => setForm((f) => f ? { ...f, tagline2: v } : f))}
+        {field("Line 3 (highlighted in blue)", form.tagline3, (v) => setForm((f) => f ? { ...f, tagline3: v } : f))}
+      </div>
+
+      <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-base font-semibold font-serif text-slate-200">Services</h3>
+            <p className="text-slate-500 text-xs mt-0.5">Shown on the home page services section.</p>
+          </div>
+          <Button type="button" size="sm" className="bg-blue-600 hover:bg-blue-700 shrink-0" onClick={addService}>
+            <Plus className="w-3.5 h-3.5 mr-1.5" />
+            Add
+          </Button>
+        </div>
+
+        <div className="space-y-3">
+          {form.services.map((service, i) => (
+            <div key={i} className="bg-slate-700/60 rounded-xl border border-slate-600 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-slate-500 text-xs">#{i + 1}</span>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => moveService(i, -1)}
+                    disabled={i === 0}
+                    className="px-1.5 py-0.5 text-slate-400 hover:text-white disabled:opacity-30 text-xs rounded hover:bg-slate-600 transition-colors"
+                    aria-label="Move up"
+                  >↑</button>
+                  <button
+                    type="button"
+                    onClick={() => moveService(i, 1)}
+                    disabled={i === form.services.length - 1}
+                    className="px-1.5 py-0.5 text-slate-400 hover:text-white disabled:opacity-30 text-xs rounded hover:bg-slate-600 transition-colors"
+                    aria-label="Move down"
+                  >↓</button>
+                  <button
+                    type="button"
+                    onClick={() => removeService(i)}
+                    className="p-1 text-red-400 hover:text-red-300 transition-colors ml-1"
+                    aria-label="Remove"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              <Input
+                value={service.title}
+                onChange={(e) => updateService(i, "title", e.target.value)}
+                placeholder="Service title"
+                className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
+              />
+              <Input
+                value={service.description}
+                onChange={(e) => updateService(i, "description", e.target.value)}
+                placeholder="Short description"
+                className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
+              />
+            </div>
+          ))}
+          {form.services.length === 0 && (
+            <p className="text-slate-500 text-sm text-center py-6">No services yet. Add one above.</p>
+          )}
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between gap-4 pb-4">
+        <Button className="bg-blue-600 hover:bg-blue-700 px-8" onClick={handleSave} disabled={saving}>
+          {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Check className="w-4 h-4 mr-2" />}
+          Save Settings
+        </Button>
+        {confirmReset ? (
+          <div className="flex items-center gap-2 bg-red-900/30 border border-red-800/50 rounded-lg px-3 py-2">
+            <span className="text-red-300 text-sm">Reset all to defaults?</span>
+            <button
+              onClick={handleReset}
+              disabled={resetting}
+              className="text-red-400 hover:text-red-300 font-medium text-sm"
+            >
+              {resetting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Yes, reset"}
+            </button>
+            <button onClick={() => setConfirmReset(false)} className="text-slate-400 hover:text-white">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        ) : (
+          <Button
+            variant="ghost"
+            className="text-slate-400 hover:text-white hover:bg-slate-700"
+            onClick={() => setConfirmReset(true)}
+          >
+            Reset to Defaults
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 type View =
   | { type: "list" }
   | { type: "create" }
-  | { type: "manage"; projectId: number };
+  | { type: "manage"; projectId: number }
+  | { type: "settings" };
 
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
@@ -1054,13 +1283,40 @@ export default function AdminPage() {
 
   if (!authenticated) return <LoginForm onLogin={() => setAuthenticated(true)} />;
 
+  const activeTab = view.type === "settings" ? "settings" : "projects";
+
+  const tabClass = (tab: string) =>
+    `inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+      activeTab === tab
+        ? "bg-white/10 text-white"
+        : "text-slate-400 hover:text-white hover:bg-white/5"
+    }`;
+
   return (
     <div className="min-h-screen bg-slate-900 text-white">
       <header className="border-b border-slate-700 bg-slate-800/60 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
-          <div>
-            <h1 className="font-bold text-lg font-serif">Project Manager</h1>
-            <p className="text-slate-400 text-xs">Upstate Palmetto Property Services</p>
+          <div className="flex items-center gap-6">
+            <div>
+              <h1 className="font-bold text-lg font-serif leading-tight">Project Manager</h1>
+              <p className="text-slate-400 text-xs">Upstate Palmetto Property Services</p>
+            </div>
+            <nav className="hidden sm:flex items-center gap-1">
+              <button
+                className={tabClass("projects")}
+                onClick={() => setView({ type: "list" })}
+              >
+                <FolderOpen className="w-4 h-4" />
+                Projects
+              </button>
+              <button
+                className={tabClass("settings")}
+                onClick={() => setView({ type: "settings" })}
+              >
+                <Settings className="w-4 h-4" />
+                Site Settings
+              </button>
+            </nav>
           </div>
           <Button
             variant="ghost"
@@ -1104,6 +1360,8 @@ export default function AdminPage() {
             onBack={() => setView({ type: "list" })}
           />
         )}
+
+        {view.type === "settings" && <SettingsView />}
       </main>
     </div>
   );

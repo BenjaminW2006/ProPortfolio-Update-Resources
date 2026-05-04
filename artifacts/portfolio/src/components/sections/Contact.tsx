@@ -1,7 +1,11 @@
 import { motion } from "framer-motion";
 import { Phone, Mail, MapPin } from "lucide-react";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
 
 export default function Contact() {
+  const settings = useSiteSettings();
+  const phoneRaw = settings.phone.replace(/\D/g, "");
+
   return (
     <section id="contact" className="py-24 bg-white">
       <div className="container mx-auto px-4 md:px-6 max-w-2xl">
@@ -28,7 +32,7 @@ export default function Contact() {
           className="bg-blue-50 rounded-2xl border border-blue-100 divide-y divide-blue-100"
         >
           <a
-            href="tel:8644342842"
+            href={`tel:${phoneRaw}`}
             className="flex items-center gap-5 p-7 hover:bg-blue-100 transition-colors rounded-t-2xl group"
           >
             <div className="w-12 h-12 rounded-full bg-blue-900 flex items-center justify-center shrink-0">
@@ -37,13 +41,13 @@ export default function Contact() {
             <div>
               <p className="text-sm text-slate-500 mb-0.5">Phone</p>
               <p className="text-xl font-bold text-blue-900 group-hover:text-blue-700 transition-colors">
-                (864) 434-2842
+                {settings.phone}
               </p>
             </div>
           </a>
 
           <a
-            href="mailto:Upstate-Palmetto@outlook.com"
+            href={`mailto:${settings.email}`}
             className="flex items-center gap-5 p-7 hover:bg-blue-100 transition-colors group"
           >
             <div className="w-12 h-12 rounded-full bg-blue-900 flex items-center justify-center shrink-0">
@@ -52,7 +56,7 @@ export default function Contact() {
             <div>
               <p className="text-sm text-slate-500 mb-0.5">Email</p>
               <p className="text-xl font-bold text-blue-900 group-hover:text-blue-700 transition-colors">
-                Upstate-Palmetto@outlook.com
+                {settings.email}
               </p>
             </div>
           </a>
@@ -64,7 +68,7 @@ export default function Contact() {
             <div>
               <p className="text-sm text-slate-500 mb-0.5">Service Area</p>
               <p className="text-xl font-bold text-blue-900">
-                Upstate South Carolina
+                {settings.serviceArea}
               </p>
             </div>
           </div>

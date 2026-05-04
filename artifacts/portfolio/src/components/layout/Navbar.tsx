@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { GiPalmTree } from "react-icons/gi";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [location] = useLocation();
+  const settings = useSiteSettings();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,7 +47,7 @@ export default function Navbar() {
         <Link href="/">
           <span className="flex items-center gap-2 text-white text-xl font-semibold tracking-wide cursor-pointer hover:opacity-90 transition-opacity">
             <GiPalmTree className="text-2xl shrink-0" />
-            Upstate Palmetto Property Services
+            {settings.companyName}
           </span>
         </Link>
 

@@ -1,55 +1,27 @@
 import { motion } from "framer-motion";
-import { Wrench, PaintRoller, Droplets, Hammer, Home, CheckSquare, Shovel, Scissors } from "lucide-react";
+import { Wrench, PaintRoller, Droplets, Hammer, Home, CheckSquare, Shovel, Scissors, Settings } from "lucide-react";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
 
-const services = [
-  {
-    icon: <Wrench className="w-8 h-8" />,
-    title: "General Handyman",
-    description: "Fixing what's broken. Door repairs, fixture installation, drywall patching, and everyday maintenance around the house."
-  },
-  {
-    icon: <PaintRoller className="w-8 h-8" />,
-    title: "Painting",
-    description: "Interior and exterior painting, trim work, deck staining, and touch-ups with meticulous attention to detail."
-  },
-  {
-    icon: <Droplets className="w-8 h-8" />,
-    title: "Pressure Washing",
-    description: "Restore your home's curb appeal. Driveways, siding, decks, patios, and walkways cleaned safely and thoroughly."
-  },
-  {
-    icon: <Hammer className="w-8 h-8" />,
-    title: "Carpentry & Woodwork",
-    description: "Custom trim, crown molding, baseboards, wainscoting, and minor wood repairs that add character to your home."
-  },
-  {
-    icon: <Home className="w-8 h-8" />,
-    title: "Deck & Fence Repair",
-    description: "Board replacement, structural reinforcement, sealing, and complete restoration for your outdoor living spaces."
-  },
-  {
-    icon: <Shovel className="w-8 h-8" />,
-    title: "Gutter Cleaning",
-    description: "Prevent water damage. Thorough removal of leaves and debris, downspout flushing, and minor repairs."
-  },
-  {
-    icon: <CheckSquare className="w-8 h-8" />,
-    title: "Property Maintenance",
-    description: "Recurring scheduled maintenance for landlords, property managers, and homeowners who want peace of mind."
-  },
-  {
-    icon: <Scissors className="w-8 h-8" />,
-    title: "Minor Landscaping",
-    description: "Shrub trimming, mulch installation, yard cleanup, and basic exterior aesthetic improvements."
-  }
+const ICONS = [
+  <Wrench className="w-8 h-8" />,
+  <PaintRoller className="w-8 h-8" />,
+  <Droplets className="w-8 h-8" />,
+  <Hammer className="w-8 h-8" />,
+  <Home className="w-8 h-8" />,
+  <Shovel className="w-8 h-8" />,
+  <CheckSquare className="w-8 h-8" />,
+  <Scissors className="w-8 h-8" />,
+  <Settings className="w-8 h-8" />,
 ];
 
 export default function Services() {
+  const { services } = useSiteSettings();
+
   return (
     <section id="services" className="py-24 bg-slate-50">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -58,7 +30,7 @@ export default function Services() {
           >
             No Job Too Small. <br className="md:hidden" /> Every Job Done Right.
           </motion.h2>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -76,16 +48,14 @@ export default function Services() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              transition={{ duration: 0.5, delay: (index % 4) * 0.1 }}
               className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow group"
             >
               <div className="w-16 h-16 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
-                {service.icon}
+                {ICONS[index % ICONS.length]}
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-3">{service.title}</h3>
-              <p className="text-slate-600 leading-relaxed">
-                {service.description}
-              </p>
+              <p className="text-slate-600 leading-relaxed">{service.description}</p>
             </motion.div>
           ))}
         </div>
