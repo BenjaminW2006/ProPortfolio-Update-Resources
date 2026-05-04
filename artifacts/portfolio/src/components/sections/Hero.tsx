@@ -32,7 +32,6 @@ export default function Hero() {
   return (
     <section id="hero" className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden">
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-slate-900/70 mix-blend-multiply z-10" />
         <img
           src={heroBg}
           alt="Professional work"
