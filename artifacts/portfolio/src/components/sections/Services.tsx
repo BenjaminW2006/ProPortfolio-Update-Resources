@@ -1,18 +1,5 @@
 import { motion } from "framer-motion";
-import { Wrench, PaintRoller, Droplets, Hammer, Home, CheckSquare, Shovel, Scissors, Settings } from "lucide-react";
 import { useSiteSettings } from "@/context/SiteSettingsContext";
-
-const ICONS = [
-  <Wrench className="w-8 h-8" />,
-  <PaintRoller className="w-8 h-8" />,
-  <Droplets className="w-8 h-8" />,
-  <Hammer className="w-8 h-8" />,
-  <Home className="w-8 h-8" />,
-  <Shovel className="w-8 h-8" />,
-  <CheckSquare className="w-8 h-8" />,
-  <Scissors className="w-8 h-8" />,
-  <Settings className="w-8 h-8" />,
-];
 
 export default function Services() {
   const { services, servicesHeading, servicesSubtitle } = useSiteSettings();
@@ -51,9 +38,6 @@ export default function Services() {
               transition={{ duration: 0.5, delay: (index % 4) * 0.1 }}
               className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow group"
             >
-              <div className="service-icon w-16 h-16 rounded-xl flex items-center justify-center mb-6">
-                {ICONS[index % ICONS.length]}
-              </div>
               <h3 className="text-xl font-bold text-slate-900 mb-3">{service.title}</h3>
               <p className="text-slate-600 leading-relaxed">{service.description}</p>
             </motion.div>
