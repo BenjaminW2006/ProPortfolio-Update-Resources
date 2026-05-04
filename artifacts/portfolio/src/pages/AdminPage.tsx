@@ -1496,27 +1496,6 @@ function SettingsView() {
     }
   };
 
-  const addGallery = () =>
-    setForm((f) => f ? { ...f, galleries: [...f.galleries, { key: "", label: "", description: "" }] } : f);
-
-  const removeGallery = (i: number) =>
-    setForm((f) => f ? { ...f, galleries: f.galleries.filter((_, idx) => idx !== i) } : f);
-
-  const moveGallery = (i: number, dir: -1 | 1) =>
-    setForm((f) => {
-      if (!f) return f;
-      const g = [...f.galleries];
-      const n = i + dir;
-      if (n < 0 || n >= g.length) return f;
-      [g[i], g[n]] = [g[n], g[i]];
-      return { ...f, galleries: g };
-    });
-
-  const updateGallery = (i: number, key: "key" | "label" | "description", val: string) =>
-    setForm((f) =>
-      f ? { ...f, galleries: f.galleries.map((g, idx) => idx === i ? { ...g, [key]: val } : g) } : f
-    );
-
   const addService = () =>
     setForm((f) => f ? { ...f, services: [...f.services, { title: "", description: "" }] } : f);
 
@@ -1675,92 +1654,6 @@ function SettingsView() {
         >
           <span style={{ color: form.colorAccent }}>●</span>
           <span>Live preview — this bar uses your chosen colors.</span>
-        </div>
-      </div>
-      <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <h3 className="text-base font-semibold font-serif text-slate-200">Galleries</h3>
-            <p className="text-slate-500 text-xs mt-0.5">Each gallery is a tile on the home page with its own filtered project page.</p>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              type="button"
-              onClick={() => setForm((f) => f ? { ...f, showGalleries: !f.showGalleries } : f)}
-              className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border font-medium transition-colors ${form.showGalleries ? "border-slate-600 text-slate-400 hover:border-slate-500 hover:text-slate-300" : "border-orange-800/60 bg-orange-900/20 text-orange-400 hover:bg-orange-900/30"}`}
-            >
-              {form.showGalleries ? <><Eye className="w-3 h-3" /> Visible</> : <><EyeOff className="w-3 h-3" /> Hidden</>}
-            </button>
-            <Button type="button" size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={addGallery}>
-              <Plus className="w-3.5 h-3.5 mr-1.5" />
-              Add
-            </Button>
-          </div>
-        </div>
-        {!form.showGalleries && (
-          <p className="text-xs text-slate-500 bg-slate-700/40 border border-slate-600/40 rounded-lg px-3 py-2">This section is hidden on your site.</p>
-        )}
-        <div className="space-y-3">
-          {form.galleries.map((gallery, i) => (
-            <div key={i} className="bg-slate-700/60 rounded-xl border border-slate-600 p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-slate-500 text-xs">#{i + 1}</span>
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => moveGallery(i, -1)}
-                    disabled={i === 0}
-                    className="px-1.5 py-0.5 text-slate-400 hover:text-white disabled:opacity-30 text-xs rounded hover:bg-slate-600 transition-colors"
-                    aria-label="Move up"
-                  >↑</button>
-                  <button
-                    type="button"
-                    onClick={() => moveGallery(i, 1)}
-                    disabled={i === form.galleries.length - 1}
-                    className="px-1.5 py-0.5 text-slate-400 hover:text-white disabled:opacity-30 text-xs rounded hover:bg-slate-600 transition-colors"
-                    aria-label="Move down"
-                  >↓</button>
-                  <button
-                    type="button"
-                    onClick={() => removeGallery(i)}
-                    className="p-1 text-red-400 hover:text-red-300 transition-colors ml-1"
-                    aria-label="Remove"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-400 text-xs mb-1">URL key (slug)</label>
-                  <Input
-                    value={gallery.key}
-                    onChange={(e) => updateGallery(i, "key", e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"))}
-                    placeholder="e.g. interior"
-                    className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 font-mono text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-400 text-xs mb-1">Display name</label>
-                  <Input
-                    value={gallery.label}
-                    onChange={(e) => updateGallery(i, "label", e.target.value)}
-                    placeholder="e.g. Interior"
-                    className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
-                  />
-                </div>
-              </div>
-              <Input
-                value={gallery.description}
-                onChange={(e) => updateGallery(i, "description", e.target.value)}
-                placeholder="Short description shown on the home page tile"
-                className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
-              />
-            </div>
-          ))}
-          {form.galleries.length === 0 && (
-            <p className="text-slate-500 text-sm text-center py-6">No galleries yet. Add one above.</p>
-          )}
         </div>
       </div>
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
