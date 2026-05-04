@@ -1,3 +1,4 @@
+@layer theme, base, clerk, components, utilities;
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
@@ -25,6 +26,12 @@
 .group:hover .service-icon {
   background-color: var(--site-accent);
   color: white;
+}
+
+/* Clerk placeholder text on dark inputs */
+.cl-formFieldInput::placeholder {
+  color: #94a3b8;
+  opacity: 1;
 }
 
 @custom-variant dark (&:is(.dark *));

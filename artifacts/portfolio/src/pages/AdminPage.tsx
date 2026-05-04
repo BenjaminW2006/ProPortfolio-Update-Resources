@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useAuth, useClerk } from "@clerk/react";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -20,11 +22,10 @@ import {
   Star,
   Settings,
   FolderOpen,
-  Eye,
-  EyeOff,
 } from "lucide-react";
 import { DEFAULT_SETTINGS, useSiteSettings, type SiteSettings } from "@/context/SiteSettingsContext";
-import SetupWizard from "@/components/SetupWizard";
+
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 function AutoTextarea({ value, onChange, placeholder, className }: {
   value: string;
@@ -146,168 +147,6 @@ async function uploadFile(
 
   onProgress?.(100);
   return objectPath;
-}
-
-function LoginForm({ onLogin }: { onLogin: (setupRequested?: boolean) => void }) {
-  const [input, setInput] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [showForgot, setShowForgot] = useState(false);
-  const [showSetupNote, setShowSetupNote] = useState(false);
-  const [resetEmail, setResetEmail] = useState("");
-  const [resetLoading, setResetLoading] = useState(false);
-  const [resetSent, setResetSent] = useState(false);
-  const [resetError, setResetError] = useState("");
-  const { companyName, logoUrl } = useSiteSettings();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-    try {
-      const res = await apiMutation("/api/admin/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: input }),
-      });
-      if (res.ok) {
-        sessionStorage.setItem("admin_logged_in", "1");
-        onLogin(showSetupNote);
-      } else {
-        const data = (await res.json().catch(() => ({}))) as ApiErrorResponse;
-        setError(data.error ?? "Incorrect password. Please try again.");
-      }
-    } catch {
-      setError("Unable to reach server. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleResetRequest = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setResetError("");
-    setResetLoading(true);
-    try {
-      await fetch("/api/admin/reset-password/request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-csrf-protection": "1" },
-        body: JSON.stringify({ email: resetEmail }),
-        credentials: "include",
-      });
-      setResetSent(true);
-    } catch {
-      setResetError("Unable to reach server. Please try again.");
-    } finally {
-      setResetLoading(false);
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-sm bg-slate-800 rounded-2xl p-8 shadow-2xl border border-slate-700">
-        <div className="text-center mb-8">
-          {logoUrl ? (
-            <img
-              src={logoUrl}
-              alt={companyName}
-              className="h-14 w-auto max-w-[160px] object-contain mx-auto mb-4"
-            />
-          ) : (
-            <div className="w-14 h-14 bg-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <ImageIcon className="w-7 h-7 text-blue-400" />
-            </div>
-          )}
-          <h1 className="text-2xl font-bold text-white font-serif">
-            {companyName || "Company Manager"}
-          </h1>
-          <p className="text-slate-400 text-sm mt-2">Company Manager</p>
-        </div>
-
-        {!showForgot ? (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {showSetupNote && (
-              <div className="text-sm text-blue-300 bg-blue-900/20 border border-blue-700/40 rounded-lg px-3 py-2">
-                Sign in to re-run the setup wizard.
-              </div>
-            )}
-            <Input
-              type="password"
-              placeholder="Admin password"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
-              autoFocus
-            />
-            {error && <p className="text-red-400 text-sm">{error}</p>}
-            <Button
-              type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700"
-              disabled={loading || !input.trim()}
-            >
-              {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-              Sign In
-            </Button>
-            <div className="flex items-center justify-between pt-1">
-              <button
-                type="button"
-                onClick={() => setShowForgot(true)}
-                className="text-slate-500 hover:text-slate-300 text-sm transition-colors"
-              >
-                Forgot password?
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowSetupNote(true)}
-                className="text-slate-500 hover:text-slate-300 text-sm transition-colors"
-              >Get Started!</button>
-            </div>
-          </form>
-        ) : resetSent ? (
-          <div className="space-y-4 text-center">
-            <p className="text-slate-300 text-sm">
-              If that email matches your admin account, a reset link is on its way. Check your inbox.
-            </p>
-            <Button
-              variant="ghost"
-              className="w-full text-slate-400 hover:text-white hover:bg-slate-700"
-              onClick={() => { setShowForgot(false); setResetSent(false); setResetEmail(""); }}
-            >
-              Back to sign in
-            </Button>
-          </div>
-        ) : (
-          <form onSubmit={handleResetRequest} className="space-y-4">
-            <p className="text-slate-400 text-sm">Enter the admin email address to receive a reset link.</p>
-            <Input
-              type="email"
-              placeholder="admin@example.com"
-              value={resetEmail}
-              onChange={(e) => setResetEmail(e.target.value)}
-              className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
-              autoFocus
-            />
-            {resetError && <p className="text-red-400 text-sm">{resetError}</p>}
-            <Button
-              type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700"
-              disabled={resetLoading || !resetEmail.trim()}
-            >
-              {resetLoading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
-              Send reset link
-            </Button>
-            <button
-              type="button"
-              onClick={() => { setShowForgot(false); setResetError(""); }}
-              className="w-full text-slate-500 hover:text-slate-300 text-sm transition-colors text-center"
-            >
-              Back to sign in
-            </button>
-          </form>
-        )}
-      </div>
-    </div>
-  );
 }
 
 function CreateProjectForm({
@@ -632,15 +471,9 @@ function CoverUploadArea({
               disabled={uploading}
             >
               {uploading ? (
-                <>
-                  <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
-                  {progress}%
-                </>
+                <><Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />{progress}%</>
               ) : (
-                <>
-                  <Upload className="w-3.5 h-3.5 mr-2" />
-                  {project.coverObjectPath ? "Replace Cover" : "Upload Cover"}
-                </>
+                <><Upload className="w-3.5 h-3.5 mr-2" />{project.coverObjectPath ? "Replace" : "Upload"}</>
               )}
             </Button>
             {project.coverObjectPath && (
@@ -661,60 +494,52 @@ function CoverUploadArea({
   );
 }
 
-function ProjectPhotoGrid({
-  projectId,
-  images,
-  onDeleted,
-}: {
-  projectId: number;
-  images: ProjectImage[];
-  onDeleted: () => void;
-}) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
+interface ImageSlot {
+  slot: string;
+  objectPath: string;
+}
+
+function ProjectPhotoGrid({ projectId }: { projectId: number }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [deletingId, setDeletingId] = useState<number | null>(null);
-  const [labelingId, setLabelingId] = useState<number | null>(null);
+  const [settingLabel, setSettingLabel] = useState<number | null>(null);
 
-  const handleLabel = async (imageId: number, newLabel: "before" | "after" | null) => {
-    setLabelingId(imageId);
-    try {
-      const res = await apiMutation(`/api/projects/${projectId}/images/${imageId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ label: newLabel }),
-      });
-      if (!res.ok) throw new Error("Failed to update label");
-      queryClient.invalidateQueries({ queryKey: ["admin-project", projectId] });
-    } catch {
-      toast({ title: "Error", description: "Failed to update label.", variant: "destructive" });
-    } finally {
-      setLabelingId(null);
-    }
-  };
+  const { data: project } = useQuery<ProjectDetail>({
+    queryKey: ["admin-project", projectId],
+    queryFn: async () => {
+      const res = await apiCall(`/api/projects/${projectId}`);
+      if (!res.ok) throw new Error("Failed to load project");
+      return res.json() as Promise<ProjectDetail>;
+    },
+    staleTime: 0,
+  });
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      toast({ title: "Invalid file", description: "Please select an image.", variant: "destructive" });
-      return;
-    }
+    const files = Array.from(e.target.files ?? []);
+    if (!files.length) return;
     setUploading(true);
     setProgress(0);
+    const totalFiles = files.length;
+    let done = 0;
     try {
-      const objectPath = await uploadFile(file, setProgress);
-      const res = await apiMutation(`/api/projects/${projectId}/images`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ objectPath }),
-      });
-      if (!res.ok) throw new Error("Failed to add photo");
+      for (const file of files) {
+        if (!file.type.startsWith("image/")) continue;
+        const objectPath = await uploadFile(file, (pct) => {
+          setProgress(Math.round(((done + pct / 100) / totalFiles) * 100));
+        });
+        await apiMutation(`/api/projects/${projectId}/images`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ objectPath }),
+        });
+        done++;
+        setProgress(Math.round((done / totalFiles) * 100));
+      }
       queryClient.invalidateQueries({ queryKey: ["admin-project", projectId] });
-      toast({ title: "Photo added!" });
-      onDeleted();
+      toast({ title: `${done} photo${done !== 1 ? "s" : ""} added!` });
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Upload failed";
       toast({ title: "Upload failed", description: msg, variant: "destructive" });
@@ -725,151 +550,159 @@ function ProjectPhotoGrid({
     }
   };
 
-  const handleDelete = async (imageId: number) => {
-    setDeletingId(imageId);
+  const removeImage = async (imageId: number) => {
     try {
-      const res = await apiMutation(`/api/projects/${projectId}/images/${imageId}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Delete failed");
+      await apiMutation(`/api/projects/${projectId}/images/${imageId}`, { method: "DELETE" });
       queryClient.invalidateQueries({ queryKey: ["admin-project", projectId] });
       toast({ title: "Photo removed" });
-      onDeleted();
     } catch {
       toast({ title: "Error", description: "Failed to remove photo.", variant: "destructive" });
-    } finally {
-      setDeletingId(null);
     }
   };
 
+  const setLabel = async (imageId: number, label: "before" | "after" | null) => {
+    setSettingLabel(imageId);
+    try {
+      await apiMutation(`/api/projects/${projectId}/images/${imageId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ label }),
+      });
+      queryClient.invalidateQueries({ queryKey: ["admin-project", projectId] });
+    } catch {
+      toast({ title: "Error", description: "Failed to set label.", variant: "destructive" });
+    } finally {
+      setSettingLabel(null);
+    }
+  };
+
+  const images = project?.images ?? [];
+
   return (
-    <div>
-      <h4 className="text-slate-300 font-medium mb-4">
-        Gallery Photos
-        {images.length > 0 && (
-          <span className="ml-2 text-slate-500 font-normal text-sm">({images.length})</span>
-        )}
-      </h4>
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-        {[...images].sort((a, b) => {
-          const o = (l?: "before" | "after" | null) => l === "before" ? 0 : l === "after" ? 2 : 1;
-          return o(a.label) - o(b.label);
-        }).map((img) => (
-          <div key={img.id} className="group relative aspect-square rounded-xl overflow-hidden bg-slate-900">
-            <img src={getImageUrl(img.objectPath)} alt="" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors" />
-
-            {/* Label badge — always visible */}
-            {img.label && (
-              <span className={`absolute top-2 left-2 px-2 py-0.5 rounded-full text-xs font-semibold pointer-events-none ${
-                img.label === "before" ? "bg-amber-500/90 text-white" : "bg-emerald-500/90 text-white"
-              }`}>
-                {img.label === "before" ? "Before" : "After"}
-              </span>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h4 className="text-white font-semibold flex items-center gap-2">
+            <FileText className="w-4 h-4 text-slate-400" />
+            Photos
+            {images.length > 0 && (
+              <span className="text-slate-500 text-sm font-normal">({images.length})</span>
             )}
-
-            {/* Label toggle buttons — visible on hover */}
-            <div className="absolute bottom-2 left-2 right-2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button
-                onClick={() => handleLabel(img.id, img.label === "before" ? null : "before")}
-                disabled={labelingId === img.id}
-                className={`flex-1 py-1 rounded-md text-xs font-semibold transition-colors disabled:opacity-50 ${
-                  img.label === "before"
-                    ? "bg-amber-500 text-white"
-                    : "bg-black/60 text-amber-300 hover:bg-amber-500/80 hover:text-white"
-                }`}
-              >
-                {labelingId === img.id ? "..." : "Before"}
-              </button>
-              <button
-                onClick={() => handleLabel(img.id, img.label === "after" ? null : "after")}
-                disabled={labelingId === img.id}
-                className={`flex-1 py-1 rounded-md text-xs font-semibold transition-colors disabled:opacity-50 ${
-                  img.label === "after"
-                    ? "bg-emerald-500 text-white"
-                    : "bg-black/60 text-emerald-300 hover:bg-emerald-500/80 hover:text-white"
-                }`}
-              >
-                {labelingId === img.id ? "..." : "After"}
-              </button>
-            </div>
-
-            {/* Delete button */}
-            <button
-              onClick={() => handleDelete(img.id)}
-              disabled={deletingId === img.id}
-              className="absolute top-2 right-2 p-1.5 rounded-full bg-red-600/80 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 disabled:opacity-50"
-              aria-label="Delete photo"
-            >
-              {deletingId === img.id ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Trash2 className="w-4 h-4" />
-              )}
-            </button>
-          </div>
-        ))}
-
-        <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          disabled={uploading}
-          className="aspect-square rounded-2xl border-2 border-dashed border-slate-600 hover:border-blue-500 hover:bg-blue-500/5 transition-colors flex flex-col items-center justify-center gap-2 text-slate-500 hover:text-blue-400 cursor-pointer disabled:opacity-50"
-        >
-          {uploading ? (
-            <div className="flex flex-col items-center gap-2">
-              <Loader2 className="w-7 h-7 animate-spin" />
-              <span className="text-xs">{progress}%</span>
-            </div>
-          ) : (
-            <>
-              <Plus className="w-8 h-8" />
-              <span className="text-xs font-medium">Add Photo</span>
-            </>
-          )}
-        </button>
+          </h4>
+          <p className="text-slate-500 text-xs mt-0.5">Tag photos as Before or After for comparison views.</p>
+        </div>
+        <div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={handleFile}
+          />
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-slate-600 text-slate-200 hover:bg-slate-700 hover:text-white"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+          >
+            {uploading ? (
+              <><Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />{progress}%</>
+            ) : (
+              <><Upload className="w-3.5 h-3.5 mr-2" />Add Photos</>
+            )}
+          </Button>
+        </div>
       </div>
+
+      {images.length === 0 ? (
+        <div className="border-2 border-dashed border-slate-700 rounded-xl flex flex-col items-center justify-center py-12 text-slate-600 gap-3">
+          <ImageIcon className="w-10 h-10" />
+          <p className="text-sm text-slate-500">No photos yet. Add some above.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          {images.map((img) => (
+            <div key={img.id} className="relative group aspect-square bg-slate-900 rounded-xl overflow-hidden border border-slate-700">
+              <img
+                src={getImageUrl(img.objectPath)}
+                alt=""
+                className="w-full h-full object-cover"
+              />
+              {img.label && (
+                <span className={`absolute top-1.5 left-1.5 text-xs font-semibold px-1.5 py-0.5 rounded-md ${
+                  img.label === "before" ? "bg-amber-500/90 text-white" : "bg-emerald-500/90 text-white"
+                }`}>
+                  {img.label === "before" ? "Before" : "After"}
+                </span>
+              )}
+              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1.5 p-1">
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => setLabel(img.id, img.label === "before" ? null : "before")}
+                    disabled={settingLabel === img.id}
+                    className={`text-xs px-2 py-1 rounded-md font-medium transition-colors ${
+                      img.label === "before"
+                        ? "bg-amber-500 text-white"
+                        : "bg-slate-700 text-slate-300 hover:bg-amber-500/80 hover:text-white"
+                    }`}
+                  >
+                    Before
+                  </button>
+                  <button
+                    onClick={() => setLabel(img.id, img.label === "after" ? null : "after")}
+                    disabled={settingLabel === img.id}
+                    className={`text-xs px-2 py-1 rounded-md font-medium transition-colors ${
+                      img.label === "after"
+                        ? "bg-emerald-500 text-white"
+                        : "bg-slate-700 text-slate-300 hover:bg-emerald-500/80 hover:text-white"
+                    }`}
+                  >
+                    After
+                  </button>
+                </div>
+                <button
+                  onClick={() => removeImage(img.id)}
+                  className="text-xs px-2 py-1 rounded-md bg-red-900/80 text-red-300 hover:bg-red-800 transition-colors"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-function ProjectManageView({
-  projectId,
-  onBack,
-}: {
-  projectId: number;
-  onBack: () => void;
-}) {
-  const { toast } = useToast();
+function ProjectManageView({ projectId, onBack }: { projectId: number; onBack: () => void }) {
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
-  const [deleting, setDeleting] = useState(false);
 
   const { data: project, isLoading } = useQuery<ProjectDetail>({
     queryKey: ["admin-project", projectId],
     queryFn: async () => {
       const res = await apiCall(`/api/projects/${projectId}`);
       if (!res.ok) throw new Error("Failed to load project");
-      return res.json();
+      return res.json() as Promise<ProjectDetail>;
     },
     staleTime: 0,
   });
 
+  const { toast } = useToast();
+
   const handleDelete = async () => {
-    setDeleting(true);
+    if (!project) return;
     try {
-      const res = await apiMutation(`/api/projects/${projectId}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Delete failed");
+      await apiMutation(`/api/projects/${project.id}`, { method: "DELETE" });
       queryClient.invalidateQueries({ queryKey: ["admin-projects"] });
       toast({ title: "Project deleted" });
       onBack();
     } catch {
       toast({ title: "Error", description: "Failed to delete project.", variant: "destructive" });
-      setDeleting(false);
     }
-  };
-
-  const refresh = () => {
-    queryClient.invalidateQueries({ queryKey: ["admin-project", projectId] });
   };
 
   if (isLoading || !project) {
@@ -881,105 +714,76 @@ function ProjectManageView({
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 max-w-4xl">
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <button
-            onClick={onBack}
-            className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm mb-4"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            All Projects
-          </button>
-          {editing ? (
-            <EditProjectForm
-              project={project}
-              onSaved={(p) => {
-                queryClient.setQueryData(["admin-project", projectId], { ...project, ...p });
-                setEditing(false);
-              }}
-              onCancel={() => setEditing(false)}
-            />
-          ) : (
-            <div>
-              <h2 className="text-3xl font-bold font-serif text-white">{project.name}</h2>
-              <div className="flex flex-wrap gap-x-5 gap-y-1 mt-2 text-slate-400 text-sm">
-                <span className="flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5" />
-                  {formatDate(project.date)}
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5" />
-                  {project.location}
-                </span>
-                {project.description && (
-                  <span className="flex items-center gap-1.5">
-                    <FileText className="w-3.5 h-3.5" />
-                    {project.description}
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
+        <button
+          onClick={onBack}
+          className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          All Projects
+        </button>
+        <button
+          onClick={handleDelete}
+          className="text-red-500 hover:text-red-400 text-sm flex items-center gap-1.5 transition-colors"
+        >
+          <Trash2 className="w-4 h-4" />
+          Delete Project
+        </button>
+      </div>
 
-        {!editing && (
-          <div className="flex gap-2 shrink-0">
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white"
-              onClick={() => setEditing(true)}
-            >
-              <Pencil className="w-3.5 h-3.5 mr-2" />
-              Edit
-            </Button>
-            {confirmDelete ? (
-              <div className="flex items-center gap-2 bg-red-900/30 border border-red-800/50 rounded-lg px-3 py-1.5">
-                <span className="text-red-300 text-sm">Delete project?</span>
-                <button
-                  onClick={handleDelete}
-                  disabled={deleting}
-                  className="text-red-400 hover:text-red-300 font-medium text-sm disabled:opacity-50"
-                >
-                  {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Yes"}
-                </button>
-                <button
-                  onClick={() => setConfirmDelete(false)}
-                  className="text-slate-400 hover:text-white"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            ) : (
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-red-900/50 text-red-400 hover:bg-red-900/20 hover:text-red-300"
-                onClick={() => setConfirmDelete(true)}
-              >
-                <Trash2 className="w-3.5 h-3.5 mr-2" />
-                Delete
-              </Button>
+      <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-5">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-bold font-serif text-white">{project.name}</h2>
+            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-slate-400 text-sm">
+              <span className="flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 shrink-0" />
+                {formatDate(project.date)}
+              </span>
+              <span className="flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 shrink-0" />
+                {project.location}
+              </span>
+            </div>
+            {project.description && (
+              <p className="text-slate-400 text-sm mt-2 max-w-lg">{project.description}</p>
             )}
           </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-slate-600 text-slate-300 hover:bg-slate-700 shrink-0"
+            onClick={() => setEditing(!editing)}
+          >
+            <Pencil className="w-3.5 h-3.5 mr-1.5" />
+            {editing ? "Cancel Edit" : "Edit"}
+          </Button>
+        </div>
+        {editing && (
+          <EditProjectForm
+            project={project}
+            onSaved={(p) => {
+              queryClient.setQueryData(["admin-project", projectId], (old: ProjectDetail | undefined) =>
+                old ? { ...old, ...p } : old
+              );
+              setEditing(false);
+            }}
+            onCancel={() => setEditing(false)}
+          />
         )}
       </div>
 
-      <CoverUploadArea project={project} onUpdated={refresh} />
-
-      <ProjectPhotoGrid
-        projectId={project.id}
-        images={project.images}
-        onDeleted={refresh}
+      <CoverUploadArea
+        project={project}
+        onUpdated={() => queryClient.invalidateQueries({ queryKey: ["admin-project", projectId] })}
       />
+
+      <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6">
+        <ProjectPhotoGrid projectId={projectId} />
+      </div>
     </div>
   );
-}
-
-interface ImageSlot {
-  slot: string;
-  objectPath: string;
 }
 
 function TileCoverUpload({ slot, label }: { slot: string; label: string }) {
@@ -1584,151 +1388,91 @@ function SettingsView() {
         {field("Email", form.email, (v) => setForm((f) => f ? { ...f, email: v } : f), "company@example.com")}
         {field("Service Area", form.serviceArea, (v) => setForm((f) => f ? { ...f, serviceArea: v } : f), "e.g. Austin, Texas")}
         <div>
-          <label className="block text-slate-400 text-sm mb-1">Admin Recovery Email</label>
-          <p className="text-slate-500 text-xs mb-1.5">Used for password reset emails. Keep this private.</p>
+          <label className="block text-slate-400 text-sm mb-1.5">Address</label>
           <Input
-            type="email"
-            value={form.adminEmail ?? ""}
-            onChange={(e) => setForm((f) => f ? { ...f, adminEmail: e.target.value } : f)}
-            placeholder="your@email.com"
-            className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 text-sm"
+            value={(form as SiteSettings & { address?: string }).address ?? ""}
+            onChange={(e) => setForm((f) => f ? { ...f, address: e.target.value } as SiteSettings : f)}
+            placeholder="123 Main St, City, State"
+            className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
           />
         </div>
       </div>
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h3 className="text-base font-semibold font-serif text-slate-200">About Section</h3>
-            <p className="text-slate-500 text-xs mt-0.5">The "Why Choose Us" section on the home page.</p>
-          </div>
-          <button
-            type="button"
-            onClick={() => setForm((f) => f ? { ...f, showAbout: !f.showAbout } : f)}
-            className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border font-medium shrink-0 transition-colors ${form.showAbout ? "border-slate-600 text-slate-400 hover:border-slate-500 hover:text-slate-300" : "border-orange-800/60 bg-orange-900/20 text-orange-400 hover:bg-orange-900/30"}`}
+        <h3 className="text-base font-semibold font-serif text-slate-200">Hero Section</h3>
+        {field("Tagline — Line 1", form.tagline1, (v) => setForm((f) => f ? { ...f, tagline1: v } : f), "Quality Work.")}
+        {field("Tagline — Line 2", form.tagline2, (v) => setForm((f) => f ? { ...f, tagline2: v } : f), "Done Right.")}
+        {field("Tagline — Line 3", form.tagline3, (v) => setForm((f) => f ? { ...f, tagline3: v } : f), "Every Time.")}
+        {textareaField("Hero Subtitle", form.heroSubtitle, (v) => setForm((f) => f ? { ...f, heroSubtitle: v } : f))}
+      </div>
+      <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
+        <h3 className="text-base font-semibold font-serif text-slate-200">About Section</h3>
+        {field("About Title", form.aboutTitle, (v) => setForm((f) => f ? { ...f, aboutTitle: v } : f))}
+        {textareaField("About Text", form.aboutText, (v) => setForm((f) => f ? { ...f, aboutText: v } : f))}
+      </div>
+      <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
+        <h3 className="text-base font-semibold font-serif text-slate-200">Services Section</h3>
+        {field("Section Heading", form.servicesHeading, (v) => setForm((f) => f ? { ...f, servicesHeading: v } : f))}
+        {textareaField("Section Subtitle", form.servicesSubtitle, (v) => setForm((f) => f ? { ...f, servicesSubtitle: v } : f))}
+      </div>
+      <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-base font-semibold font-serif text-slate-200">Services</h3>
+          <Button
+            size="sm"
+            variant="outline"
+            className="border-slate-600 text-slate-300 hover:bg-slate-700"
+            onClick={addService}
           >
-            {form.showAbout ? <><Eye className="w-3 h-3" /> Visible</> : <><EyeOff className="w-3 h-3" /> Hidden</>}
-          </button>
+            <Plus className="w-3.5 h-3.5 mr-1" />
+            Add Service
+          </Button>
         </div>
-        {!form.showAbout && (
-          <p className="text-xs text-slate-500 bg-slate-700/40 border border-slate-600/40 rounded-lg px-3 py-2">This section is hidden on your site.</p>
-        )}
-        {field("Section heading", form.aboutTitle ?? "", (v) => setForm((f) => f ? { ...f, aboutTitle: v } : f), "e.g. A Team You Can Count On.")}
-        {textareaField("Body paragraph", form.aboutText ?? "", (v) => setForm((f) => f ? { ...f, aboutText: v } : f), "Share why you started the business and what makes you different.")}
-      </div>
-      <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
-        <div>
-          <h3 className="text-base font-semibold font-serif text-slate-200">Colors</h3>
-          <p className="text-slate-500 text-xs mt-0.5">Enter a hex color code (e.g. #2563eb). The swatch updates as you type.</p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-          {(["colorBg", "colorText", "colorAccent", "colorHeader"] as const).map((key) => {
-            const labels: Record<typeof key, string> = {
-              colorBg: "Page Background",
-              colorText: "Text",
-              colorAccent: "Accent",
-              colorHeader: "Header / Nav",
-            };
-            return (
-              <div key={key}>
-                <label className="block text-slate-400 text-sm mb-1.5">{labels[key]}</label>
-                <div className="flex items-center gap-2">
-                  <div
-                    className="w-10 h-10 rounded-lg border border-slate-600 shrink-0"
-                    style={{ backgroundColor: form[key] }}
-                  />
-                  <Input
-                    value={form[key]}
-                    onChange={(e) => setForm((f) => f ? { ...f, [key]: e.target.value } : f)}
-                    placeholder="#000000"
-                    className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 font-mono text-sm"
-                  />
-                </div>
+        {form.services.map((service, i) => (
+          <div key={i} className="bg-slate-700/50 rounded-xl p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-slate-400 text-xs font-medium">Service {i + 1}</span>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => moveService(i, -1)}
+                  disabled={i === 0}
+                  className="px-1.5 py-0.5 text-slate-400 hover:text-white disabled:opacity-30 text-xs rounded hover:bg-slate-600 transition-colors"
+                  aria-label="Move up"
+                >↑</button>
+                <button
+                  type="button"
+                  onClick={() => moveService(i, 1)}
+                  disabled={i === form.services.length - 1}
+                  className="px-1.5 py-0.5 text-slate-400 hover:text-white disabled:opacity-30 text-xs rounded hover:bg-slate-600 transition-colors"
+                  aria-label="Move down"
+                >↓</button>
+                <button
+                  type="button"
+                  onClick={() => removeService(i)}
+                  className="p-1 text-red-400 hover:text-red-300 transition-colors ml-1"
+                  aria-label="Remove"
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
-            );
-          })}
-        </div>
-        <div
-          className="rounded-lg px-4 py-3 text-sm flex items-center gap-3"
-          style={{ backgroundColor: form.colorHeader, color: form.colorText, border: `2px solid ${form.colorAccent}` }}
-        >
-          <span style={{ color: form.colorAccent }}>●</span>
-          <span>Live preview — this bar uses your chosen colors.</span>
-        </div>
-      </div>
-      <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <h3 className="text-base font-semibold font-serif text-slate-200">Services</h3>
-            <p className="text-slate-500 text-xs mt-0.5">Shown on the home page services section.</p>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              type="button"
-              onClick={() => setForm((f) => f ? { ...f, showServices: !f.showServices } : f)}
-              className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border font-medium transition-colors ${form.showServices ? "border-slate-600 text-slate-400 hover:border-slate-500 hover:text-slate-300" : "border-orange-800/60 bg-orange-900/20 text-orange-400 hover:bg-orange-900/30"}`}
-            >
-              {form.showServices ? <><Eye className="w-3 h-3" /> Visible</> : <><EyeOff className="w-3 h-3" /> Hidden</>}
-            </button>
-            <Button type="button" size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={addService}>
-              <Plus className="w-3.5 h-3.5 mr-1.5" />
-              Add
-            </Button>
-          </div>
-        </div>
-        {!form.showServices && (
-          <p className="text-xs text-slate-500 bg-slate-700/40 border border-slate-600/40 rounded-lg px-3 py-2">This section is hidden on your site.</p>
-        )}
-        {field("Section heading", form.servicesHeading ?? "", (v) => setForm((f) => f ? { ...f, servicesHeading: v } : f), "e.g. What We Offer")}
-        {textareaField("Section subtitle", form.servicesSubtitle ?? "", (v) => setForm((f) => f ? { ...f, servicesSubtitle: v } : f), "A short sentence or two below the heading.")}
-
-        <div className="space-y-3">
-          {form.services.map((service, i) => (
-            <div key={i} className="bg-slate-700/60 rounded-xl border border-slate-600 p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-slate-500 text-xs">#{i + 1}</span>
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => moveService(i, -1)}
-                    disabled={i === 0}
-                    className="px-1.5 py-0.5 text-slate-400 hover:text-white disabled:opacity-30 text-xs rounded hover:bg-slate-600 transition-colors"
-                    aria-label="Move up"
-                  >↑</button>
-                  <button
-                    type="button"
-                    onClick={() => moveService(i, 1)}
-                    disabled={i === form.services.length - 1}
-                    className="px-1.5 py-0.5 text-slate-400 hover:text-white disabled:opacity-30 text-xs rounded hover:bg-slate-600 transition-colors"
-                    aria-label="Move down"
-                  >↓</button>
-                  <button
-                    type="button"
-                    onClick={() => removeService(i)}
-                    className="p-1 text-red-400 hover:text-red-300 transition-colors ml-1"
-                    aria-label="Remove"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-              <Input
-                value={service.title}
-                onChange={(e) => updateService(i, "title", e.target.value)}
-                placeholder="Service title"
-                className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
-              />
-              <Input
-                value={service.description}
-                onChange={(e) => updateService(i, "description", e.target.value)}
-                placeholder="Short description"
-                className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
-              />
             </div>
-          ))}
-          {form.services.length === 0 && (
-            <p className="text-slate-500 text-sm text-center py-6">No services yet. Add one above.</p>
-          )}
-        </div>
+            <Input
+              value={service.title}
+              onChange={(e) => updateService(i, "title", e.target.value)}
+              placeholder="Service title"
+              className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
+            />
+            <Input
+              value={service.description}
+              onChange={(e) => updateService(i, "description", e.target.value)}
+              placeholder="Short description"
+              className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
+            />
+          </div>
+        ))}
+        {form.services.length === 0 && (
+          <p className="text-slate-500 text-sm text-center py-6">No services yet. Add one above.</p>
+        )}
       </div>
       <div className="flex items-center justify-between gap-4 pb-4">
         <Button className="bg-blue-600 hover:bg-blue-700 px-8" onClick={handleSave} disabled={saving}>
@@ -1770,65 +1514,22 @@ type View =
   | { type: "settings" };
 
 export default function AdminPage() {
-  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
-  const [showSetup, setShowSetup] = useState(false);
+  const { isLoaded, isSignedIn } = useAuth();
+  const { signOut } = useClerk();
+  const [, setLocation] = useLocation();
   const [view, setView] = useState<View>({ type: "list" });
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
   const { companyName } = useSiteSettings();
 
   useEffect(() => {
-    const flag = sessionStorage.getItem("admin_logged_in");
-    if (!flag) {
-      setAuthenticated(false);
-      return;
+    if (isLoaded && !isSignedIn) {
+      setLocation("/manager/sign-in");
     }
-    apiCall("/api/admin/ping")
-      .then((res) => setAuthenticated(res.ok))
-      .catch(() => setAuthenticated(false));
-  }, []);
+  }, [isLoaded, isSignedIn, setLocation]);
 
-  const handleLogout = async () => {
-    await apiMutation("/api/admin/logout", { method: "POST" }).catch(() => {});
-    sessionStorage.removeItem("admin_logged_in");
-    setAuthenticated(false);
-    setShowSetup(false);
-    queryClient.clear();
-    toast({ title: "Signed out" });
-  };
-
-  if (authenticated === null) {
+  if (!isLoaded || !isSignedIn) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
-      </div>
-    );
-  }
-
-  if (!authenticated) {
-    return (
-      <LoginForm
-        onLogin={(setupRequested) => {
-          setAuthenticated(true);
-          if (setupRequested) setShowSetup(true);
-        }}
-      />
-    );
-  }
-
-  if (showSetup) {
-    return (
-      <div className="min-h-screen bg-slate-900">
-        <div className="max-w-xl mx-auto pt-8 px-4">
-          <button
-            type="button"
-            onClick={() => setShowSetup(false)}
-            className="text-slate-400 hover:text-white text-sm flex items-center gap-1 mb-4 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" /> Back to admin
-          </button>
-        </div>
-        <SetupWizard onDone={() => setShowSetup(false)} />
       </div>
     );
   }
@@ -1872,7 +1573,7 @@ export default function AdminPage() {
             variant="ghost"
             size="sm"
             className="text-slate-400 hover:text-white hover:bg-slate-700"
-            onClick={handleLogout}
+            onClick={() => signOut({ redirectUrl: basePath || "/" })}
           >
             <LogOut className="w-4 h-4 mr-2" />
             Sign Out

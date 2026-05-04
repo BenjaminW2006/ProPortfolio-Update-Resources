@@ -1,9 +1,9 @@
 import { Router, type IRouter, type Request, type Response, type NextFunction } from "express";
+import { getAuth } from "@clerk/express";
 import { db } from "@workspace/db";
 import { siteSettingsTable, siteImagesTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import bcrypt from "bcryptjs";
 
 const router: IRouter = Router();
 
@@ -46,9 +46,6 @@ const SiteSettingsSchema = z.object({
   showGalleries: z.boolean().default(true),
   showServices: z.boolean().default(true),
   showAbout: z.boolean().default(true),
-  setupComplete: z.boolean().default(false),
-  adminEmail: z.string().default(""),
-  adminPasswordHash: z.string().default(""),
 });
 
 type SiteSettings = z.infer<typeof SiteSettingsSchema>;
@@ -88,9 +85,6 @@ const DEFAULT_SETTINGS: SiteSettings = {
   showGalleries: true,
   showServices: true,
   showAbout: true,
-  setupComplete: false,
-  adminEmail: "",
-  adminPasswordHash: "",
 };
 
 export async function getCurrentSettings(): Promise<SiteSettings> {
@@ -105,9 +99,13 @@ export async function getCurrentSettings(): Promise<SiteSettings> {
   }
 }
 
-function requireAdminSession(req: Request, res: Response, next: NextFunction): void {
-  if (req.session.isAdmin) { next(); return; }
-  res.status(401).json({ error: "Unauthorized" });
+function requireAuth(req: Request, res: Response, next: NextFunction): void {
+  const auth = getAuth(req);
+  if (!auth?.userId) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+  next();
 }
 
 function requireCsrfHeader(req: Request, res: Response, next: NextFunction): void {
@@ -117,24 +115,19 @@ function requireCsrfHeader(req: Request, res: Response, next: NextFunction): voi
 
 router.get("/settings", async (req: Request, res: Response) => {
   try {
-    const raw = await getCurrentSettings();
-    // Strip private fields — never expose these to unauthenticated callers
-    const { adminPasswordHash, adminEmail: _e, ...settings } = raw;
-    // Fetch logo slot for the public navbar
+    const settings = await getCurrentSettings();
     const [logoRow] = await db.select().from(siteImagesTable).where(eq(siteImagesTable.slot, "logo"));
     const logoUrl = logoRow ? `/api/storage${logoRow.objectPath}` : null;
-    // Expose a safe boolean so the frontend knows whether admin setup is complete
-    res.json({ ...settings, hasAdminPassword: Boolean(adminPasswordHash), logoUrl });
+    res.json({ ...settings, logoUrl });
   } catch (error) {
     req.log.error({ err: error }, "Error fetching settings");
     res.status(500).json({ error: "Failed to fetch settings" });
   }
 });
 
-router.get("/admin/settings", requireAdminSession, async (req: Request, res: Response) => {
+router.get("/admin/settings", requireAuth, async (req: Request, res: Response) => {
   try {
-    const raw = await getCurrentSettings();
-    const { adminPasswordHash: _h, ...settings } = raw;
+    const settings = await getCurrentSettings();
     const [logoRow] = await db.select().from(siteImagesTable).where(eq(siteImagesTable.slot, "logo"));
     const logoUrl = logoRow ? `/api/storage${logoRow.objectPath}` : null;
     res.json({ ...settings, logoUrl });
@@ -144,7 +137,7 @@ router.get("/admin/settings", requireAdminSession, async (req: Request, res: Res
   }
 });
 
-router.patch("/settings", requireAdminSession, requireCsrfHeader, async (req: Request, res: Response) => {
+router.patch("/settings", requireAuth, requireCsrfHeader, async (req: Request, res: Response) => {
   try {
     const current = await getCurrentSettings();
     const merged = { ...current, ...(req.body as Partial<SiteSettings>) };
@@ -161,17 +154,16 @@ router.patch("/settings", requireAdminSession, requireCsrfHeader, async (req: Re
         target: siteSettingsTable.id,
         set: { data: dataStr, updatedAt: new Date() },
       });
-    const { adminPasswordHash: _h, ...safe } = validated.data;
     const [logoRowPatch] = await db.select().from(siteImagesTable).where(eq(siteImagesTable.slot, "logo"));
     const logoUrlPatch = logoRowPatch ? `/api/storage${logoRowPatch.objectPath}` : null;
-    res.json({ ...safe, logoUrl: logoUrlPatch });
+    res.json({ ...validated.data, logoUrl: logoUrlPatch });
   } catch (error) {
     req.log.error({ err: error }, "Error updating settings");
     res.status(500).json({ error: "Failed to update settings" });
   }
 });
 
-router.post("/settings/reset", requireAdminSession, requireCsrfHeader, async (req: Request, res: Response) => {
+router.post("/settings/reset", requireAuth, requireCsrfHeader, async (req: Request, res: Response) => {
   try {
     const dataStr = JSON.stringify(DEFAULT_SETTINGS);
     await db
@@ -187,66 +179,6 @@ router.post("/settings/reset", requireAdminSession, requireCsrfHeader, async (re
   } catch (error) {
     req.log.error({ err: error }, "Error resetting settings");
     res.status(500).json({ error: "Failed to reset settings" });
-  }
-});
-
-router.post("/settings/first-run", requireCsrfHeader, async (req: Request, res: Response) => {
-  try {
-    const current = await getCurrentSettings();
-
-    // Allow unauthenticated first-run when:
-    // 1. Setup has never been completed (!current.setupComplete), OR
-    // 2. No admin password has been set yet (!current.adminPasswordHash) — covers the case
-    //    where the wizard was run before the admin account step existed.
-    // Once a password is configured, re-running setup requires an active admin session.
-    const isFirstTime = !current.setupComplete || !current.adminPasswordHash;
-    if (!isFirstTime && !req.session.isAdmin) {
-      res.status(403).json({ error: "Please sign in to the admin panel before re-running setup." });
-      return;
-    }
-
-    const rawBody = req.body as Record<string, unknown>;
-
-    // Accept a plain adminPassword, hash it server-side, and discard the plain value.
-    // When no password is set yet, a valid password is REQUIRED to complete setup.
-    let adminPasswordHash = current.adminPasswordHash;
-    const incomingPassword = rawBody.adminPassword;
-    if (typeof incomingPassword === "string" && incomingPassword.length >= 8) {
-      adminPasswordHash = await bcrypt.hash(incomingPassword, 12);
-    } else if (!current.adminPasswordHash) {
-      // No existing hash and no valid new password — refuse to complete first-run
-      res.status(400).json({ error: "A password of at least 8 characters is required to complete setup." });
-      return;
-    }
-    delete rawBody.adminPassword;
-    delete rawBody.adminPasswordHash;
-
-    const merged = {
-      ...current,
-      ...(rawBody as Partial<SiteSettings>),
-      adminPasswordHash,
-      setupComplete: true,
-    };
-
-    const validated = SiteSettingsSchema.safeParse(merged);
-    if (!validated.success) {
-      res.status(400).json({ error: "Invalid settings" });
-      return;
-    }
-    const dataStr = JSON.stringify(validated.data);
-    await db
-      .insert(siteSettingsTable)
-      .values({ id: 1, data: dataStr })
-      .onConflictDoUpdate({
-        target: siteSettingsTable.id,
-        set: { data: dataStr, updatedAt: new Date() },
-      });
-
-    const { adminPasswordHash: savedHash, adminEmail: _e, ...safe } = validated.data;
-    res.json({ ...safe, hasAdminPassword: Boolean(savedHash) });
-  } catch (error) {
-    req.log.error({ err: error }, "Error during first-run setup");
-    res.status(500).json({ error: "Failed to save setup" });
   }
 });
 

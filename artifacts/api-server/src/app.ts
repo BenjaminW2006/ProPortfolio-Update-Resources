@@ -1,9 +1,14 @@
-import express, { type Express } from "express";
+import express, { type Express, type Request, type Response, type NextFunction } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import pinoHttp from "pino-http";
-import session from "express-session";
-import { randomBytes } from "crypto";
+import { clerkMiddleware } from "@clerk/express";
+import { publishableKeyFromHost } from "@clerk/shared/keys";
+import {
+  CLERK_PROXY_PATH,
+  clerkProxyMiddleware,
+  getClerkProxyHost,
+} from "./middlewares/clerkProxyMiddleware";
 import router from "./routes";
 import { logger } from "./lib/logger";
 
@@ -24,6 +29,37 @@ app.use(
     },
   }),
 );
+
+// Serve Clerk JS bundle via unpkg.com — npm.clerk.dev is not reachable in this environment.
+// This route must be registered BEFORE the generic proxy middleware below.
+app.use(
+  `${CLERK_PROXY_PATH}/npm`,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // req.path is relative to the mount point, e.g. "/@clerk/clerk-js@6/dist/clerk.browser.js"
+      const npmPath = req.path.startsWith("/") ? req.path.slice(1) : req.path;
+      const upstream = await fetch(`https://unpkg.com/${npmPath}`, {
+        redirect: "follow",
+        headers: { "User-Agent": "Mozilla/5.0" },
+      });
+      if (!upstream.ok) {
+        res.status(upstream.status).end();
+        return;
+      }
+      const body = await upstream.arrayBuffer();
+      res.setHeader(
+        "Content-Type",
+        upstream.headers.get("Content-Type") ?? "application/javascript",
+      );
+      res.setHeader("Cache-Control", "public, max-age=86400");
+      res.send(Buffer.from(body));
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
+app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 
 app.use(
   helmet({
@@ -64,37 +100,13 @@ app.use(
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true, limit: "2mb" }));
 
-const isProduction = process.env.NODE_ENV === "production";
-
-const sessionSecret = (() => {
-  const secret = process.env.SESSION_SECRET;
-  const adminPw = process.env.ADMIN_PASSWORD;
-
-  if (!secret) {
-    if (isProduction) throw new Error("SESSION_SECRET must be set in production");
-    return randomBytes(32).toString("hex");
-  }
-
-  // SESSION_SECRET must never be the same value as ADMIN_PASSWORD
-  if (adminPw && secret === adminPw) {
-    throw new Error("SESSION_SECRET must not be the same value as ADMIN_PASSWORD");
-  }
-
-  return secret;
-})();
-
 app.use(
-  session({
-    secret: sessionSecret,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: isProduction,
-      maxAge: 8 * 60 * 60 * 1000,
-    },
-  }),
+  clerkMiddleware((req) => ({
+    publishableKey: publishableKeyFromHost(
+      getClerkProxyHost(req) ?? "",
+      process.env.CLERK_PUBLISHABLE_KEY,
+    ),
+  })),
 );
 
 app.use("/api", router);

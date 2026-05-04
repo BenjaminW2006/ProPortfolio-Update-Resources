@@ -1,4 +1,5 @@
 import { Router, type IRouter, type Request, type Response, type NextFunction } from "express";
+import { getAuth } from "@clerk/express";
 import { db } from "@workspace/db";
 import { projectsTable, siteImagesTable } from "@workspace/db/schema";
 import { eq, desc, and } from "drizzle-orm";
@@ -18,12 +19,13 @@ import {
 
 const router: IRouter = Router();
 
-function requireAdminSession(req: Request, res: Response, next: NextFunction): void {
-  if (req.session.isAdmin) {
-    next();
+function requireAuth(req: Request, res: Response, next: NextFunction): void {
+  const auth = getAuth(req);
+  if (!auth?.userId) {
+    res.status(401).json({ error: "Unauthorized" });
     return;
   }
-  res.status(401).json({ error: "Unauthorized" });
+  next();
 }
 
 function requireCsrfHeader(req: Request, res: Response, next: NextFunction): void {
@@ -81,7 +83,7 @@ router.get("/projects/:id", async (req: Request, res: Response) => {
   }
 });
 
-router.post("/projects", requireAdminSession, requireCsrfHeader, async (req: Request, res: Response) => {
+router.post("/projects", requireAuth, requireCsrfHeader, async (req: Request, res: Response) => {
   const bodyParsed = CreateProjectBody.safeParse(req.body);
   if (!bodyParsed.success) {
     res.status(400).json({ error: "Invalid body", details: bodyParsed.error.issues });
@@ -96,7 +98,7 @@ router.post("/projects", requireAdminSession, requireCsrfHeader, async (req: Req
   }
 });
 
-router.patch("/projects/:id", requireAdminSession, requireCsrfHeader, async (req: Request, res: Response) => {
+router.patch("/projects/:id", requireAuth, requireCsrfHeader, async (req: Request, res: Response) => {
   const paramsParsed = ProjectIdParam.safeParse(req.params);
   if (!paramsParsed.success) {
     res.status(400).json({ error: "Invalid project id" });
@@ -125,7 +127,7 @@ router.patch("/projects/:id", requireAdminSession, requireCsrfHeader, async (req
   }
 });
 
-router.delete("/projects/:id", requireAdminSession, requireCsrfHeader, async (req: Request, res: Response) => {
+router.delete("/projects/:id", requireAuth, requireCsrfHeader, async (req: Request, res: Response) => {
   const paramsParsed = ProjectIdParam.safeParse(req.params);
   if (!paramsParsed.success) {
     res.status(400).json({ error: "Invalid project id" });
@@ -143,7 +145,7 @@ router.delete("/projects/:id", requireAdminSession, requireCsrfHeader, async (re
 
 router.post(
   "/projects/:id/images",
-  requireAdminSession,
+  requireAuth,
   requireCsrfHeader,
   async (req: Request, res: Response) => {
     const paramsParsed = ProjectIdParam.safeParse(req.params);
@@ -178,7 +180,7 @@ router.post(
 
 router.delete(
   "/projects/:id/images/:imageId",
-  requireAdminSession,
+  requireAuth,
   requireCsrfHeader,
   async (req: Request, res: Response) => {
     const paramsParsed = ProjectImageIdParam.safeParse(req.params);
@@ -206,7 +208,7 @@ router.delete(
 
 router.patch(
   "/projects/:id/images/:imageId",
-  requireAdminSession,
+  requireAuth,
   requireCsrfHeader,
   async (req: Request, res: Response) => {
     const paramsParsed = ProjectImageIdParam.safeParse(req.params);
@@ -241,7 +243,7 @@ router.patch(
 
 router.patch(
   "/projects/:id/cover",
-  requireAdminSession,
+  requireAuth,
   requireCsrfHeader,
   async (req: Request, res: Response) => {
     const paramsParsed = ProjectIdParam.safeParse(req.params);
