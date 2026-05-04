@@ -184,6 +184,10 @@ export const GetSettingsResponse = zod.object({
   setupComplete: zod
     .boolean()
     .describe("Whether the initial setup wizard has been completed."),
+  logoUrl: zod
+    .string()
+    .nullish()
+    .describe("URL of the uploaded logo image, or null if no logo is set."),
 });
 
 /**
@@ -299,6 +303,10 @@ export const UpdateSettingsBody = zod.object({
   setupComplete: zod
     .boolean()
     .describe("Whether the initial setup wizard has been completed."),
+  logoUrl: zod
+    .string()
+    .nullish()
+    .describe("URL of the uploaded logo image, or null if no logo is set."),
 });
 
 export const updateSettingsResponseGalleriesItemKeyRegExp = new RegExp(
@@ -412,6 +420,10 @@ export const UpdateSettingsResponse = zod.object({
   setupComplete: zod
     .boolean()
     .describe("Whether the initial setup wizard has been completed."),
+  logoUrl: zod
+    .string()
+    .nullish()
+    .describe("URL of the uploaded logo image, or null if no logo is set."),
 });
 
 /**
@@ -529,6 +541,10 @@ export const ResetSettingsResponse = zod.object({
   setupComplete: zod
     .boolean()
     .describe("Whether the initial setup wizard has been completed."),
+  logoUrl: zod
+    .string()
+    .nullish()
+    .describe("URL of the uploaded logo image, or null if no logo is set."),
 });
 
 /**
