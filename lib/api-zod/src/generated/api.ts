@@ -103,9 +103,6 @@ export const GetSettingsResponse = zod.object({
     .string()
     .describe("Heading for the About\/Why Choose Us section."),
   aboutText: zod.string().describe("Body paragraph for the About section."),
-  aboutQuote: zod
-    .string()
-    .describe("Pull quote shown over the About section image."),
   servicesHeading: zod.string().describe("Heading for the Services section."),
   servicesSubtitle: zod
     .string()
@@ -212,9 +209,6 @@ export const UpdateSettingsBody = zod.object({
     .string()
     .describe("Heading for the About\/Why Choose Us section."),
   aboutText: zod.string().describe("Body paragraph for the About section."),
-  aboutQuote: zod
-    .string()
-    .describe("Pull quote shown over the About section image."),
   servicesHeading: zod.string().describe("Heading for the Services section."),
   servicesSubtitle: zod
     .string()
@@ -313,9 +307,6 @@ export const UpdateSettingsResponse = zod.object({
     .string()
     .describe("Heading for the About\/Why Choose Us section."),
   aboutText: zod.string().describe("Body paragraph for the About section."),
-  aboutQuote: zod
-    .string()
-    .describe("Pull quote shown over the About section image."),
   servicesHeading: zod.string().describe("Heading for the Services section."),
   servicesSubtitle: zod
     .string()
@@ -424,9 +415,6 @@ export const ResetSettingsResponse = zod.object({
     .string()
     .describe("Heading for the About\/Why Choose Us section."),
   aboutText: zod.string().describe("Body paragraph for the About section."),
-  aboutQuote: zod
-    .string()
-    .describe("Pull quote shown over the About section image."),
   servicesHeading: zod.string().describe("Heading for the Services section."),
   servicesSubtitle: zod
     .string()

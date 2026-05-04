@@ -1614,7 +1614,6 @@ function SettingsView() {
         )}
         {field("Section heading", form.aboutTitle ?? "", (v) => setForm((f) => f ? { ...f, aboutTitle: v } : f), "e.g. A Team You Can Count On.")}
         {textareaField("Body paragraph", form.aboutText ?? "", (v) => setForm((f) => f ? { ...f, aboutText: v } : f), "Share why you started the business and what makes you different.")}
-        {field("Pull quote (shown over image)", form.aboutQuote ?? "", (v) => setForm((f) => f ? { ...f, aboutQuote: v } : f), "e.g. Good work isn't just about how it looks — it's about how it lasts.")}
       </div>
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
         <div>

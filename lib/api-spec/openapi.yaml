@@ -349,7 +349,7 @@ components:
           description: Short subtitle shown on the tile and gallery page.
     SiteSettings:
       type: object
-      required: [companyName, tagline1, tagline2, tagline3, heroSubtitle, aboutTitle, aboutText, aboutQuote, servicesHeading, servicesSubtitle, phone, email, serviceArea, services, galleries, colorBg, colorText, colorAccent, colorHeader, showHero, showGalleries, showServices, showAbout, setupComplete]
+      required: [companyName, tagline1, tagline2, tagline3, heroSubtitle, aboutTitle, aboutText, servicesHeading, servicesSubtitle, phone, email, serviceArea, services, galleries, colorBg, colorText, colorAccent, colorHeader, showHero, showGalleries, showServices, showAbout, setupComplete]
       properties:
         companyName:
           type: string
@@ -372,9 +372,6 @@ components:
         aboutText:
           type: string
           description: Body paragraph for the About section.
-        aboutQuote:
-          type: string
-          description: Pull quote shown over the About section image.
         servicesHeading:
           type: string
           description: Heading for the Services section.

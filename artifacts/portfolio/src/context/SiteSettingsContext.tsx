@@ -20,7 +20,6 @@ export interface SiteSettings {
   heroSubtitle: string;
   aboutTitle: string;
   aboutText: string;
-  aboutQuote: string;
   servicesHeading: string;
   servicesSubtitle: string;
   phone: string;
@@ -50,7 +49,6 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   heroSubtitle: "Professional services tailored to your needs. We show up on time, work with care, and stand behind everything we do.",
   aboutTitle: "A Team You Can Count On.",
   aboutText: "We built this business because we saw a need for reliable, honest professionals in our community. We don't cut corners or leave messes. When we make a commitment, we keep it.",
-  aboutQuote: "Good work isn't just about how it looks — it's about how it lasts.",
   servicesHeading: "What We Offer",
   servicesSubtitle: "From small repairs to major projects, we bring professional tools and real expertise to every job.",
   phone: "(555) 000-0000",

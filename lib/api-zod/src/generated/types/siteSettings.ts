@@ -23,8 +23,6 @@ export interface SiteSettings {
   aboutTitle: string;
   /** Body paragraph for the About section. */
   aboutText: string;
-  /** Pull quote shown over the About section image. */
-  aboutQuote: string;
   /** Heading for the Services section. */
   servicesHeading: string;
   /** Subtitle shown below the Services heading. */
