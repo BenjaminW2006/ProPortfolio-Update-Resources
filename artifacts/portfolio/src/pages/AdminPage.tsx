@@ -226,9 +226,7 @@ function LoginForm({ onLogin }: { onLogin: (setupRequested?: boolean) => void })
                 type="button"
                 onClick={() => setShowSetupNote(true)}
                 className="text-slate-500 hover:text-slate-300 text-sm transition-colors"
-              >
-                Set up your site
-              </button>
+              >Get Started!</button>
             </div>
           </form>
         ) : resetSent ? (
