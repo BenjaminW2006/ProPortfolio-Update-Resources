@@ -4,8 +4,14 @@ export const ProjectImageItem = z.object({
   id: z.number(),
   objectPath: z.string(),
   uploadedAt: z.coerce.date().optional(),
+  label: z.enum(["before", "after"]).nullable().optional(),
 });
 export type ProjectImageItem = z.infer<typeof ProjectImageItem>;
+
+export const SetImageLabelBody = z.object({
+  label: z.enum(["before", "after"]).nullable(),
+});
+export type SetImageLabelBody = z.infer<typeof SetImageLabelBody>;
 
 export const ProjectResponse = z.object({
   id: z.number(),

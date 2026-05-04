@@ -66,6 +66,7 @@ interface ProjectImage {
   id: number;
   objectPath: string;
   uploadedAt?: string;
+  label?: "before" | "after" | null;
 }
 
 interface ProjectDetail extends Project {
@@ -675,6 +676,24 @@ function ProjectPhotoGrid({
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [labelingId, setLabelingId] = useState<number | null>(null);
+
+  const handleLabel = async (imageId: number, newLabel: "before" | "after" | null) => {
+    setLabelingId(imageId);
+    try {
+      const res = await apiMutation(`/api/projects/${projectId}/images/${imageId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ label: newLabel }),
+      });
+      if (!res.ok) throw new Error("Failed to update label");
+      queryClient.invalidateQueries({ queryKey: ["admin-project", projectId] });
+    } catch {
+      toast({ title: "Error", description: "Failed to update label.", variant: "destructive" });
+    } finally {
+      setLabelingId(null);
+    }
+  };
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -730,10 +749,50 @@ function ProjectPhotoGrid({
         )}
       </h4>
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-        {images.map((img) => (
+        {[...images].sort((a, b) => {
+          const o = (l?: "before" | "after" | null) => l === "before" ? 0 : l === "after" ? 2 : 1;
+          return o(a.label) - o(b.label);
+        }).map((img) => (
           <div key={img.id} className="group relative aspect-square rounded-xl overflow-hidden bg-slate-900">
             <img src={getImageUrl(img.objectPath)} alt="" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors" />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors" />
+
+            {/* Label badge — always visible */}
+            {img.label && (
+              <span className={`absolute top-2 left-2 px-2 py-0.5 rounded-full text-xs font-semibold pointer-events-none ${
+                img.label === "before" ? "bg-amber-500/90 text-white" : "bg-emerald-500/90 text-white"
+              }`}>
+                {img.label === "before" ? "Before" : "After"}
+              </span>
+            )}
+
+            {/* Label toggle buttons — visible on hover */}
+            <div className="absolute bottom-2 left-2 right-2 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button
+                onClick={() => handleLabel(img.id, img.label === "before" ? null : "before")}
+                disabled={labelingId === img.id}
+                className={`flex-1 py-1 rounded-md text-xs font-semibold transition-colors disabled:opacity-50 ${
+                  img.label === "before"
+                    ? "bg-amber-500 text-white"
+                    : "bg-black/60 text-amber-300 hover:bg-amber-500/80 hover:text-white"
+                }`}
+              >
+                {labelingId === img.id ? "..." : "Before"}
+              </button>
+              <button
+                onClick={() => handleLabel(img.id, img.label === "after" ? null : "after")}
+                disabled={labelingId === img.id}
+                className={`flex-1 py-1 rounded-md text-xs font-semibold transition-colors disabled:opacity-50 ${
+                  img.label === "after"
+                    ? "bg-emerald-500 text-white"
+                    : "bg-black/60 text-emerald-300 hover:bg-emerald-500/80 hover:text-white"
+                }`}
+              >
+                {labelingId === img.id ? "..." : "After"}
+              </button>
+            </div>
+
+            {/* Delete button */}
             <button
               onClick={() => handleDelete(img.id)}
               disabled={deletingId === img.id}

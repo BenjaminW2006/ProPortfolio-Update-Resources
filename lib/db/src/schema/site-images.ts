@@ -9,6 +9,7 @@ export const siteImagesTable = pgTable("site_images", {
   objectPath: text("object_path").notNull(),
   uploadedAt: timestamp("uploaded_at").defaultNow().notNull(),
   projectId: integer("project_id").references(() => projectsTable.id, { onDelete: "cascade" }),
+  label: text("label"),
 });
 
 export const insertSiteImageSchema = createInsertSchema(siteImagesTable).omit({ id: true, uploadedAt: true });

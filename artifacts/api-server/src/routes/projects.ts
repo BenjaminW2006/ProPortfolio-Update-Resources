@@ -13,6 +13,7 @@ import {
   ListProjectsResponse,
   ProjectImageItem,
   SetProjectCoverBody,
+  SetImageLabelBody,
 } from "@workspace/api-zod";
 
 const router: IRouter = Router();
@@ -70,6 +71,7 @@ router.get("/projects/:id", async (req: Request, res: Response) => {
           id: img.id,
           objectPath: img.objectPath,
           uploadedAt: img.uploadedAt,
+          label: img.label ?? null,
         })),
       })
     );
@@ -198,6 +200,41 @@ router.delete(
     } catch (error) {
       req.log.error({ err: error }, "Error deleting project image");
       res.status(500).json({ error: "Failed to delete image" });
+    }
+  }
+);
+
+router.patch(
+  "/projects/:id/images/:imageId",
+  requireAdminSession,
+  requireCsrfHeader,
+  async (req: Request, res: Response) => {
+    const paramsParsed = ProjectImageIdParam.safeParse(req.params);
+    if (!paramsParsed.success) {
+      res.status(400).json({ error: "Invalid params" });
+      return;
+    }
+    const bodyParsed = SetImageLabelBody.safeParse(req.body);
+    if (!bodyParsed.success) {
+      res.status(400).json({ error: "Invalid body" });
+      return;
+    }
+    const { id, imageId } = paramsParsed.data;
+    const { label } = bodyParsed.data;
+    try {
+      const [image] = await db
+        .update(siteImagesTable)
+        .set({ label })
+        .where(and(eq(siteImagesTable.id, imageId), eq(siteImagesTable.projectId, id)))
+        .returning();
+      if (!image) {
+        res.status(404).json({ error: "Image not found in this project" });
+        return;
+      }
+      res.json(ProjectImageItem.parse({ id: image.id, objectPath: image.objectPath, uploadedAt: image.uploadedAt, label: image.label ?? null }));
+    } catch (error) {
+      req.log.error({ err: error }, "Error updating image label");
+      res.status(500).json({ error: "Failed to update label" });
     }
   }
 );
