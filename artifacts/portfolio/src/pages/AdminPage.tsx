@@ -1149,11 +1149,12 @@ function SettingsView() {
           <p className="text-slate-500 text-xs mt-0.5">Click a swatch to open a color picker, or type a hex value directly.</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-          {(["colorBg", "colorText", "colorAccent"] as const).map((key) => {
+          {(["colorBg", "colorText", "colorAccent", "colorHeader"] as const).map((key) => {
             const labels: Record<typeof key, string> = {
-              colorBg: "Background",
+              colorBg: "Page Background",
               colorText: "Text",
               colorAccent: "Accent",
+              colorHeader: "Header / Nav",
             };
             return (
               <div key={key}>
@@ -1178,7 +1179,7 @@ function SettingsView() {
         </div>
         <div
           className="rounded-lg px-4 py-3 text-sm flex items-center gap-3"
-          style={{ backgroundColor: form.colorBg, color: form.colorText, border: `2px solid ${form.colorAccent}` }}
+          style={{ backgroundColor: form.colorHeader, color: form.colorText, border: `2px solid ${form.colorAccent}` }}
         >
           <span style={{ color: form.colorAccent }}>●</span>
           <span>Live preview — this bar uses your chosen colors.</span>

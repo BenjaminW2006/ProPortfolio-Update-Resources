@@ -18,6 +18,7 @@ export interface SiteSettings {
   colorBg: string;
   colorText: string;
   colorAccent: string;
+  colorHeader: string;
 }
 
 export const DEFAULT_SETTINGS: SiteSettings = {
@@ -41,6 +42,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   colorBg: "#0f172a",
   colorText: "#f1f5f9",
   colorAccent: "#2563eb",
+  colorHeader: "#0f172a",
 };
 
 const SiteSettingsContext = createContext<SiteSettings>(DEFAULT_SETTINGS);
@@ -64,7 +66,8 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     root.style.setProperty("--site-bg", settings.colorBg);
     root.style.setProperty("--site-text", settings.colorText);
     root.style.setProperty("--site-accent", settings.colorAccent);
-  }, [settings.colorBg, settings.colorText, settings.colorAccent]);
+    root.style.setProperty("--site-header", settings.colorHeader);
+  }, [settings.colorBg, settings.colorText, settings.colorAccent, settings.colorHeader]);
 
   return (
     <SiteSettingsContext.Provider value={settings}>

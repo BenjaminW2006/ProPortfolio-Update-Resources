@@ -7,6 +7,7 @@
   --site-bg: #0f172a;
   --site-text: #f1f5f9;
   --site-accent: #2563eb;
+  --site-header: #0f172a;
 }
 
 .bg-site { background-color: var(--site-bg) !important; }

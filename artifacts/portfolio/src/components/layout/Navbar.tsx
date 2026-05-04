@@ -34,8 +34,8 @@ export default function Navbar() {
       }`}
       style={{
         backgroundColor: isScrolled
-          ? "color-mix(in srgb, var(--site-bg) 98%, transparent)"
-          : "color-mix(in srgb, var(--site-bg) 82%, transparent)",
+          ? "color-mix(in srgb, var(--site-header) 98%, transparent)"
+          : "color-mix(in srgb, var(--site-header) 82%, transparent)",
       }}
     >
       <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
@@ -61,7 +61,7 @@ export default function Navbar() {
         <div
           id="mobile-nav-menu"
           className="backdrop-blur-sm border-t border-white/10 px-4 pb-4 pt-2"
-          style={{ backgroundColor: "color-mix(in srgb, var(--site-bg) 98%, transparent)" }}
+          style={{ backgroundColor: "color-mix(in srgb, var(--site-header) 98%, transparent)" }}
         >
           <Link href="/">
             <span className={navLinkClass("/")}>Home</span>

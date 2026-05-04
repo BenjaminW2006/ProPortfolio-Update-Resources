@@ -25,6 +25,7 @@ const SiteSettingsSchema = z.object({
   colorBg: hexColor.default("#0f172a"),
   colorText: hexColor.default("#f1f5f9"),
   colorAccent: hexColor.default("#2563eb"),
+  colorHeader: hexColor.default("#0f172a"),
 });
 
 type SiteSettings = z.infer<typeof SiteSettingsSchema>;
@@ -40,6 +41,7 @@ const DEFAULT_SETTINGS: SiteSettings = {
   colorBg: "#0f172a",
   colorText: "#f1f5f9",
   colorAccent: "#2563eb",
+  colorHeader: "#0f172a",
   services: [
     { title: "General Handyman", description: "Fixing what's broken. Door repairs, fixture installation, drywall patching, and everyday maintenance around the house." },
     { title: "Painting", description: "Interior and exterior painting, trim work, deck staining, and touch-ups with meticulous attention to detail." },

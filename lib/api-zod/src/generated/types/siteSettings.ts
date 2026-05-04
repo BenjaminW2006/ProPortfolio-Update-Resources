@@ -39,4 +39,9 @@ export interface SiteSettings {
    * @pattern ^#[0-9A-Fa-f]{6}$
    */
   colorAccent: string;
+  /**
+   * Navbar/header background color as a hex value (e.g. #0f172a).
+   * @pattern ^#[0-9A-Fa-f]{6}$
+   */
+  colorHeader: string;
 }

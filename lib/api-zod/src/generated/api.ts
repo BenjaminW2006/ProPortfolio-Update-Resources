@@ -82,6 +82,9 @@ export const getSettingsResponseColorTextRegExp = new RegExp(
 export const getSettingsResponseColorAccentRegExp = new RegExp(
   "^#[0-9A-Fa-f]{6}$",
 );
+export const getSettingsResponseColorHeaderRegExp = new RegExp(
+  "^#[0-9A-Fa-f]{6}$",
+);
 
 export const GetSettingsResponse = zod.object({
   companyName: zod
@@ -113,6 +116,10 @@ export const GetSettingsResponse = zod.object({
     .string()
     .regex(getSettingsResponseColorAccentRegExp)
     .describe("Accent\/brand color as a hex value (e.g. #2563eb)."),
+  colorHeader: zod
+    .string()
+    .regex(getSettingsResponseColorHeaderRegExp)
+    .describe("Navbar\/header background color as a hex value (e.g. #0f172a)."),
 });
 
 /**
@@ -124,6 +131,9 @@ export const updateSettingsBodyColorTextRegExp = new RegExp(
   "^#[0-9A-Fa-f]{6}$",
 );
 export const updateSettingsBodyColorAccentRegExp = new RegExp(
+  "^#[0-9A-Fa-f]{6}$",
+);
+export const updateSettingsBodyColorHeaderRegExp = new RegExp(
   "^#[0-9A-Fa-f]{6}$",
 );
 
@@ -157,6 +167,10 @@ export const UpdateSettingsBody = zod.object({
     .string()
     .regex(updateSettingsBodyColorAccentRegExp)
     .describe("Accent\/brand color as a hex value (e.g. #2563eb)."),
+  colorHeader: zod
+    .string()
+    .regex(updateSettingsBodyColorHeaderRegExp)
+    .describe("Navbar\/header background color as a hex value (e.g. #0f172a)."),
 });
 
 export const updateSettingsResponseColorBgRegExp = new RegExp(
@@ -166,6 +180,9 @@ export const updateSettingsResponseColorTextRegExp = new RegExp(
   "^#[0-9A-Fa-f]{6}$",
 );
 export const updateSettingsResponseColorAccentRegExp = new RegExp(
+  "^#[0-9A-Fa-f]{6}$",
+);
+export const updateSettingsResponseColorHeaderRegExp = new RegExp(
   "^#[0-9A-Fa-f]{6}$",
 );
 
@@ -199,6 +216,10 @@ export const UpdateSettingsResponse = zod.object({
     .string()
     .regex(updateSettingsResponseColorAccentRegExp)
     .describe("Accent\/brand color as a hex value (e.g. #2563eb)."),
+  colorHeader: zod
+    .string()
+    .regex(updateSettingsResponseColorHeaderRegExp)
+    .describe("Navbar\/header background color as a hex value (e.g. #0f172a)."),
 });
 
 /**
@@ -212,6 +233,9 @@ export const resetSettingsResponseColorTextRegExp = new RegExp(
   "^#[0-9A-Fa-f]{6}$",
 );
 export const resetSettingsResponseColorAccentRegExp = new RegExp(
+  "^#[0-9A-Fa-f]{6}$",
+);
+export const resetSettingsResponseColorHeaderRegExp = new RegExp(
   "^#[0-9A-Fa-f]{6}$",
 );
 
@@ -245,6 +269,10 @@ export const ResetSettingsResponse = zod.object({
     .string()
     .regex(resetSettingsResponseColorAccentRegExp)
     .describe("Accent\/brand color as a hex value (e.g. #2563eb)."),
+  colorHeader: zod
+    .string()
+    .regex(resetSettingsResponseColorHeaderRegExp)
+    .describe("Navbar\/header background color as a hex value (e.g. #0f172a)."),
 });
 
 /**
