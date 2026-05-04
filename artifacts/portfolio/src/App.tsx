@@ -91,7 +91,8 @@ const clerkAppearance = {
 };
 
 function ManagerSignInPage() {
-  const { companyName } = useSiteSettings();
+  const { companyName, logoUrl } = useSiteSettings();
+  const logoImageUrl = logoUrl ?? `${window.location.origin}${basePath}/logo.svg`;
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4">
       <div className="flex flex-col items-center gap-1">
@@ -105,6 +106,7 @@ function ManagerSignInPage() {
           path={`${basePath}/manager/sign-in`}
           signUpUrl={`${basePath}/manager/sign-in`}
           forceRedirectUrl={`${basePath}/manager`}
+          appearance={{ options: { logoImageUrl } }}
         />
       </div>
     </div>
