@@ -29,13 +29,13 @@ export interface SiteSettings {
 }
 
 export const DEFAULT_SETTINGS: SiteSettings = {
-  companyName: "Upstate Palmetto Property Services",
-  tagline1: "Hard Work.",
+  companyName: "Your Business Name",
+  tagline1: "Quality Work.",
   tagline2: "Done Right.",
   tagline3: "Every Time.",
-  phone: "(864) 434-2842",
-  email: "Upstate-Palmetto@outlook.com",
-  serviceArea: "Upstate South Carolina",
+  phone: "(555) 000-0000",
+  email: "hello@yourbusiness.com",
+  serviceArea: "Your City, State",
   services: [
     { title: "General Handyman", description: "Fixing what's broken. Door repairs, fixture installation, drywall patching, and everyday maintenance around the house." },
     { title: "Painting", description: "Interior and exterior painting, trim work, deck staining, and touch-ups with meticulous attention to detail." },

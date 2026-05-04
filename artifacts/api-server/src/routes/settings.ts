@@ -41,13 +41,13 @@ const SiteSettingsSchema = z.object({
 type SiteSettings = z.infer<typeof SiteSettingsSchema>;
 
 const DEFAULT_SETTINGS: SiteSettings = {
-  companyName: "Upstate Palmetto Property Services",
-  tagline1: "Hard Work.",
+  companyName: "Your Business Name",
+  tagline1: "Quality Work.",
   tagline2: "Done Right.",
   tagline3: "Every Time.",
-  phone: "(864) 434-2842",
-  email: "Upstate-Palmetto@outlook.com",
-  serviceArea: "Upstate South Carolina",
+  phone: "(555) 000-0000",
+  email: "hello@yourbusiness.com",
+  serviceArea: "Your City, State",
   colorBg: "#0f172a",
   colorText: "#f1f5f9",
   colorAccent: "#2563eb",
