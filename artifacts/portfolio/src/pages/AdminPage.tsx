@@ -1071,7 +1071,7 @@ function LogoUpload() {
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-slate-300 text-sm font-medium mb-1">{current ? "Logo uploaded" : "No logo uploaded"}</p>
-        <p className="text-slate-500 text-xs mb-2">Appears in the navbar. PNG or SVG with transparency works best.</p>
+        <p className="text-slate-500 text-xs mb-2">Appears in the navbar. PNG with a transparent background works best.</p>
         <div className="flex gap-2 flex-wrap">
           <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
           <Button
@@ -1525,7 +1525,7 @@ function SettingsView() {
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
         <div>
           <h3 className="text-base font-semibold font-serif text-slate-200">Logo</h3>
-          <p className="text-slate-500 text-xs mt-0.5">Upload a logo to display in the navbar. PNG or SVG with a transparent background works best.</p>
+          <p className="text-slate-500 text-xs mt-0.5">Upload a logo to display in the navbar. PNG with a transparent background works best.</p>
         </div>
         <LogoUpload />
       </div>

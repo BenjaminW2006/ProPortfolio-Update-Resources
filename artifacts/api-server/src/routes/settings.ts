@@ -155,7 +155,9 @@ router.get("/admin/settings", requireAdminSession, async (req: Request, res: Res
   try {
     const raw = await getCurrentSettings();
     const { adminPasswordHash: _h, ...settings } = raw;
-    res.json(settings);
+    const [logoRow] = await db.select().from(siteImagesTable).where(eq(siteImagesTable.slot, "logo"));
+    const logoUrl = logoRow ? `/api/storage${logoRow.objectPath}` : null;
+    res.json({ ...settings, logoUrl });
   } catch (error) {
     req.log.error({ err: error }, "Error fetching admin settings");
     res.status(500).json({ error: "Failed to fetch settings" });
