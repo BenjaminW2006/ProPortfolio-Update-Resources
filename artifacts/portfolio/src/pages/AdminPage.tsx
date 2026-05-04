@@ -185,9 +185,9 @@ function LoginForm({ onLogin }: { onLogin: (setupRequested?: boolean) => void })
             <ImageIcon className="w-7 h-7 text-blue-400" />
           </div>
           <h1 className="text-2xl font-bold text-white font-serif">
-            ProPortfolio
+            {companyName || "Company Manager"}
           </h1>
-          <p className="text-slate-400 text-sm mt-2">{companyName || "Company Manager"}</p>
+          <p className="text-slate-400 text-sm mt-2">Company Manager</p>
         </div>
 
         {!showForgot ? (
