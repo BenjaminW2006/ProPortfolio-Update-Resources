@@ -956,10 +956,6 @@ function ProjectListView({
           <div className="flex flex-col items-center justify-center py-24 text-slate-600 gap-4 border-2 border-dashed border-slate-700 rounded-2xl">
             <ImageIcon className="w-14 h-14" />
             <p className="text-lg text-slate-500">No projects yet</p>
-            <Button className="bg-blue-600 hover:bg-blue-700" onClick={onCreateNew}>
-              <Plus className="w-4 h-4 mr-2" />
-              Create Your First Project
-            </Button>
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-slate-600 gap-3">
