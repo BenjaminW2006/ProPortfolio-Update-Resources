@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ImageIcon, Calendar, ArrowLeft } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
 
 interface Project {
   id: number;
@@ -11,13 +12,10 @@ interface Project {
   date: string;
   location: string;
   description: string;
-  category: "interior" | "exterior" | null;
+  category: string | null;
   coverObjectPath: string | null;
   createdAt: string;
 }
-
-const CATEGORY_ORDER = ["interior", "exterior"] as const;
-const CATEGORY_LABELS: Record<string, string> = { interior: "Interior", exterior: "Exterior" };
 
 function getImageUrl(objectPath: string): string {
   return `/api/storage${objectPath}`;
@@ -54,7 +52,7 @@ function ProjectCard({ project }: { project: Project }) {
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
           </div>
           <div className="p-5">
-            <h2 className="text-lg font-semibold font-serif text-white group-hover:text-blue-300 transition-colors">
+            <h2 className="text-lg font-semibold font-serif text-white group-hover:text-site-accent transition-colors">
               {project.name}
             </h2>
             <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-slate-400 text-sm">
@@ -85,8 +83,8 @@ function ProjectGrid({ projects }: { projects: Project[] }) {
   );
 }
 
-function ProjectGroups({ projects }: { projects: Project[] }) {
-  const grouped: Record<string, Project[]> = { interior: [], exterior: [], uncategorized: [] };
+function ProjectGroups({ projects, galleryOrder }: { projects: Project[]; galleryOrder: Array<{ key: string; label: string }> }) {
+  const grouped: Record<string, Project[]> = {};
   for (const p of projects) {
     const key = p.category ?? "uncategorized";
     if (!grouped[key]) grouped[key] = [];
@@ -94,9 +92,9 @@ function ProjectGroups({ projects }: { projects: Project[] }) {
   }
 
   const sections: Array<{ key: string; label: string; items: Project[] }> = [
-    ...CATEGORY_ORDER
-      .filter((k) => grouped[k]?.length > 0)
-      .map((k) => ({ key: k, label: CATEGORY_LABELS[k], items: grouped[k] })),
+    ...galleryOrder
+      .filter((g) => grouped[g.key]?.length > 0)
+      .map((g) => ({ key: g.key, label: g.label, items: grouped[g.key] })),
     ...(grouped.uncategorized?.length > 0
       ? [{ key: "uncategorized", label: "Other Projects", items: grouped.uncategorized }]
       : []),
@@ -110,7 +108,7 @@ function ProjectGroups({ projects }: { projects: Project[] }) {
     <div className="space-y-16">
       {sections.map((section) => (
         <div key={section.key}>
-          <h2 className="text-2xl font-bold font-serif mb-6 text-white">{section.label}</h2>
+          <h2 className="text-2xl font-bold font-serif mb-6 text-site">{section.label}</h2>
           <ProjectGrid projects={section.items} />
         </div>
       ))}
@@ -118,12 +116,9 @@ function ProjectGroups({ projects }: { projects: Project[] }) {
   );
 }
 
-const CATEGORY_TITLES: Record<string, { heading: string; sub: string }> = {
-  interior: { heading: "Interior Projects", sub: "Indoor work completed by Upstate Palmetto Property Services." },
-  exterior: { heading: "Exterior Projects", sub: "Outdoor work completed by Upstate Palmetto Property Services." },
-};
+export default function GalleryPage({ category }: { category?: string }) {
+  const { galleries = [], companyName } = useSiteSettings();
 
-export default function GalleryPage({ category }: { category?: "interior" | "exterior" }) {
   const { data: allProjects = [], isLoading } = useQuery<Project[]>({
     queryKey: ["projects"],
     queryFn: async () => {
@@ -138,9 +133,11 @@ export default function GalleryPage({ category }: { category?: "interior" | "ext
     ? allProjects.filter((p) => p.category === category)
     : allProjects;
 
-  const { heading, sub } = category
-    ? CATEGORY_TITLES[category]
-    : { heading: "Our Work", sub: "Browse completed projects from Upstate Palmetto Property Services." };
+  const gallery = galleries.find((g) => g.key === category);
+  const heading = gallery ? gallery.label : "Our Work";
+  const sub = gallery
+    ? gallery.description
+    : `Browse completed projects from ${companyName}.`;
 
   return (
     <div className="min-h-screen bg-site text-site flex flex-col">
@@ -163,7 +160,7 @@ export default function GalleryPage({ category }: { category?: "interior" | "ext
 
           {isLoading ? (
             <div className="flex items-center justify-center py-32">
-              <div className="w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 border-site-accent border-t-transparent rounded-full animate-spin" />
             </div>
           ) : projects.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-32 text-slate-600 gap-4">
@@ -174,7 +171,7 @@ export default function GalleryPage({ category }: { category?: "interior" | "ext
           ) : category ? (
             <ProjectGrid projects={projects} />
           ) : (
-            <ProjectGroups projects={projects} />
+            <ProjectGroups projects={projects} galleryOrder={galleries} />
           )}
         </div>
       </main>

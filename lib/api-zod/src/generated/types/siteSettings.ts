@@ -5,6 +5,7 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { SiteGallery } from "./siteGallery";
 import type { SiteService } from "./siteService";
 
 export interface SiteSettings {
@@ -24,6 +25,8 @@ export interface SiteSettings {
   serviceArea: string;
   /** List of services offered. */
   services: SiteService[];
+  /** Ordered list of gallery categories shown as tiles on the home page. */
+  galleries: SiteGallery[];
   /**
    * Page background color as a hex value (e.g. #0f172a).
    * @pattern ^#[0-9A-Fa-f]{6}$

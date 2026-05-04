@@ -21,7 +21,7 @@ import {
   Settings,
   FolderOpen,
 } from "lucide-react";
-import { DEFAULT_SETTINGS, type SiteSettings } from "@/context/SiteSettingsContext";
+import { DEFAULT_SETTINGS, useSiteSettings, type SiteSettings } from "@/context/SiteSettingsContext";
 
 interface Project {
   id: number;
@@ -29,7 +29,7 @@ interface Project {
   date: string;
   location: string;
   description: string;
-  category: "interior" | "exterior" | null;
+  category: string | null;
   coverObjectPath: string | null;
   createdAt: string;
 }
@@ -191,7 +191,8 @@ function CreateProjectForm({
 }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [form, setForm] = useState({ name: "", date: "", location: "", description: "", category: "" as "" | "interior" | "exterior" });
+  const { galleries = [] } = useSiteSettings();
+  const [form, setForm] = useState({ name: "", date: "", location: "", description: "", category: "" });
   const [saving, setSaving] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -250,15 +251,16 @@ function CreateProjectForm({
             />
           </div>
           <div>
-            <label className="block text-slate-400 text-sm mb-1.5">Category</label>
+            <label className="block text-slate-400 text-sm mb-1.5">Gallery</label>
             <select
               value={form.category}
-              onChange={(e) => setForm((f) => ({ ...f, category: e.target.value as "" | "interior" | "exterior" }))}
+              onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
               className="w-full h-10 rounded-md border border-slate-600 bg-slate-700 text-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">— No category —</option>
-              <option value="interior">Interior</option>
-              <option value="exterior">Exterior</option>
+              <option value="">— No gallery —</option>
+              {galleries.map((g) => (
+                <option key={g.key} value={g.key}>{g.label}</option>
+              ))}
             </select>
           </div>
           <div>
@@ -305,12 +307,13 @@ function EditProjectForm({
 }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { galleries = [] } = useSiteSettings();
   const [form, setForm] = useState({
     name: project.name,
     date: toDateInputValue(project.date),
     location: project.location,
     description: project.description,
-    category: (project.category ?? "") as "" | "interior" | "exterior",
+    category: project.category ?? "",
   });
   const [saving, setSaving] = useState(false);
 
@@ -365,15 +368,16 @@ function EditProjectForm({
           />
         </div>
         <div>
-          <label className="block text-slate-400 text-sm mb-1.5">Category</label>
+          <label className="block text-slate-400 text-sm mb-1.5">Gallery</label>
           <select
             value={form.category}
-            onChange={(e) => setForm((f) => ({ ...f, category: e.target.value as "" | "interior" | "exterior" }))}
+            onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
             className="w-full h-10 rounded-md border border-slate-600 bg-slate-700 text-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="">— No category —</option>
-            <option value="interior">Interior</option>
-            <option value="exterior">Exterior</option>
+            <option value="">— No gallery —</option>
+            {galleries.map((g) => (
+              <option key={g.key} value={g.key}>{g.label}</option>
+            ))}
           </select>
         </div>
         <div>
@@ -906,6 +910,7 @@ function ProjectListView({
   onCreateNew: () => void;
 }) {
   const [search, setSearch] = useState("");
+  const { galleries: galleryTiles = [] } = useSiteSettings();
   const { data: projects = [], isLoading } = useQuery<Project[]>({
     queryKey: ["admin-projects"],
     queryFn: async () => {
@@ -924,10 +929,11 @@ function ProjectListView({
     <div className="space-y-10">
       <div>
         <h2 className="text-2xl font-bold font-serif mb-4">Gallery Tile Covers</h2>
-        <p className="text-slate-400 text-sm mb-5">These images appear on the home page tiles.</p>
+        <p className="text-slate-400 text-sm mb-5">These images appear on the home page tiles. Configure galleries in Site Settings.</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl">
-          <TileCoverUpload slot="tile-interior" label="Interior" />
-          <TileCoverUpload slot="tile-exterior" label="Exterior" />
+          {galleryTiles.map((g) => (
+            <TileCoverUpload key={g.key} slot={`tile-${g.key}`} label={g.label} />
+          ))}
         </div>
       </div>
 
@@ -1080,6 +1086,27 @@ function SettingsView() {
     }
   };
 
+  const addGallery = () =>
+    setForm((f) => f ? { ...f, galleries: [...f.galleries, { key: "", label: "", description: "" }] } : f);
+
+  const removeGallery = (i: number) =>
+    setForm((f) => f ? { ...f, galleries: f.galleries.filter((_, idx) => idx !== i) } : f);
+
+  const moveGallery = (i: number, dir: -1 | 1) =>
+    setForm((f) => {
+      if (!f) return f;
+      const g = [...f.galleries];
+      const n = i + dir;
+      if (n < 0 || n >= g.length) return f;
+      [g[i], g[n]] = [g[n], g[i]];
+      return { ...f, galleries: g };
+    });
+
+  const updateGallery = (i: number, key: "key" | "label" | "description", val: string) =>
+    setForm((f) =>
+      f ? { ...f, galleries: f.galleries.map((g, idx) => idx === i ? { ...g, [key]: val } : g) } : f
+    );
+
   const addService = () =>
     setForm((f) => f ? { ...f, services: [...f.services, { title: "", description: "" }] } : f);
 
@@ -1183,6 +1210,81 @@ function SettingsView() {
         >
           <span style={{ color: form.colorAccent }}>●</span>
           <span>Live preview — this bar uses your chosen colors.</span>
+        </div>
+      </div>
+
+      <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-base font-semibold font-serif text-slate-200">Galleries</h3>
+            <p className="text-slate-500 text-xs mt-0.5">Each gallery is a tile on the home page with its own filtered project page.</p>
+          </div>
+          <Button type="button" size="sm" className="bg-blue-600 hover:bg-blue-700 shrink-0" onClick={addGallery}>
+            <Plus className="w-3.5 h-3.5 mr-1.5" />
+            Add
+          </Button>
+        </div>
+        <div className="space-y-3">
+          {form.galleries.map((gallery, i) => (
+            <div key={i} className="bg-slate-700/60 rounded-xl border border-slate-600 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-slate-500 text-xs">#{i + 1}</span>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => moveGallery(i, -1)}
+                    disabled={i === 0}
+                    className="px-1.5 py-0.5 text-slate-400 hover:text-white disabled:opacity-30 text-xs rounded hover:bg-slate-600 transition-colors"
+                    aria-label="Move up"
+                  >↑</button>
+                  <button
+                    type="button"
+                    onClick={() => moveGallery(i, 1)}
+                    disabled={i === form.galleries.length - 1}
+                    className="px-1.5 py-0.5 text-slate-400 hover:text-white disabled:opacity-30 text-xs rounded hover:bg-slate-600 transition-colors"
+                    aria-label="Move down"
+                  >↓</button>
+                  <button
+                    type="button"
+                    onClick={() => removeGallery(i)}
+                    className="p-1 text-red-400 hover:text-red-300 transition-colors ml-1"
+                    aria-label="Remove"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-400 text-xs mb-1">URL key (slug)</label>
+                  <Input
+                    value={gallery.key}
+                    onChange={(e) => updateGallery(i, "key", e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"))}
+                    placeholder="e.g. interior"
+                    className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 font-mono text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-400 text-xs mb-1">Display name</label>
+                  <Input
+                    value={gallery.label}
+                    onChange={(e) => updateGallery(i, "label", e.target.value)}
+                    placeholder="e.g. Interior"
+                    className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
+                  />
+                </div>
+              </div>
+              <Input
+                value={gallery.description}
+                onChange={(e) => updateGallery(i, "description", e.target.value)}
+                placeholder="Short description shown on the home page tile"
+                className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
+              />
+            </div>
+          ))}
+          {form.galleries.length === 0 && (
+            <p className="text-slate-500 text-sm text-center py-6">No galleries yet. Add one above.</p>
+          )}
         </div>
       </div>
 

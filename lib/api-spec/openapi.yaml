@@ -333,9 +333,23 @@ components:
         description:
           type: string
           description: Short description of the service.
+    SiteGallery:
+      type: object
+      required: [key, label, description]
+      properties:
+        key:
+          type: string
+          pattern: "^[a-z0-9-]+$"
+          description: URL slug used in the gallery path (e.g. "interior").
+        label:
+          type: string
+          description: Display name shown on the tile and gallery page heading.
+        description:
+          type: string
+          description: Short subtitle shown on the tile and gallery page.
     SiteSettings:
       type: object
-      required: [companyName, tagline1, tagline2, tagline3, phone, email, serviceArea, services, colorBg, colorText, colorAccent, colorHeader]
+      required: [companyName, tagline1, tagline2, tagline3, phone, email, serviceArea, services, galleries, colorBg, colorText, colorAccent, colorHeader]
       properties:
         companyName:
           type: string
@@ -363,6 +377,11 @@ components:
           items:
             $ref: "#/components/schemas/SiteService"
           description: List of services offered.
+        galleries:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteGallery"
+          description: Ordered list of gallery categories shown as tiles on the home page.
         colorBg:
           type: string
           pattern: "^#[0-9A-Fa-f]{6}$"

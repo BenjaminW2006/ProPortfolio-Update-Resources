@@ -1,4 +1,4 @@
-import { Switch, Route, Router as WouterRouter } from "wouter";
+import { Switch, Route, Router as WouterRouter, useParams } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,8 +10,10 @@ import AdminPage from "@/pages/AdminPage";
 import GalleryPage from "@/pages/GalleryPage";
 import ProjectDetailPage from "@/pages/ProjectDetailPage";
 
-const InteriorGallery = () => <GalleryPage category="interior" />;
-const ExteriorGallery = () => <GalleryPage category="exterior" />;
+const GalleryRoute = () => {
+  const params = useParams<{ key: string }>();
+  return <GalleryPage category={params.key} />;
+};
 const DefaultGallery = () => <GalleryPage />;
 
 const queryClient = new QueryClient();
@@ -21,9 +23,8 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/contact" component={ContactPage} />
-      <Route path="/gallery/interior" component={InteriorGallery} />
-      <Route path="/gallery/exterior" component={ExteriorGallery} />
       <Route path="/gallery/project/:id" component={ProjectDetailPage} />
+      <Route path="/gallery/:key" component={GalleryRoute} />
       <Route path="/gallery" component={DefaultGallery} />
       <Route path="/admin" component={AdminPage} />
       <Route component={NotFound} />

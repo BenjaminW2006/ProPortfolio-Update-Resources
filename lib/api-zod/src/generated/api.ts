@@ -75,6 +75,9 @@ export const GetStorageObjectParams = zod.object({
  * Returns the current site settings (company info, taglines, services list). Public endpoint.
  * @summary Get site settings
  */
+export const getSettingsResponseGalleriesItemKeyRegExp = new RegExp(
+  "^[a-z0-9-]+$",
+);
 export const getSettingsResponseColorBgRegExp = new RegExp("^#[0-9A-Fa-f]{6}$");
 export const getSettingsResponseColorTextRegExp = new RegExp(
   "^#[0-9A-Fa-f]{6}$",
@@ -104,6 +107,24 @@ export const GetSettingsResponse = zod.object({
       }),
     )
     .describe("List of services offered."),
+  galleries: zod
+    .array(
+      zod.object({
+        key: zod
+          .string()
+          .regex(getSettingsResponseGalleriesItemKeyRegExp)
+          .describe('URL slug used in the gallery path (e.g. \"interior\").'),
+        label: zod
+          .string()
+          .describe("Display name shown on the tile and gallery page heading."),
+        description: zod
+          .string()
+          .describe("Short subtitle shown on the tile and gallery page."),
+      }),
+    )
+    .describe(
+      "Ordered list of gallery categories shown as tiles on the home page.",
+    ),
   colorBg: zod
     .string()
     .regex(getSettingsResponseColorBgRegExp)
@@ -126,6 +147,9 @@ export const GetSettingsResponse = zod.object({
  * Saves updated site settings. Requires admin session and the x-csrf-protection: 1 header.
  * @summary Update site settings
  */
+export const updateSettingsBodyGalleriesItemKeyRegExp = new RegExp(
+  "^[a-z0-9-]+$",
+);
 export const updateSettingsBodyColorBgRegExp = new RegExp("^#[0-9A-Fa-f]{6}$");
 export const updateSettingsBodyColorTextRegExp = new RegExp(
   "^#[0-9A-Fa-f]{6}$",
@@ -155,6 +179,24 @@ export const UpdateSettingsBody = zod.object({
       }),
     )
     .describe("List of services offered."),
+  galleries: zod
+    .array(
+      zod.object({
+        key: zod
+          .string()
+          .regex(updateSettingsBodyGalleriesItemKeyRegExp)
+          .describe('URL slug used in the gallery path (e.g. \"interior\").'),
+        label: zod
+          .string()
+          .describe("Display name shown on the tile and gallery page heading."),
+        description: zod
+          .string()
+          .describe("Short subtitle shown on the tile and gallery page."),
+      }),
+    )
+    .describe(
+      "Ordered list of gallery categories shown as tiles on the home page.",
+    ),
   colorBg: zod
     .string()
     .regex(updateSettingsBodyColorBgRegExp)
@@ -173,6 +215,9 @@ export const UpdateSettingsBody = zod.object({
     .describe("Navbar\/header background color as a hex value (e.g. #0f172a)."),
 });
 
+export const updateSettingsResponseGalleriesItemKeyRegExp = new RegExp(
+  "^[a-z0-9-]+$",
+);
 export const updateSettingsResponseColorBgRegExp = new RegExp(
   "^#[0-9A-Fa-f]{6}$",
 );
@@ -204,6 +249,24 @@ export const UpdateSettingsResponse = zod.object({
       }),
     )
     .describe("List of services offered."),
+  galleries: zod
+    .array(
+      zod.object({
+        key: zod
+          .string()
+          .regex(updateSettingsResponseGalleriesItemKeyRegExp)
+          .describe('URL slug used in the gallery path (e.g. \"interior\").'),
+        label: zod
+          .string()
+          .describe("Display name shown on the tile and gallery page heading."),
+        description: zod
+          .string()
+          .describe("Short subtitle shown on the tile and gallery page."),
+      }),
+    )
+    .describe(
+      "Ordered list of gallery categories shown as tiles on the home page.",
+    ),
   colorBg: zod
     .string()
     .regex(updateSettingsResponseColorBgRegExp)
@@ -226,6 +289,9 @@ export const UpdateSettingsResponse = zod.object({
  * Resets all site settings to factory defaults. Requires admin session and the x-csrf-protection: 1 header.
  * @summary Reset site settings to defaults
  */
+export const resetSettingsResponseGalleriesItemKeyRegExp = new RegExp(
+  "^[a-z0-9-]+$",
+);
 export const resetSettingsResponseColorBgRegExp = new RegExp(
   "^#[0-9A-Fa-f]{6}$",
 );
@@ -257,6 +323,24 @@ export const ResetSettingsResponse = zod.object({
       }),
     )
     .describe("List of services offered."),
+  galleries: zod
+    .array(
+      zod.object({
+        key: zod
+          .string()
+          .regex(resetSettingsResponseGalleriesItemKeyRegExp)
+          .describe('URL slug used in the gallery path (e.g. \"interior\").'),
+        label: zod
+          .string()
+          .describe("Display name shown on the tile and gallery page heading."),
+        description: zod
+          .string()
+          .describe("Short subtitle shown on the tile and gallery page."),
+      }),
+    )
+    .describe(
+      "Ordered list of gallery categories shown as tiles on the home page.",
+    ),
   colorBg: zod
     .string()
     .regex(resetSettingsResponseColorBgRegExp)

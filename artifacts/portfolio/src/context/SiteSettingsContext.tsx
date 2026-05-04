@@ -6,6 +6,12 @@ export interface ServiceItem {
   description: string;
 }
 
+export interface GalleryItem {
+  key: string;
+  label: string;
+  description: string;
+}
+
 export interface SiteSettings {
   companyName: string;
   tagline1: string;
@@ -15,6 +21,7 @@ export interface SiteSettings {
   email: string;
   serviceArea: string;
   services: ServiceItem[];
+  galleries: GalleryItem[];
   colorBg: string;
   colorText: string;
   colorAccent: string;
@@ -38,6 +45,10 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     { title: "Gutter Cleaning", description: "Prevent water damage. Thorough removal of leaves and debris, downspout flushing, and minor repairs." },
     { title: "Property Maintenance", description: "Recurring scheduled maintenance for landlords, property managers, and homeowners who want peace of mind." },
     { title: "Minor Landscaping", description: "Shrub trimming, mulch installation, yard cleanup, and basic exterior aesthetic improvements." },
+  ],
+  galleries: [
+    { key: "interior", label: "Interior", description: "Kitchen, bathroom, trim, and indoor projects" },
+    { key: "exterior", label: "Exterior", description: "Decks, siding, painting, and outdoor work" },
   ],
   colorBg: "#0f172a",
   colorText: "#f1f5f9",

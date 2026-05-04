@@ -59,6 +59,18 @@ export interface SiteService {
   description: string;
 }
 
+export interface SiteGallery {
+  /**
+   * URL slug used in the gallery path (e.g. "interior").
+   * @pattern ^[a-z0-9-]+$
+   */
+  key: string;
+  /** Display name shown on the tile and gallery page heading. */
+  label: string;
+  /** Short subtitle shown on the tile and gallery page. */
+  description: string;
+}
+
 export interface SiteSettings {
   /** Business name shown in the navbar and footer. */
   companyName: string;
@@ -76,6 +88,8 @@ export interface SiteSettings {
   serviceArea: string;
   /** List of services offered. */
   services: SiteService[];
+  /** Ordered list of gallery categories shown as tiles on the home page. */
+  galleries: SiteGallery[];
   /**
    * Page background color as a hex value (e.g. #0f172a).
    * @pattern ^#[0-9A-Fa-f]{6}$

@@ -11,6 +11,12 @@ const ServiceSchema = z.object({
   description: z.string(),
 });
 
+const GalleryItemSchema = z.object({
+  key: z.string().regex(/^[a-z0-9-]+$/, "Key must be lowercase letters, numbers, and hyphens only"),
+  label: z.string(),
+  description: z.string(),
+});
+
 const hexColor = z.string().regex(/^#[0-9A-Fa-f]{6}$/);
 
 const SiteSettingsSchema = z.object({
@@ -22,6 +28,10 @@ const SiteSettingsSchema = z.object({
   email: z.string(),
   serviceArea: z.string(),
   services: z.array(ServiceSchema),
+  galleries: z.array(GalleryItemSchema).default([
+    { key: "interior", label: "Interior", description: "Kitchen, bathroom, trim, and indoor projects" },
+    { key: "exterior", label: "Exterior", description: "Decks, siding, painting, and outdoor work" },
+  ]),
   colorBg: hexColor.default("#0f172a"),
   colorText: hexColor.default("#f1f5f9"),
   colorAccent: hexColor.default("#2563eb"),
@@ -42,6 +52,10 @@ const DEFAULT_SETTINGS: SiteSettings = {
   colorText: "#f1f5f9",
   colorAccent: "#2563eb",
   colorHeader: "#0f172a",
+  galleries: [
+    { key: "interior", label: "Interior", description: "Kitchen, bathroom, trim, and indoor projects" },
+    { key: "exterior", label: "Exterior", description: "Decks, siding, painting, and outdoor work" },
+  ],
   services: [
     { title: "General Handyman", description: "Fixing what's broken. Door repairs, fixture installation, drywall patching, and everyday maintenance around the house." },
     { title: "Painting", description: "Interior and exterior painting, trim work, deck staining, and touch-ups with meticulous attention to detail." },

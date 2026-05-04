@@ -2,11 +2,12 @@ import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { ChevronRight } from "lucide-react";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
 
 interface Project {
   id: number;
   name: string;
-  category: "interior" | "exterior" | null;
+  category: string | null;
   coverObjectPath: string | null;
 }
 
@@ -15,28 +16,13 @@ interface ImageSlot {
   objectPath: string;
 }
 
-const CATEGORIES = [
-  {
-    key: "interior" as const,
-    label: "Interior",
-    description: "Kitchen, bathroom, trim, and indoor projects",
-    href: "/gallery/interior",
-    slot: "tile-interior",
-  },
-  {
-    key: "exterior" as const,
-    label: "Exterior",
-    description: "Decks, siding, painting, and outdoor work",
-    href: "/gallery/exterior",
-    slot: "tile-exterior",
-  },
-];
-
 function getImageUrl(objectPath: string): string {
   return `/api/storage${objectPath}`;
 }
 
 export default function Portfolio() {
+  const { galleries = [] } = useSiteSettings();
+
   const { data: projects = [] } = useQuery<Project[]>({
     queryKey: ["projects"],
     queryFn: async () => {
@@ -57,41 +43,42 @@ export default function Portfolio() {
     staleTime: 5 * 60 * 1000,
   });
 
-  function getCover(category: "interior" | "exterior", slot: string): string | null {
+  function getCover(key: string, slot: string): string | null {
     const slotMatch = imageSlots.find((s) => s.slot === slot);
     if (slotMatch) return getImageUrl(slotMatch.objectPath);
-    const projectMatch = projects.find((p) => p.category === category && p.coverObjectPath);
+    const projectMatch = projects.find((p) => p.category === key && p.coverObjectPath);
     return projectMatch?.coverObjectPath ? getImageUrl(projectMatch.coverObjectPath) : null;
   }
 
-  function getCount(category: "interior" | "exterior"): number {
-    return projects.filter((p) => p.category === category).length;
+  function getCount(key: string): number {
+    return projects.filter((p) => p.category === key).length;
   }
 
   return (
     <section id="portfolio" className="min-h-screen bg-site text-site pt-28 pb-24">
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-          {CATEGORIES.map((category, i) => {
-            const cover = getCover(category.key, category.slot);
-            const count = getCount(category.key);
+          {galleries.map((gallery, i) => {
+            const slot = `tile-${gallery.key}`;
+            const cover = getCover(gallery.key, slot);
+            const count = getCount(gallery.key);
 
             return (
               <motion.div
-                key={category.key}
+                key={gallery.key}
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: i * 0.12 }}
               >
-                <Link href={category.href}>
+                <Link href={`/gallery/${gallery.key}`}>
                   <span
                     className="group relative block aspect-[4/3] rounded-2xl overflow-hidden cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
-                    aria-label={`Open ${category.label} gallery`}
+                    aria-label={`Open ${gallery.label} gallery`}
                   >
                     {cover ? (
                       <img
                         src={cover}
-                        alt={category.label}
+                        alt={gallery.label}
                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     ) : (
@@ -102,7 +89,7 @@ export default function Portfolio() {
 
                     <div className="absolute inset-0 flex flex-col justify-end p-8">
                       <h2 className="text-3xl md:text-4xl font-bold font-serif text-white mb-4 group-hover:-translate-y-1 transition-transform duration-300">
-                        {category.label}
+                        {gallery.label}
                       </h2>
                       <span className="inline-flex items-center gap-2 text-site-accent text-sm font-medium group-hover:-translate-y-1 transition-transform duration-300 delay-[20ms]">
                         {count > 0 ? `View ${count} project${count !== 1 ? "s" : ""}` : "View gallery"}
