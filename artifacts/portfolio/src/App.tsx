@@ -1,9 +1,8 @@
-import { Switch, Route, Router as WouterRouter, useParams, useLocation } from "wouter";
-import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
+import { Switch, Route, Router as WouterRouter, useParams } from "wouter";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { SiteSettingsProvider, DEFAULT_SETTINGS, type SiteSettings } from "@/context/SiteSettingsContext";
-import SetupWizard from "@/components/SetupWizard";
+import { SiteSettingsProvider } from "@/context/SiteSettingsContext";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import ContactPage from "@/pages/ContactPage";
@@ -36,34 +35,6 @@ function Router() {
 }
 
 function AppContent() {
-  const [location] = useLocation();
-  const { data: settings, isLoading } = useQuery<SiteSettings>({
-    queryKey: ["site-settings"],
-    queryFn: async () => {
-      const res = await fetch("/api/settings");
-      if (!res.ok) return DEFAULT_SETTINGS;
-      return res.json() as Promise<SiteSettings>;
-    },
-    staleTime: 60 * 1000,
-    retry: false,
-  });
-
-  if (isLoading) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-slate-900">
-        <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  // Admin routes handle their own auth and setup flow — never intercept them
-  const isAdminRoute = location.startsWith("/manager");
-
-  // Show wizard on first visit OR if no admin password has been set yet
-  if (!isAdminRoute && (!settings?.setupComplete || !settings?.hasAdminPassword)) {
-    return <SetupWizard />;
-  }
-
   return <Router />;
 }
 
