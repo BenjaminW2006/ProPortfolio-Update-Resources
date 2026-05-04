@@ -862,7 +862,7 @@ function TileCoverUpload({ slot, label }: { slot: string; label: string }) {
         )}
       </div>
       <div className="p-4">
-        <p className="text-white font-semibold font-serif mb-3">{label} Tile</p>
+        <p className="text-white font-semibold font-serif mb-3">{label} Gallery Cover</p>
         <div className="flex gap-2 flex-wrap">
           <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
           <Button
