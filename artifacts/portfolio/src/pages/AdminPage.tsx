@@ -1321,30 +1321,6 @@ function SettingsView() {
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h3 className="text-base font-semibold font-serif text-slate-200">Hero Section</h3>
-            <p className="text-slate-500 text-xs mt-0.5">The large headline and description shown on the home page banner.</p>
-          </div>
-          <button
-            type="button"
-            onClick={() => setForm((f) => f ? { ...f, showHero: !f.showHero } : f)}
-            className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border font-medium shrink-0 transition-colors ${form.showHero ? "border-slate-600 text-slate-400 hover:border-slate-500 hover:text-slate-300" : "border-orange-800/60 bg-orange-900/20 text-orange-400 hover:bg-orange-900/30"}`}
-          >
-            {form.showHero ? <><Eye className="w-3 h-3" /> Visible</> : <><EyeOff className="w-3 h-3" /> N/A</>}
-          </button>
-        </div>
-        {!form.showHero && (
-          <p className="text-xs text-slate-500 bg-slate-700/40 border border-slate-600/40 rounded-lg px-3 py-2">This section is hidden on your site.</p>
-        )}
-        <div className="grid grid-cols-3 gap-3">
-          {field("Tagline line 1", form.tagline1, (v) => setForm((f) => f ? { ...f, tagline1: v } : f))}
-          {field("Tagline line 2", form.tagline2, (v) => setForm((f) => f ? { ...f, tagline2: v } : f))}
-          {field("Tagline line 3 (accent)", form.tagline3, (v) => setForm((f) => f ? { ...f, tagline3: v } : f))}
-        </div>
-        {textareaField("Hero description", form.heroSubtitle ?? "", (v) => setForm((f) => f ? { ...f, heroSubtitle: v } : f), "One or two sentences describing your business and value proposition.")}
-      </div>
-      <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
-        <div className="flex items-start justify-between gap-3">
-          <div>
             <h3 className="text-base font-semibold font-serif text-slate-200">About Section</h3>
             <p className="text-slate-500 text-xs mt-0.5">The "Why Choose Us" section on the home page.</p>
           </div>
