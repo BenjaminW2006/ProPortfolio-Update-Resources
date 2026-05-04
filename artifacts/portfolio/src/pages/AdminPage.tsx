@@ -1190,7 +1190,7 @@ function SettingsView() {
   return (
     <div className="max-w-2xl space-y-8">
       <div>
-        <h2 className="text-2xl font-bold font-serif mb-1">Site Settings</h2>
+        <h2 className="text-2xl font-bold font-serif mb-1">Company Information</h2>
         <p className="text-slate-400 text-sm">Changes update the live website immediately after saving.</p>
       </div>
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
