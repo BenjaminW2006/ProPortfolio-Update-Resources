@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { GiPalmTree } from "react-icons/gi";
+import { Menu, X } from "lucide-react";
 import { useSiteSettings } from "@/context/SiteSettingsContext";
 
 export default function Navbar() {
@@ -10,9 +11,7 @@ export default function Navbar() {
   const settings = useSiteSettings();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -22,13 +21,6 @@ export default function Navbar() {
   }, [location]);
 
   const navLinkClass = (path: string) =>
-    `text-sm font-medium transition-colors duration-200 px-3 py-1 rounded-md ${
-      location === path
-        ? "text-white bg-white/10"
-        : "text-slate-300 hover:text-white hover:bg-white/10"
-    }`;
-
-  const mobileNavLinkClass = (path: string) =>
     `block text-base font-medium transition-colors duration-200 px-4 py-3 rounded-md ${
       location === path
         ? "text-white bg-white/10"
@@ -54,47 +46,28 @@ export default function Navbar() {
           </span>
         </Link>
 
-        <div className="hidden md:flex items-center gap-1">
-          <Link href="/">
-            <span className={navLinkClass("/")}>Home</span>
-          </Link>
-          <Link href="/contact">
-            <span className={navLinkClass("/contact")}>Contact</span>
-          </Link>
-        </div>
-
         <button
-          className="md:hidden flex flex-col justify-center items-center w-9 h-9 gap-1.5 rounded-md text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
+          className="flex items-center justify-center w-9 h-9 rounded-md text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
           onClick={() => setMenuOpen((prev) => !prev)}
           aria-label={menuOpen ? "Close menu" : "Open menu"}
           aria-expanded={menuOpen}
           aria-controls="mobile-nav-menu"
         >
-          <span
-            className={`block w-5 h-0.5 bg-current transition-all duration-300 ${
-              menuOpen ? "rotate-45 translate-y-2" : ""
-            }`}
-          />
-          <span
-            className={`block w-5 h-0.5 bg-current transition-all duration-300 ${
-              menuOpen ? "opacity-0" : ""
-            }`}
-          />
-          <span
-            className={`block w-5 h-0.5 bg-current transition-all duration-300 ${
-              menuOpen ? "-rotate-45 -translate-y-2" : ""
-            }`}
-          />
+          {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
       {menuOpen && (
-        <div id="mobile-nav-menu" className="md:hidden backdrop-blur-sm border-t border-white/10 px-4 pb-4 pt-2" style={{ backgroundColor: "color-mix(in srgb, var(--site-bg) 98%, transparent)" }}>
+        <div
+          id="mobile-nav-menu"
+          className="backdrop-blur-sm border-t border-white/10 px-4 pb-4 pt-2"
+          style={{ backgroundColor: "color-mix(in srgb, var(--site-bg) 98%, transparent)" }}
+        >
           <Link href="/">
-            <span className={mobileNavLinkClass("/")}>Home</span>
+            <span className={navLinkClass("/")}>Home</span>
           </Link>
           <Link href="/contact">
-            <span className={mobileNavLinkClass("/contact")}>Contact</span>
+            <span className={navLinkClass("/contact")}>Contact</span>
           </Link>
         </div>
       )}
