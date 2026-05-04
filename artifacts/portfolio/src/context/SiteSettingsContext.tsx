@@ -100,6 +100,12 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     root.style.setProperty("--site-header", settings.colorHeader);
   }, [settings.colorBg, settings.colorText, settings.colorAccent, settings.colorHeader]);
 
+  useEffect(() => {
+    if (settings.companyName) {
+      document.title = settings.companyName;
+    }
+  }, [settings.companyName]);
+
   return (
     <SiteSettingsContext.Provider value={settings}>
       {children}
