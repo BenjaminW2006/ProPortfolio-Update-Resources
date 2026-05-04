@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQueryClient } from "@tanstack/react-query";
-import { ArrowRight, ArrowLeft, CheckCircle2, Building2, MessageSquare, Phone, Sparkles } from "lucide-react";
+import { ArrowRight, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { SiteSettings } from "@/context/SiteSettingsContext";
@@ -32,12 +32,7 @@ const INITIAL: WizardData = {
   email: "",
 };
 
-const STEPS = [
-  { icon: Building2, label: "Your Business" },
-  { icon: MessageSquare, label: "Your Story" },
-  { icon: Phone, label: "Contact Info" },
-  { icon: Sparkles, label: "All Set!" },
-];
+const STEPS = ["Your Business", "Your Story", "Contact Info", "All Set!"];
 
 interface FieldProps {
   label: string;
@@ -111,8 +106,6 @@ export default function SetupWizard() {
     }
   };
 
-  const StepIcon = STEPS[step].icon;
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900 overflow-y-auto py-8">
       <div className="w-full max-w-xl mx-auto px-4">
@@ -122,9 +115,6 @@ export default function SetupWizard() {
           transition={{ duration: 0.5 }}
         >
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-blue-600/20 border border-blue-500/30 mb-4">
-              <StepIcon className="w-7 h-7 text-blue-400" />
-            </div>
             <div className="flex items-center justify-center gap-2 mb-6">
               {STEPS.map((s, i) => (
                 <div key={i} className="flex items-center gap-2">
