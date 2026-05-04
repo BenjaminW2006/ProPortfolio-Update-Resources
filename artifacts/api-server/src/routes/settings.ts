@@ -218,10 +218,16 @@ router.post("/settings/first-run", requireCsrfHeader, async (req: Request, res: 
 
     const rawBody = req.body as Record<string, unknown>;
 
-    // Accept a plain adminPassword, hash it server-side, and discard the plain value
+    // Accept a plain adminPassword, hash it server-side, and discard the plain value.
+    // When no password is set yet, a valid password is REQUIRED to complete setup.
     let adminPasswordHash = current.adminPasswordHash;
-    if (typeof rawBody.adminPassword === "string" && rawBody.adminPassword.length >= 8) {
-      adminPasswordHash = await bcrypt.hash(rawBody.adminPassword as string, 12);
+    const incomingPassword = rawBody.adminPassword;
+    if (typeof incomingPassword === "string" && incomingPassword.length >= 8) {
+      adminPasswordHash = await bcrypt.hash(incomingPassword, 12);
+    } else if (!current.adminPasswordHash) {
+      // No existing hash and no valid new password — refuse to complete first-run
+      res.status(400).json({ error: "A password of at least 8 characters is required to complete setup." });
+      return;
     }
     delete rawBody.adminPassword;
     delete rawBody.adminPasswordHash;
