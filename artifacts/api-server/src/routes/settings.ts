@@ -137,10 +137,22 @@ function requireCsrfHeader(req: Request, res: Response, next: NextFunction): voi
 router.get("/settings", async (req: Request, res: Response) => {
   try {
     const raw = await getCurrentSettings();
-    const { adminPasswordHash: _h, ...settings } = raw;
+    // Strip private fields — never expose these to unauthenticated callers
+    const { adminPasswordHash: _h, adminEmail: _e, ...settings } = raw;
     res.json(settings);
   } catch (error) {
     req.log.error({ err: error }, "Error fetching settings");
+    res.status(500).json({ error: "Failed to fetch settings" });
+  }
+});
+
+router.get("/admin/settings", requireAdminSession, async (req: Request, res: Response) => {
+  try {
+    const raw = await getCurrentSettings();
+    const { adminPasswordHash: _h, ...settings } = raw;
+    res.json(settings);
+  } catch (error) {
+    req.log.error({ err: error }, "Error fetching admin settings");
     res.status(500).json({ error: "Failed to fetch settings" });
   }
 });
@@ -162,7 +174,8 @@ router.patch("/settings", requireAdminSession, requireCsrfHeader, async (req: Re
         target: siteSettingsTable.id,
         set: { data: dataStr, updatedAt: new Date() },
       });
-    res.json(validated.data);
+    const { adminPasswordHash: _h, ...safe } = validated.data;
+    res.json(safe);
   } catch (error) {
     req.log.error({ err: error }, "Error updating settings");
     res.status(500).json({ error: "Failed to update settings" });

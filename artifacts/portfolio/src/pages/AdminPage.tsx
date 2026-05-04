@@ -1229,9 +1229,9 @@ function SettingsView() {
   const [confirmReset, setConfirmReset] = useState(false);
 
   const { data: current, isLoading } = useQuery<SiteSettings>({
-    queryKey: ["site-settings"],
+    queryKey: ["admin-settings"],
     queryFn: async () => {
-      const res = await apiCall("/api/settings");
+      const res = await apiCall("/api/admin/settings");
       if (!res.ok) return DEFAULT_SETTINGS;
       return res.json() as Promise<SiteSettings>;
     },
@@ -1262,7 +1262,8 @@ function SettingsView() {
       });
       if (!res.ok) throw new Error("Failed to save");
       const updated = (await res.json()) as SiteSettings;
-      queryClient.setQueryData(["site-settings"], updated);
+      queryClient.setQueryData(["admin-settings"], updated);
+      queryClient.invalidateQueries({ queryKey: ["site-settings"] });
       toast({ title: "Settings saved!" });
     } catch {
       toast({ title: "Error", description: "Failed to save settings.", variant: "destructive" });
@@ -1278,7 +1279,8 @@ function SettingsView() {
       if (!res.ok) throw new Error("Failed to reset");
       const defaults = (await res.json()) as SiteSettings;
       setForm(defaults);
-      queryClient.setQueryData(["site-settings"], defaults);
+      queryClient.setQueryData(["admin-settings"], defaults);
+      queryClient.invalidateQueries({ queryKey: ["site-settings"] });
       setConfirmReset(false);
       toast({ title: "Settings reset to defaults" });
     } catch {

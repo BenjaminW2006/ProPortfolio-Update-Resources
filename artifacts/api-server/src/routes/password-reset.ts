@@ -90,8 +90,10 @@ router.post("/admin/reset-password/request", async (req: Request, res: Response)
     const resetLink = `${baseUrl}/admin/reset-password?token=${token}`;
 
     const sent = await sendResetEmail(email.trim(), resetLink);
-    if (!sent) {
-      logger.warn({ resetLink }, "Email not sent — reset link logged for dev");
+    if (!sent && process.env.NODE_ENV !== "production") {
+      logger.warn({ resetLink }, "Email not sent — reset link available in dev logs only");
+    } else if (!sent) {
+      logger.warn("Email not sent — RESEND_API_KEY may not be configured");
     }
 
     res.json({ ok: true });
