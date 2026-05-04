@@ -55,7 +55,8 @@ function AppContent() {
     );
   }
 
-  if (!settings?.setupComplete) {
+  // Show wizard on first visit OR if no admin password has been set yet
+  if (!settings?.setupComplete || !settings?.hasAdminPassword) {
     return <SetupWizard />;
   }
 

@@ -3,6 +3,7 @@ import { db } from "@workspace/db";
 import { siteSettingsTable } from "@workspace/db/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import bcrypt from "bcryptjs";
 
 const router: IRouter = Router();
 
@@ -138,8 +139,9 @@ router.get("/settings", async (req: Request, res: Response) => {
   try {
     const raw = await getCurrentSettings();
     // Strip private fields — never expose these to unauthenticated callers
-    const { adminPasswordHash: _h, adminEmail: _e, ...settings } = raw;
-    res.json(settings);
+    const { adminPasswordHash, adminEmail: _e, ...settings } = raw;
+    // Expose a safe boolean so the frontend knows whether admin setup is complete
+    res.json({ ...settings, hasAdminPassword: Boolean(adminPasswordHash) });
   } catch (error) {
     req.log.error({ err: error }, "Error fetching settings");
     res.status(500).json({ error: "Failed to fetch settings" });
@@ -202,14 +204,35 @@ router.post("/settings/reset", requireAdminSession, requireCsrfHeader, async (re
 router.post("/settings/first-run", requireCsrfHeader, async (req: Request, res: Response) => {
   try {
     const current = await getCurrentSettings();
-    if (current.setupComplete && !req.session.isAdmin) {
-      res.status(403).json({ error: "Setup already complete. Please sign in to the admin panel before re-running setup." });
+
+    // Allow unauthenticated first-run when:
+    // 1. Setup has never been completed (!current.setupComplete), OR
+    // 2. No admin password has been set yet (!current.adminPasswordHash) — covers the case
+    //    where the wizard was run before the admin account step existed.
+    // Once a password is configured, re-running setup requires an active admin session.
+    const isFirstTime = !current.setupComplete || !current.adminPasswordHash;
+    if (!isFirstTime && !req.session.isAdmin) {
+      res.status(403).json({ error: "Please sign in to the admin panel before re-running setup." });
       return;
     }
-    const body = req.body as Partial<SiteSettings>;
-    // Strip sensitive fields from first-run payloads — password hash is only set via the dedicated reset endpoints
-    delete (body as Record<string, unknown>).adminPasswordHash;
-    const merged = { ...current, ...body, setupComplete: true };
+
+    const rawBody = req.body as Record<string, unknown>;
+
+    // Accept a plain adminPassword, hash it server-side, and discard the plain value
+    let adminPasswordHash = current.adminPasswordHash;
+    if (typeof rawBody.adminPassword === "string" && rawBody.adminPassword.length >= 8) {
+      adminPasswordHash = await bcrypt.hash(rawBody.adminPassword as string, 12);
+    }
+    delete rawBody.adminPassword;
+    delete rawBody.adminPasswordHash;
+
+    const merged = {
+      ...current,
+      ...(rawBody as Partial<SiteSettings>),
+      adminPasswordHash,
+      setupComplete: true,
+    };
+
     const validated = SiteSettingsSchema.safeParse(merged);
     if (!validated.success) {
       res.status(400).json({ error: "Invalid settings" });
@@ -223,7 +246,9 @@ router.post("/settings/first-run", requireCsrfHeader, async (req: Request, res: 
         target: siteSettingsTable.id,
         set: { data: dataStr, updatedAt: new Date() },
       });
-    res.json(validated.data);
+
+    const { adminPasswordHash: _h, adminEmail: _e, ...safe } = validated.data;
+    res.json(safe);
   } catch (error) {
     req.log.error({ err: error }, "Error during first-run setup");
     res.status(500).json({ error: "Failed to save setup" });

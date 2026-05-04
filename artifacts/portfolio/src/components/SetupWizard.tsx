@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQueryClient } from "@tanstack/react-query";
-import { ArrowRight, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { ArrowRight, ArrowLeft, CheckCircle2, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { SiteSettings } from "@/context/SiteSettingsContext";
@@ -17,6 +17,9 @@ interface WizardData {
   aboutText: string;
   phone: string;
   email: string;
+  adminEmail: string;
+  adminPassword: string;
+  adminPasswordConfirm: string;
 }
 
 const INITIAL: WizardData = {
@@ -30,9 +33,12 @@ const INITIAL: WizardData = {
   aboutText: "We built this business because we saw a need for reliable, honest professionals in our community. We don't cut corners or leave messes. When we make a commitment, we keep it.",
   phone: "",
   email: "",
+  adminEmail: "",
+  adminPassword: "",
+  adminPasswordConfirm: "",
 };
 
-const STEPS = ["Your Business", "Your Story", "Contact Info", "All Set!"];
+const STEPS = ["Your Business", "Your Story", "Contact Info", "Admin Account", "All Set!"];
 
 interface FieldProps {
   label: string;
@@ -41,9 +47,10 @@ interface FieldProps {
   placeholder?: string;
   hint?: string;
   multiline?: boolean;
+  type?: string;
 }
 
-function Field({ label, value, onChange, placeholder, hint, multiline }: FieldProps) {
+function Field({ label, value, onChange, placeholder, hint, multiline, type = "text" }: FieldProps) {
   return (
     <div className="space-y-1.5">
       <label className="block text-sm font-medium text-slate-200">{label}</label>
@@ -58,12 +65,40 @@ function Field({ label, value, onChange, placeholder, hint, multiline }: FieldPr
         />
       ) : (
         <Input
+          type={type}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           className="bg-slate-700/60 border-slate-600 text-white placeholder:text-slate-500"
         />
       )}
+    </div>
+  );
+}
+
+function PasswordField({ label, value, onChange, placeholder, hint }: Omit<FieldProps, "type" | "multiline">) {
+  const [show, setShow] = useState(false);
+  return (
+    <div className="space-y-1.5">
+      <label className="block text-sm font-medium text-slate-200">{label}</label>
+      {hint && <p className="text-xs text-slate-400">{hint}</p>}
+      <div className="relative">
+        <Input
+          type={show ? "text" : "password"}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className="bg-slate-700/60 border-slate-600 text-white placeholder:text-slate-500 pr-10"
+        />
+        <button
+          type="button"
+          onClick={() => setShow((s) => !s)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200"
+          tabIndex={-1}
+        >
+          {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+        </button>
+      </div>
     </div>
   );
 }
@@ -86,17 +121,44 @@ export default function SetupWizard({ onDone }: SetupWizardProps = {}) {
     if (step === 0) return data.companyName.trim().length > 0 && data.serviceArea.trim().length > 0;
     if (step === 1) return data.heroSubtitle.trim().length > 0 && data.aboutText.trim().length > 0;
     if (step === 2) return data.phone.trim().length > 0 && data.email.trim().length > 0;
+    if (step === 3) {
+      if (!data.adminEmail.trim() || !data.adminPassword) return false;
+      if (data.adminPassword.length < 8) return false;
+      if (data.adminPassword !== data.adminPasswordConfirm) return false;
+      return true;
+    }
     return true;
+  };
+
+  const step3Error = () => {
+    if (!data.adminPassword) return "";
+    if (data.adminPassword.length < 8) return "Password must be at least 8 characters.";
+    if (data.adminPasswordConfirm && data.adminPassword !== data.adminPasswordConfirm) return "Passwords do not match.";
+    return "";
   };
 
   const handleFinish = async () => {
     setSaving(true);
     setError("");
     try {
+      const payload = {
+        companyName: data.companyName,
+        serviceArea: data.serviceArea,
+        tagline1: data.tagline1,
+        tagline2: data.tagline2,
+        tagline3: data.tagline3,
+        heroSubtitle: data.heroSubtitle,
+        aboutTitle: data.aboutTitle,
+        aboutText: data.aboutText,
+        phone: data.phone,
+        email: data.email,
+        adminEmail: data.adminEmail,
+        adminPassword: data.adminPassword,
+      };
       const res = await fetch("/api/settings/first-run", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-csrf-protection": "1" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
       if (!res.ok) {
         const body = (await res.json()) as { error?: string };
@@ -122,7 +184,7 @@ export default function SetupWizard({ onDone }: SetupWizardProps = {}) {
         >
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-2 mb-6">
-              {STEPS.map((s, i) => (
+              {STEPS.map((_, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <div
                     className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
@@ -218,16 +280,54 @@ export default function SetupWizard({ onDone }: SetupWizardProps = {}) {
                     <p className="text-slate-400 text-sm">Shown on the contact page and footer.</p>
                   </div>
                   <Field label="Phone number" value={data.phone} onChange={set("phone")} placeholder="(555) 000-0000" />
-                  <Field label="Email address" value={data.email} onChange={set("email")} placeholder="hello@yourbusiness.com" />
-                  {error && (
-                    <p className="text-red-400 text-sm bg-red-900/20 border border-red-800/40 rounded-lg px-3 py-2">{error}</p>
-                  )}
+                  <Field label="Business email" value={data.email} onChange={set("email")} placeholder="hello@yourbusiness.com" hint="Shown publicly — this is for customer inquiries." />
                 </motion.div>
               )}
 
               {step === 3 && (
                 <motion.div
                   key="step3"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.25 }}
+                  className="space-y-5"
+                >
+                  <div>
+                    <h2 className="text-2xl font-bold font-serif text-white mb-1">Create your admin account.</h2>
+                    <p className="text-slate-400 text-sm">You'll use these credentials to sign in to the admin panel and manage your site.</p>
+                  </div>
+                  <Field
+                    label="Admin email"
+                    value={data.adminEmail}
+                    onChange={set("adminEmail")}
+                    placeholder="you@example.com"
+                    type="email"
+                    hint="Used for password recovery. Kept private — never shown to visitors."
+                  />
+                  <PasswordField
+                    label="Admin password"
+                    value={data.adminPassword}
+                    onChange={set("adminPassword")}
+                    placeholder="At least 8 characters"
+                  />
+                  <PasswordField
+                    label="Confirm password"
+                    value={data.adminPasswordConfirm}
+                    onChange={set("adminPasswordConfirm")}
+                    placeholder="Re-enter your password"
+                  />
+                  {step3Error() && (
+                    <p className="text-red-400 text-sm bg-red-900/20 border border-red-800/40 rounded-lg px-3 py-2">
+                      {step3Error()}
+                    </p>
+                  )}
+                </motion.div>
+              )}
+
+              {step === 4 && (
+                <motion.div
+                  key="step4"
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
@@ -271,7 +371,7 @@ export default function SetupWizard({ onDone }: SetupWizardProps = {}) {
             </AnimatePresence>
           </div>
 
-          {step < 3 && (
+          {step < 4 && (
             <div className="flex justify-between mt-6">
               <Button
                 variant="ghost"
@@ -287,7 +387,7 @@ export default function SetupWizard({ onDone }: SetupWizardProps = {}) {
                 onClick={() => setStep((s) => s + 1)}
                 disabled={!canAdvance()}
               >
-                {step === 2 ? "Review & Finish" : "Next"}
+                {step === 3 ? "Review & Finish" : "Next"}
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </div>
