@@ -9,43 +9,43 @@ if (!process.env.DATABASE_URL) {
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 const DEFAULT_SETTINGS = {
-  companyName: "Upstate Palmetto Property Services",
-  tagline1: "Hard Work.",
+  companyName: "Your Business Name",
+  tagline1: "Quality Work.",
   tagline2: "Done Right.",
   tagline3: "Every Time.",
-  phone: "(864) 434-2842",
-  email: "Upstate-Palmetto@outlook.com",
-  serviceArea: "Upstate South Carolina",
+  phone: "(555) 000-0000",
+  email: "hello@yourbusiness.com",
+  serviceArea: "Your City, State",
   services: [
     {
-      title: "General Handyman",
+      title: "General Repairs",
       description:
-        "Fixing what's broken. Door repairs, fixture installation, drywall patching, and everyday maintenance around the house.",
+        "Fixing what's broken. Door repairs, fixture installation, drywall patching, and everyday maintenance.",
     },
     {
       title: "Painting",
       description:
-        "Interior and exterior painting, trim work, deck staining, and touch-ups with meticulous attention to detail.",
+        "Interior and exterior painting, trim work, deck staining, and touch-ups with attention to detail.",
     },
     {
       title: "Pressure Washing",
       description:
-        "Restore your home's curb appeal. Driveways, siding, decks, patios, and walkways cleaned safely and thoroughly.",
+        "Restore curb appeal. Driveways, siding, decks, patios, and walkways cleaned safely and thoroughly.",
     },
     {
       title: "Carpentry & Woodwork",
       description:
-        "Custom trim, crown molding, baseboards, wainscoting, and minor wood repairs that add character to your home.",
+        "Custom trim, molding, wainscoting, and minor wood repairs that add character to your space.",
     },
     {
-      title: "Deck & Fence Repair",
+      title: "Deck & Fence Work",
       description:
-        "Board replacement, structural reinforcement, sealing, and complete restoration for your outdoor living spaces.",
+        "Board replacement, structural reinforcement, sealing, and full restoration for outdoor spaces.",
     },
     {
       title: "Gutter Cleaning",
       description:
-        "Prevent water damage. Thorough removal of leaves and debris, downspout flushing, and minor repairs.",
+        "Prevent water damage with thorough removal of leaves and debris, downspout flushing, and minor repairs.",
     },
     {
       title: "Property Maintenance",
@@ -53,7 +53,7 @@ const DEFAULT_SETTINGS = {
         "Recurring scheduled maintenance for landlords, property managers, and homeowners who want peace of mind.",
     },
     {
-      title: "Minor Landscaping",
+      title: "Landscaping",
       description:
         "Shrub trimming, mulch installation, yard cleanup, and basic exterior aesthetic improvements.",
     },
