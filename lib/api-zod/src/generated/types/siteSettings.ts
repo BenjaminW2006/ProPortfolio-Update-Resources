@@ -62,6 +62,16 @@ export interface SiteSettings {
    * @pattern ^#[0-9A-Fa-f]{6}$
    */
   colorHeader: string;
+  /** Whether the hero section is visible on the home page. */
+  showHero: boolean;
+  /** Whether the gallery tiles section is visible on the home page. */
+  showGalleries: boolean;
+  /** Whether the services section is visible on the home page. */
+  showServices: boolean;
+  /** Whether the about/why-choose-us section is visible on the home page. */
+  showAbout: boolean;
+  /** Whether the testimonials section is visible on the home page. */
+  showTestimonials: boolean;
   /** Whether the initial setup wizard has been completed. */
   setupComplete: boolean;
 }

@@ -53,6 +53,11 @@ const SiteSettingsSchema = z.object({
   colorText: hexColor.default("#f1f5f9"),
   colorAccent: hexColor.default("#2563eb"),
   colorHeader: hexColor.default("#0f172a"),
+  showHero: z.boolean().default(true),
+  showGalleries: z.boolean().default(true),
+  showServices: z.boolean().default(true),
+  showAbout: z.boolean().default(true),
+  showTestimonials: z.boolean().default(true),
   setupComplete: z.boolean().default(false),
 });
 
@@ -95,6 +100,11 @@ const DEFAULT_SETTINGS: SiteSettings = {
     { title: "Property Maintenance", description: "Recurring scheduled maintenance for landlords, property managers, and homeowners who want peace of mind." },
     { title: "Landscaping", description: "Shrub trimming, mulch installation, yard cleanup, and basic exterior aesthetic improvements." },
   ],
+  showHero: true,
+  showGalleries: true,
+  showServices: true,
+  showAbout: true,
+  showTestimonials: true,
   setupComplete: false,
 };
 

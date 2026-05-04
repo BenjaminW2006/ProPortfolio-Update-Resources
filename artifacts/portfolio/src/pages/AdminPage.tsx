@@ -20,6 +20,8 @@ import {
   Star,
   Settings,
   FolderOpen,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { DEFAULT_SETTINGS, useSiteSettings, type SiteSettings } from "@/context/SiteSettingsContext";
 
@@ -1201,10 +1203,22 @@ function SettingsView() {
         {field("Service Area", form.serviceArea, (v) => setForm((f) => f ? { ...f, serviceArea: v } : f), "e.g. Austin, Texas")}
       </div>
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
-        <div>
-          <h3 className="text-base font-semibold font-serif text-slate-200">Hero Section</h3>
-          <p className="text-slate-500 text-xs mt-0.5">The large headline and description shown on the home page banner.</p>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h3 className="text-base font-semibold font-serif text-slate-200">Hero Section</h3>
+            <p className="text-slate-500 text-xs mt-0.5">The large headline and description shown on the home page banner.</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setForm((f) => f ? { ...f, showHero: !f.showHero } : f)}
+            className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border font-medium shrink-0 transition-colors ${form.showHero ? "border-slate-600 text-slate-400 hover:border-slate-500 hover:text-slate-300" : "border-orange-800/60 bg-orange-900/20 text-orange-400 hover:bg-orange-900/30"}`}
+          >
+            {form.showHero ? <><Eye className="w-3 h-3" /> Visible</> : <><EyeOff className="w-3 h-3" /> N/A</>}
+          </button>
         </div>
+        {!form.showHero && (
+          <p className="text-xs text-slate-500 bg-slate-700/40 border border-slate-600/40 rounded-lg px-3 py-2">This section is hidden on your site.</p>
+        )}
         <div className="grid grid-cols-3 gap-3">
           {field("Tagline line 1", form.tagline1, (v) => setForm((f) => f ? { ...f, tagline1: v } : f))}
           {field("Tagline line 2", form.tagline2, (v) => setForm((f) => f ? { ...f, tagline2: v } : f))}
@@ -1213,10 +1227,22 @@ function SettingsView() {
         {textareaField("Hero description", form.heroSubtitle ?? "", (v) => setForm((f) => f ? { ...f, heroSubtitle: v } : f), "One or two sentences describing your business and value proposition.")}
       </div>
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
-        <div>
-          <h3 className="text-base font-semibold font-serif text-slate-200">About Section</h3>
-          <p className="text-slate-500 text-xs mt-0.5">The "Why Choose Us" section on the home page.</p>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h3 className="text-base font-semibold font-serif text-slate-200">About Section</h3>
+            <p className="text-slate-500 text-xs mt-0.5">The "Why Choose Us" section on the home page.</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setForm((f) => f ? { ...f, showAbout: !f.showAbout } : f)}
+            className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border font-medium shrink-0 transition-colors ${form.showAbout ? "border-slate-600 text-slate-400 hover:border-slate-500 hover:text-slate-300" : "border-orange-800/60 bg-orange-900/20 text-orange-400 hover:bg-orange-900/30"}`}
+          >
+            {form.showAbout ? <><Eye className="w-3 h-3" /> Visible</> : <><EyeOff className="w-3 h-3" /> N/A</>}
+          </button>
         </div>
+        {!form.showAbout && (
+          <p className="text-xs text-slate-500 bg-slate-700/40 border border-slate-600/40 rounded-lg px-3 py-2">This section is hidden on your site.</p>
+        )}
         {field("Section heading", form.aboutTitle ?? "", (v) => setForm((f) => f ? { ...f, aboutTitle: v } : f), "e.g. A Team You Can Count On.")}
         {textareaField("Body paragraph", form.aboutText ?? "", (v) => setForm((f) => f ? { ...f, aboutText: v } : f), "Share why you started the business and what makes you different.")}
         {field("Pull quote (shown over image)", form.aboutQuote ?? "", (v) => setForm((f) => f ? { ...f, aboutQuote: v } : f), "e.g. Good work isn't just about how it looks — it's about how it lasts.")}
@@ -1262,16 +1288,28 @@ function SettingsView() {
         </div>
       </div>
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           <div>
             <h3 className="text-base font-semibold font-serif text-slate-200">Galleries</h3>
             <p className="text-slate-500 text-xs mt-0.5">Each gallery is a tile on the home page with its own filtered project page.</p>
           </div>
-          <Button type="button" size="sm" className="bg-blue-600 hover:bg-blue-700 shrink-0" onClick={addGallery}>
-            <Plus className="w-3.5 h-3.5 mr-1.5" />
-            Add
-          </Button>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => setForm((f) => f ? { ...f, showGalleries: !f.showGalleries } : f)}
+              className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border font-medium transition-colors ${form.showGalleries ? "border-slate-600 text-slate-400 hover:border-slate-500 hover:text-slate-300" : "border-orange-800/60 bg-orange-900/20 text-orange-400 hover:bg-orange-900/30"}`}
+            >
+              {form.showGalleries ? <><Eye className="w-3 h-3" /> Visible</> : <><EyeOff className="w-3 h-3" /> N/A</>}
+            </button>
+            <Button type="button" size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={addGallery}>
+              <Plus className="w-3.5 h-3.5 mr-1.5" />
+              Add
+            </Button>
+          </div>
         </div>
+        {!form.showGalleries && (
+          <p className="text-xs text-slate-500 bg-slate-700/40 border border-slate-600/40 rounded-lg px-3 py-2">This section is hidden on your site.</p>
+        )}
         <div className="space-y-3">
           {form.galleries.map((gallery, i) => (
             <div key={i} className="bg-slate-700/60 rounded-xl border border-slate-600 p-4 space-y-3">
@@ -1336,16 +1374,28 @@ function SettingsView() {
         </div>
       </div>
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           <div>
             <h3 className="text-base font-semibold font-serif text-slate-200">Services</h3>
             <p className="text-slate-500 text-xs mt-0.5">Shown on the home page services section.</p>
           </div>
-          <Button type="button" size="sm" className="bg-blue-600 hover:bg-blue-700 shrink-0" onClick={addService}>
-            <Plus className="w-3.5 h-3.5 mr-1.5" />
-            Add
-          </Button>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => setForm((f) => f ? { ...f, showServices: !f.showServices } : f)}
+              className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border font-medium transition-colors ${form.showServices ? "border-slate-600 text-slate-400 hover:border-slate-500 hover:text-slate-300" : "border-orange-800/60 bg-orange-900/20 text-orange-400 hover:bg-orange-900/30"}`}
+            >
+              {form.showServices ? <><Eye className="w-3 h-3" /> Visible</> : <><EyeOff className="w-3 h-3" /> N/A</>}
+            </button>
+            <Button type="button" size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={addService}>
+              <Plus className="w-3.5 h-3.5 mr-1.5" />
+              Add
+            </Button>
+          </div>
         </div>
+        {!form.showServices && (
+          <p className="text-xs text-slate-500 bg-slate-700/40 border border-slate-600/40 rounded-lg px-3 py-2">This section is hidden on your site.</p>
+        )}
         {field("Section heading", form.servicesHeading ?? "", (v) => setForm((f) => f ? { ...f, servicesHeading: v } : f), "e.g. What We Offer")}
         {textareaField("Section subtitle", form.servicesSubtitle ?? "", (v) => setForm((f) => f ? { ...f, servicesSubtitle: v } : f), "A short sentence or two below the heading.")}
 
@@ -1399,16 +1449,28 @@ function SettingsView() {
         </div>
       </div>
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           <div>
             <h3 className="text-base font-semibold font-serif text-slate-200">Testimonials</h3>
             <p className="text-slate-500 text-xs mt-0.5">Customer reviews shown on the home page. Replace placeholder text with real reviews.</p>
           </div>
-          <Button type="button" size="sm" className="bg-blue-600 hover:bg-blue-700 shrink-0" onClick={addTestimonial}>
-            <Plus className="w-3.5 h-3.5 mr-1.5" />
-            Add
-          </Button>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => setForm((f) => f ? { ...f, showTestimonials: !f.showTestimonials } : f)}
+              className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border font-medium transition-colors ${form.showTestimonials ? "border-slate-600 text-slate-400 hover:border-slate-500 hover:text-slate-300" : "border-orange-800/60 bg-orange-900/20 text-orange-400 hover:bg-orange-900/30"}`}
+            >
+              {form.showTestimonials ? <><Eye className="w-3 h-3" /> Visible</> : <><EyeOff className="w-3 h-3" /> N/A</>}
+            </button>
+            <Button type="button" size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={addTestimonial}>
+              <Plus className="w-3.5 h-3.5 mr-1.5" />
+              Add
+            </Button>
+          </div>
         </div>
+        {!form.showTestimonials && (
+          <p className="text-xs text-slate-500 bg-slate-700/40 border border-slate-600/40 rounded-lg px-3 py-2">This section is hidden on your site.</p>
+        )}
         <div className="space-y-3">
           {(form.testimonials ?? []).map((t, i) => (
             <div key={i} className="bg-slate-700/60 rounded-xl border border-slate-600 p-4 space-y-3">

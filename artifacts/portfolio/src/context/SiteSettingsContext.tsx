@@ -39,6 +39,11 @@ export interface SiteSettings {
   colorText: string;
   colorAccent: string;
   colorHeader: string;
+  showHero: boolean;
+  showGalleries: boolean;
+  showServices: boolean;
+  showAbout: boolean;
+  showTestimonials: boolean;
   setupComplete: boolean;
 }
 
@@ -79,6 +84,11 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   colorText: "#f1f5f9",
   colorAccent: "#2563eb",
   colorHeader: "#0f172a",
+  showHero: true,
+  showGalleries: true,
+  showServices: true,
+  showAbout: true,
+  showTestimonials: true,
   setupComplete: false,
 };
 

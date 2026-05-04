@@ -164,6 +164,23 @@ export const GetSettingsResponse = zod.object({
     .string()
     .regex(getSettingsResponseColorHeaderRegExp)
     .describe("Navbar\/header background color as a hex value (e.g. #0f172a)."),
+  showHero: zod
+    .boolean()
+    .describe("Whether the hero section is visible on the home page."),
+  showGalleries: zod
+    .boolean()
+    .describe("Whether the gallery tiles section is visible on the home page."),
+  showServices: zod
+    .boolean()
+    .describe("Whether the services section is visible on the home page."),
+  showAbout: zod
+    .boolean()
+    .describe(
+      "Whether the about\/why-choose-us section is visible on the home page.",
+    ),
+  showTestimonials: zod
+    .boolean()
+    .describe("Whether the testimonials section is visible on the home page."),
   setupComplete: zod
     .boolean()
     .describe("Whether the initial setup wizard has been completed."),
@@ -262,6 +279,23 @@ export const UpdateSettingsBody = zod.object({
     .string()
     .regex(updateSettingsBodyColorHeaderRegExp)
     .describe("Navbar\/header background color as a hex value (e.g. #0f172a)."),
+  showHero: zod
+    .boolean()
+    .describe("Whether the hero section is visible on the home page."),
+  showGalleries: zod
+    .boolean()
+    .describe("Whether the gallery tiles section is visible on the home page."),
+  showServices: zod
+    .boolean()
+    .describe("Whether the services section is visible on the home page."),
+  showAbout: zod
+    .boolean()
+    .describe(
+      "Whether the about\/why-choose-us section is visible on the home page.",
+    ),
+  showTestimonials: zod
+    .boolean()
+    .describe("Whether the testimonials section is visible on the home page."),
   setupComplete: zod
     .boolean()
     .describe("Whether the initial setup wizard has been completed."),
@@ -358,6 +392,23 @@ export const UpdateSettingsResponse = zod.object({
     .string()
     .regex(updateSettingsResponseColorHeaderRegExp)
     .describe("Navbar\/header background color as a hex value (e.g. #0f172a)."),
+  showHero: zod
+    .boolean()
+    .describe("Whether the hero section is visible on the home page."),
+  showGalleries: zod
+    .boolean()
+    .describe("Whether the gallery tiles section is visible on the home page."),
+  showServices: zod
+    .boolean()
+    .describe("Whether the services section is visible on the home page."),
+  showAbout: zod
+    .boolean()
+    .describe(
+      "Whether the about\/why-choose-us section is visible on the home page.",
+    ),
+  showTestimonials: zod
+    .boolean()
+    .describe("Whether the testimonials section is visible on the home page."),
   setupComplete: zod
     .boolean()
     .describe("Whether the initial setup wizard has been completed."),
@@ -458,6 +509,23 @@ export const ResetSettingsResponse = zod.object({
     .string()
     .regex(resetSettingsResponseColorHeaderRegExp)
     .describe("Navbar\/header background color as a hex value (e.g. #0f172a)."),
+  showHero: zod
+    .boolean()
+    .describe("Whether the hero section is visible on the home page."),
+  showGalleries: zod
+    .boolean()
+    .describe("Whether the gallery tiles section is visible on the home page."),
+  showServices: zod
+    .boolean()
+    .describe("Whether the services section is visible on the home page."),
+  showAbout: zod
+    .boolean()
+    .describe(
+      "Whether the about\/why-choose-us section is visible on the home page.",
+    ),
+  showTestimonials: zod
+    .boolean()
+    .describe("Whether the testimonials section is visible on the home page."),
   setupComplete: zod
     .boolean()
     .describe("Whether the initial setup wizard has been completed."),

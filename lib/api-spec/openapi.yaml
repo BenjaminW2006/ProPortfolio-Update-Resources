@@ -362,7 +362,7 @@ components:
           description: Review text.
     SiteSettings:
       type: object
-      required: [companyName, tagline1, tagline2, tagline3, heroSubtitle, aboutTitle, aboutText, aboutQuote, servicesHeading, servicesSubtitle, phone, email, serviceArea, services, galleries, testimonials, colorBg, colorText, colorAccent, colorHeader, setupComplete]
+      required: [companyName, tagline1, tagline2, tagline3, heroSubtitle, aboutTitle, aboutText, aboutQuote, servicesHeading, servicesSubtitle, phone, email, serviceArea, services, galleries, testimonials, colorBg, colorText, colorAccent, colorHeader, showHero, showGalleries, showServices, showAbout, showTestimonials, setupComplete]
       properties:
         companyName:
           type: string
@@ -434,6 +434,21 @@ components:
           type: string
           pattern: "^#[0-9A-Fa-f]{6}$"
           description: "Navbar/header background color as a hex value (e.g. #0f172a)."
+        showHero:
+          type: boolean
+          description: Whether the hero section is visible on the home page.
+        showGalleries:
+          type: boolean
+          description: Whether the gallery tiles section is visible on the home page.
+        showServices:
+          type: boolean
+          description: Whether the services section is visible on the home page.
+        showAbout:
+          type: boolean
+          description: Whether the about/why-choose-us section is visible on the home page.
+        showTestimonials:
+          type: boolean
+          description: Whether the testimonials section is visible on the home page.
         setupComplete:
           type: boolean
           description: Whether the initial setup wizard has been completed.
