@@ -1224,7 +1224,7 @@ function SettingsView() {
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
         <div>
           <h3 className="text-base font-semibold font-serif text-slate-200">Colors</h3>
-          <p className="text-slate-500 text-xs mt-0.5">Click a swatch to open a color picker, or type a hex value directly.</p>
+          <p className="text-slate-500 text-xs mt-0.5">Enter a hex color code (e.g. #2563eb). The swatch updates as you type.</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           {(["colorBg", "colorText", "colorAccent", "colorHeader"] as const).map((key) => {
@@ -1238,11 +1238,9 @@ function SettingsView() {
               <div key={key}>
                 <label className="block text-slate-400 text-sm mb-1.5">{labels[key]}</label>
                 <div className="flex items-center gap-2">
-                  <input
-                    type="color"
-                    value={form[key]}
-                    onChange={(e) => setForm((f) => f ? { ...f, [key]: e.target.value } : f)}
-                    className="w-10 h-10 rounded-lg cursor-pointer border border-slate-600 p-0.5 bg-transparent shrink-0"
+                  <div
+                    className="w-10 h-10 rounded-lg border border-slate-600 shrink-0"
+                    style={{ backgroundColor: form[key] }}
                   />
                   <Input
                     value={form[key]}
