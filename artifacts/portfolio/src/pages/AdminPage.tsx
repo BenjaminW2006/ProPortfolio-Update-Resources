@@ -1582,6 +1582,7 @@ export default function AdminPage() {
   const [view, setView] = useState<View>({ type: "list" });
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { companyName } = useSiteSettings();
 
   useEffect(() => {
     const flag = sessionStorage.getItem("admin_logged_in");
@@ -1628,7 +1629,7 @@ export default function AdminPage() {
           <div className="flex items-center gap-6">
             <div>
               <h1 className="font-bold text-lg font-serif leading-tight">Project Manager</h1>
-              <p className="text-slate-400 text-xs">Upstate Palmetto Property Services</p>
+              <p className="text-slate-400 text-xs">{companyName}</p>
             </div>
             <nav className="hidden sm:flex items-center gap-1">
               <button
