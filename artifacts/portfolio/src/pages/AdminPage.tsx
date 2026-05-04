@@ -913,7 +913,14 @@ function ProjectListView({
   onCreateNew: () => void;
 }) {
   const [search, setSearch] = useState("");
+  const [newGalleryLabel, setNewGalleryLabel] = useState("");
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [savingGallery, setSavingGallery] = useState(false);
+  const [confirmDeleteKey, setConfirmDeleteKey] = useState<string | null>(null);
   const { galleries: galleryTiles = [] } = useSiteSettings();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
   const { data: projects = [], isLoading } = useQuery<Project[]>({
     queryKey: ["admin-projects"],
     queryFn: async () => {
@@ -924,6 +931,51 @@ function ProjectListView({
     staleTime: 0,
   });
 
+  const patchGalleries = async (galleries: typeof galleryTiles) => {
+    const res = await apiMutation("/api/settings", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ galleries }),
+    });
+    if (!res.ok) throw new Error("Failed to save");
+    const updated = await res.json();
+    queryClient.setQueryData(["site-settings"], updated);
+  };
+
+  const handleAddGallery = async () => {
+    const label = newGalleryLabel.trim();
+    if (!label) return;
+    const key = label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    if (galleryTiles.some((g) => g.key === key)) {
+      toast({ title: "A gallery with that name already exists.", variant: "destructive" });
+      return;
+    }
+    setSavingGallery(true);
+    try {
+      await patchGalleries([...galleryTiles, { key, label, description: "" }]);
+      setNewGalleryLabel("");
+      setShowAddForm(false);
+      toast({ title: `"${label}" gallery added!` });
+    } catch {
+      toast({ title: "Error", description: "Failed to add gallery.", variant: "destructive" });
+    } finally {
+      setSavingGallery(false);
+    }
+  };
+
+  const handleRemoveGallery = async (key: string) => {
+    setSavingGallery(true);
+    try {
+      await patchGalleries(galleryTiles.filter((g) => g.key !== key));
+      setConfirmDeleteKey(null);
+      toast({ title: "Gallery removed." });
+    } catch {
+      toast({ title: "Error", description: "Failed to remove gallery.", variant: "destructive" });
+    } finally {
+      setSavingGallery(false);
+    }
+  };
+
   const filtered = search.trim()
     ? projects.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
     : projects;
@@ -931,13 +983,77 @@ function ProjectListView({
   return (
     <div className="space-y-10">
       <div>
-        <h2 className="text-2xl font-bold font-serif mb-4">Gallery Tile Covers</h2>
-        <p className="text-slate-400 text-sm mb-5">These images appear on the home page tiles. Configure galleries in Site Settings.</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl">
-          {galleryTiles.map((g) => (
-            <TileCoverUpload key={g.key} slot={`tile-${g.key}`} label={g.label} />
-          ))}
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <h2 className="text-2xl font-bold font-serif">Galleries</h2>
+            <p className="text-slate-400 text-sm mt-0.5">Each gallery is a tile on the home page with its own project page.</p>
+          </div>
+          <Button
+            size="sm"
+            className="bg-blue-600 hover:bg-blue-700 shrink-0"
+            onClick={() => { setShowAddForm(true); setNewGalleryLabel(""); }}
+          >
+            <Plus className="w-4 h-4 mr-1.5" />
+            Add Gallery
+          </Button>
         </div>
+
+        {showAddForm && (
+          <div className="flex items-center gap-2 mb-4 max-w-sm">
+            <Input
+              value={newGalleryLabel}
+              onChange={(e) => setNewGalleryLabel(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") handleAddGallery(); if (e.key === "Escape") setShowAddForm(false); }}
+              placeholder="Gallery name (e.g. Kitchens)"
+              className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-500"
+              autoFocus
+            />
+            <Button size="sm" className="bg-blue-600 hover:bg-blue-700 shrink-0" onClick={handleAddGallery} disabled={savingGallery || !newGalleryLabel.trim()}>
+              {savingGallery ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+            </Button>
+            <button type="button" onClick={() => setShowAddForm(false)} className="text-slate-400 hover:text-white">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
+        {galleryTiles.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-slate-600 gap-3 border-2 border-dashed border-slate-700 rounded-2xl max-w-xl">
+            <p className="text-slate-500 text-sm">No galleries yet. Add one above.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl">
+            {galleryTiles.map((g) => (
+              <div key={g.key} className="relative group">
+                <TileCoverUpload slot={`tile-${g.key}`} label={g.label} />
+                {confirmDeleteKey === g.key ? (
+                  <div className="absolute top-2 right-2 flex items-center gap-1.5 bg-slate-900/90 border border-red-800/60 rounded-lg px-2.5 py-1.5 backdrop-blur-sm">
+                    <span className="text-red-300 text-xs">Remove gallery?</span>
+                    <button
+                      onClick={() => handleRemoveGallery(g.key)}
+                      disabled={savingGallery}
+                      className="text-red-400 hover:text-red-300 text-xs font-medium disabled:opacity-50"
+                    >
+                      {savingGallery ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Yes"}
+                    </button>
+                    <button onClick={() => setConfirmDeleteKey(null)} className="text-slate-400 hover:text-white">
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setConfirmDeleteKey(g.key)}
+                    className="absolute top-2 right-2 p-1.5 rounded-lg bg-slate-900/70 text-slate-400 hover:text-red-400 hover:bg-slate-900/90 opacity-0 group-hover:opacity-100 transition-opacity"
+                    title={`Remove "${g.label}" gallery`}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="space-y-6">
