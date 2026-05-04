@@ -15,7 +15,7 @@ const ICONS = [
 ];
 
 export default function Services() {
-  const { services } = useSiteSettings();
+  const { services, servicesHeading, servicesSubtitle } = useSiteSettings();
 
   return (
     <section id="services" className="py-24 bg-slate-50">
@@ -28,7 +28,7 @@ export default function Services() {
             transition={{ duration: 0.5 }}
             className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 font-serif"
           >
-            No Job Too Small. <br className="md:hidden" /> Every Job Done Right.
+            {servicesHeading}
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -37,7 +37,7 @@ export default function Services() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-lg text-slate-600"
           >
-            We handle the punch list so you can enjoy your weekend. From structural fixes to aesthetic upgrades, we bring professional tools and expertise to every project.
+            {servicesSubtitle}
           </motion.p>
         </div>
 

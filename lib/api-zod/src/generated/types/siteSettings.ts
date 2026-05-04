@@ -7,6 +7,7 @@
  */
 import type { SiteGallery } from "./siteGallery";
 import type { SiteService } from "./siteService";
+import type { SiteTestimonial } from "./siteTestimonial";
 
 export interface SiteSettings {
   /** Business name shown in the navbar and footer. */
@@ -17,6 +18,18 @@ export interface SiteSettings {
   tagline2: string;
   /** Third hero tagline word/phrase. */
   tagline3: string;
+  /** Descriptive paragraph shown below the hero taglines. */
+  heroSubtitle: string;
+  /** Heading for the About/Why Choose Us section. */
+  aboutTitle: string;
+  /** Body paragraph for the About section. */
+  aboutText: string;
+  /** Pull quote shown over the About section image. */
+  aboutQuote: string;
+  /** Heading for the Services section. */
+  servicesHeading: string;
+  /** Subtitle shown below the Services heading. */
+  servicesSubtitle: string;
   /** Contact phone number. */
   phone: string;
   /** Contact email address. */
@@ -27,6 +40,8 @@ export interface SiteSettings {
   services: SiteService[];
   /** Ordered list of gallery categories shown as tiles on the home page. */
   galleries: SiteGallery[];
+  /** Customer testimonials shown on the home page. */
+  testimonials: SiteTestimonial[];
   /**
    * Page background color as a hex value (e.g. #0f172a).
    * @pattern ^#[0-9A-Fa-f]{6}$
@@ -47,4 +62,6 @@ export interface SiteSettings {
    * @pattern ^#[0-9A-Fa-f]{6}$
    */
   colorHeader: string;
+  /** Whether the initial setup wizard has been completed. */
+  setupComplete: boolean;
 }

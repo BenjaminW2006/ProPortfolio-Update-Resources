@@ -96,6 +96,20 @@ export const GetSettingsResponse = zod.object({
   tagline1: zod.string().describe("First hero tagline word\/phrase."),
   tagline2: zod.string().describe("Second hero tagline word\/phrase."),
   tagline3: zod.string().describe("Third hero tagline word\/phrase."),
+  heroSubtitle: zod
+    .string()
+    .describe("Descriptive paragraph shown below the hero taglines."),
+  aboutTitle: zod
+    .string()
+    .describe("Heading for the About\/Why Choose Us section."),
+  aboutText: zod.string().describe("Body paragraph for the About section."),
+  aboutQuote: zod
+    .string()
+    .describe("Pull quote shown over the About section image."),
+  servicesHeading: zod.string().describe("Heading for the Services section."),
+  servicesSubtitle: zod
+    .string()
+    .describe("Subtitle shown below the Services heading."),
   phone: zod.string().describe("Contact phone number."),
   email: zod.string().describe("Contact email address."),
   serviceArea: zod.string().describe("Geographic service area description."),
@@ -125,6 +139,15 @@ export const GetSettingsResponse = zod.object({
     .describe(
       "Ordered list of gallery categories shown as tiles on the home page.",
     ),
+  testimonials: zod
+    .array(
+      zod.object({
+        name: zod.string().describe("Reviewer's name."),
+        location: zod.string().describe("Reviewer's city\/location."),
+        text: zod.string().describe("Review text."),
+      }),
+    )
+    .describe("Customer testimonials shown on the home page."),
   colorBg: zod
     .string()
     .regex(getSettingsResponseColorBgRegExp)
@@ -141,6 +164,9 @@ export const GetSettingsResponse = zod.object({
     .string()
     .regex(getSettingsResponseColorHeaderRegExp)
     .describe("Navbar\/header background color as a hex value (e.g. #0f172a)."),
+  setupComplete: zod
+    .boolean()
+    .describe("Whether the initial setup wizard has been completed."),
 });
 
 /**
@@ -168,6 +194,20 @@ export const UpdateSettingsBody = zod.object({
   tagline1: zod.string().describe("First hero tagline word\/phrase."),
   tagline2: zod.string().describe("Second hero tagline word\/phrase."),
   tagline3: zod.string().describe("Third hero tagline word\/phrase."),
+  heroSubtitle: zod
+    .string()
+    .describe("Descriptive paragraph shown below the hero taglines."),
+  aboutTitle: zod
+    .string()
+    .describe("Heading for the About\/Why Choose Us section."),
+  aboutText: zod.string().describe("Body paragraph for the About section."),
+  aboutQuote: zod
+    .string()
+    .describe("Pull quote shown over the About section image."),
+  servicesHeading: zod.string().describe("Heading for the Services section."),
+  servicesSubtitle: zod
+    .string()
+    .describe("Subtitle shown below the Services heading."),
   phone: zod.string().describe("Contact phone number."),
   email: zod.string().describe("Contact email address."),
   serviceArea: zod.string().describe("Geographic service area description."),
@@ -197,6 +237,15 @@ export const UpdateSettingsBody = zod.object({
     .describe(
       "Ordered list of gallery categories shown as tiles on the home page.",
     ),
+  testimonials: zod
+    .array(
+      zod.object({
+        name: zod.string().describe("Reviewer's name."),
+        location: zod.string().describe("Reviewer's city\/location."),
+        text: zod.string().describe("Review text."),
+      }),
+    )
+    .describe("Customer testimonials shown on the home page."),
   colorBg: zod
     .string()
     .regex(updateSettingsBodyColorBgRegExp)
@@ -213,6 +262,9 @@ export const UpdateSettingsBody = zod.object({
     .string()
     .regex(updateSettingsBodyColorHeaderRegExp)
     .describe("Navbar\/header background color as a hex value (e.g. #0f172a)."),
+  setupComplete: zod
+    .boolean()
+    .describe("Whether the initial setup wizard has been completed."),
 });
 
 export const updateSettingsResponseGalleriesItemKeyRegExp = new RegExp(
@@ -238,6 +290,20 @@ export const UpdateSettingsResponse = zod.object({
   tagline1: zod.string().describe("First hero tagline word\/phrase."),
   tagline2: zod.string().describe("Second hero tagline word\/phrase."),
   tagline3: zod.string().describe("Third hero tagline word\/phrase."),
+  heroSubtitle: zod
+    .string()
+    .describe("Descriptive paragraph shown below the hero taglines."),
+  aboutTitle: zod
+    .string()
+    .describe("Heading for the About\/Why Choose Us section."),
+  aboutText: zod.string().describe("Body paragraph for the About section."),
+  aboutQuote: zod
+    .string()
+    .describe("Pull quote shown over the About section image."),
+  servicesHeading: zod.string().describe("Heading for the Services section."),
+  servicesSubtitle: zod
+    .string()
+    .describe("Subtitle shown below the Services heading."),
   phone: zod.string().describe("Contact phone number."),
   email: zod.string().describe("Contact email address."),
   serviceArea: zod.string().describe("Geographic service area description."),
@@ -267,6 +333,15 @@ export const UpdateSettingsResponse = zod.object({
     .describe(
       "Ordered list of gallery categories shown as tiles on the home page.",
     ),
+  testimonials: zod
+    .array(
+      zod.object({
+        name: zod.string().describe("Reviewer's name."),
+        location: zod.string().describe("Reviewer's city\/location."),
+        text: zod.string().describe("Review text."),
+      }),
+    )
+    .describe("Customer testimonials shown on the home page."),
   colorBg: zod
     .string()
     .regex(updateSettingsResponseColorBgRegExp)
@@ -283,6 +358,9 @@ export const UpdateSettingsResponse = zod.object({
     .string()
     .regex(updateSettingsResponseColorHeaderRegExp)
     .describe("Navbar\/header background color as a hex value (e.g. #0f172a)."),
+  setupComplete: zod
+    .boolean()
+    .describe("Whether the initial setup wizard has been completed."),
 });
 
 /**
@@ -312,6 +390,20 @@ export const ResetSettingsResponse = zod.object({
   tagline1: zod.string().describe("First hero tagline word\/phrase."),
   tagline2: zod.string().describe("Second hero tagline word\/phrase."),
   tagline3: zod.string().describe("Third hero tagline word\/phrase."),
+  heroSubtitle: zod
+    .string()
+    .describe("Descriptive paragraph shown below the hero taglines."),
+  aboutTitle: zod
+    .string()
+    .describe("Heading for the About\/Why Choose Us section."),
+  aboutText: zod.string().describe("Body paragraph for the About section."),
+  aboutQuote: zod
+    .string()
+    .describe("Pull quote shown over the About section image."),
+  servicesHeading: zod.string().describe("Heading for the Services section."),
+  servicesSubtitle: zod
+    .string()
+    .describe("Subtitle shown below the Services heading."),
   phone: zod.string().describe("Contact phone number."),
   email: zod.string().describe("Contact email address."),
   serviceArea: zod.string().describe("Geographic service area description."),
@@ -341,6 +433,15 @@ export const ResetSettingsResponse = zod.object({
     .describe(
       "Ordered list of gallery categories shown as tiles on the home page.",
     ),
+  testimonials: zod
+    .array(
+      zod.object({
+        name: zod.string().describe("Reviewer's name."),
+        location: zod.string().describe("Reviewer's city\/location."),
+        text: zod.string().describe("Review text."),
+      }),
+    )
+    .describe("Customer testimonials shown on the home page."),
   colorBg: zod
     .string()
     .regex(resetSettingsResponseColorBgRegExp)
@@ -357,6 +458,9 @@ export const ResetSettingsResponse = zod.object({
     .string()
     .regex(resetSettingsResponseColorHeaderRegExp)
     .describe("Navbar\/header background color as a hex value (e.g. #0f172a)."),
+  setupComplete: zod
+    .boolean()
+    .describe("Whether the initial setup wizard has been completed."),
 });
 
 /**

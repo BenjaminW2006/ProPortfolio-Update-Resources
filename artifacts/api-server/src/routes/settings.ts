@@ -17,6 +17,12 @@ const GalleryItemSchema = z.object({
   description: z.string(),
 });
 
+const TestimonialSchema = z.object({
+  name: z.string(),
+  location: z.string(),
+  text: z.string(),
+});
+
 const hexColor = z.string().regex(/^#[0-9A-Fa-f]{6}$/);
 
 const SiteSettingsSchema = z.object({
@@ -24,18 +30,30 @@ const SiteSettingsSchema = z.object({
   tagline1: z.string(),
   tagline2: z.string(),
   tagline3: z.string(),
+  heroSubtitle: z.string().default("Professional services tailored to your needs. We show up on time, work with care, and stand behind everything we do."),
+  aboutTitle: z.string().default("A Team You Can Count On."),
+  aboutText: z.string().default("We built this business because we saw a need for reliable, honest professionals in our community. We don't cut corners or leave messes. When we make a commitment, we keep it."),
+  aboutQuote: z.string().default("Good work isn't just about how it looks — it's about how it lasts."),
+  servicesHeading: z.string().default("What We Offer"),
+  servicesSubtitle: z.string().default("From small repairs to major projects, we bring professional tools and real expertise to every job."),
   phone: z.string(),
   email: z.string(),
   serviceArea: z.string(),
   services: z.array(ServiceSchema),
   galleries: z.array(GalleryItemSchema).default([
-    { key: "interior", label: "Interior", description: "Kitchen, bathroom, trim, and indoor projects" },
-    { key: "exterior", label: "Exterior", description: "Decks, siding, painting, and outdoor work" },
+    { key: "interior", label: "Interior", description: "Indoor projects and finished spaces" },
+    { key: "exterior", label: "Exterior", description: "Outdoor work and curb appeal projects" },
+  ]),
+  testimonials: z.array(TestimonialSchema).default([
+    { name: "Customer Name", location: "City, State", text: "Replace this with a real review from one of your happy customers. Testimonials build trust and help new visitors feel confident reaching out." },
+    { name: "Customer Name", location: "City, State", text: "Add another review here. Ask satisfied customers to share their experience — even a few sentences makes a big difference." },
+    { name: "Customer Name", location: "City, State", text: "A third testimonial rounds out this section. Consider including customers who highlight different services or aspects of your work." },
   ]),
   colorBg: hexColor.default("#0f172a"),
   colorText: hexColor.default("#f1f5f9"),
   colorAccent: hexColor.default("#2563eb"),
   colorHeader: hexColor.default("#0f172a"),
+  setupComplete: z.boolean().default(false),
 });
 
 type SiteSettings = z.infer<typeof SiteSettingsSchema>;
@@ -45,6 +63,12 @@ const DEFAULT_SETTINGS: SiteSettings = {
   tagline1: "Quality Work.",
   tagline2: "Done Right.",
   tagline3: "Every Time.",
+  heroSubtitle: "Professional services tailored to your needs. We show up on time, work with care, and stand behind everything we do.",
+  aboutTitle: "A Team You Can Count On.",
+  aboutText: "We built this business because we saw a need for reliable, honest professionals in our community. We don't cut corners or leave messes. When we make a commitment, we keep it.",
+  aboutQuote: "Good work isn't just about how it looks — it's about how it lasts.",
+  servicesHeading: "What We Offer",
+  servicesSubtitle: "From small repairs to major projects, we bring professional tools and real expertise to every job.",
   phone: "(555) 000-0000",
   email: "hello@yourbusiness.com",
   serviceArea: "Your City, State",
@@ -53,19 +77,25 @@ const DEFAULT_SETTINGS: SiteSettings = {
   colorAccent: "#2563eb",
   colorHeader: "#0f172a",
   galleries: [
-    { key: "interior", label: "Interior", description: "Kitchen, bathroom, trim, and indoor projects" },
-    { key: "exterior", label: "Exterior", description: "Decks, siding, painting, and outdoor work" },
+    { key: "interior", label: "Interior", description: "Indoor projects and finished spaces" },
+    { key: "exterior", label: "Exterior", description: "Outdoor work and curb appeal projects" },
+  ],
+  testimonials: [
+    { name: "Customer Name", location: "City, State", text: "Replace this with a real review from one of your happy customers. Testimonials build trust and help new visitors feel confident reaching out." },
+    { name: "Customer Name", location: "City, State", text: "Add another review here. Ask satisfied customers to share their experience — even a few sentences makes a big difference." },
+    { name: "Customer Name", location: "City, State", text: "A third testimonial rounds out this section. Consider including customers who highlight different services or aspects of your work." },
   ],
   services: [
-    { title: "General Handyman", description: "Fixing what's broken. Door repairs, fixture installation, drywall patching, and everyday maintenance around the house." },
-    { title: "Painting", description: "Interior and exterior painting, trim work, deck staining, and touch-ups with meticulous attention to detail." },
-    { title: "Pressure Washing", description: "Restore your home's curb appeal. Driveways, siding, decks, patios, and walkways cleaned safely and thoroughly." },
-    { title: "Carpentry & Woodwork", description: "Custom trim, crown molding, baseboards, wainscoting, and minor wood repairs that add character to your home." },
-    { title: "Deck & Fence Repair", description: "Board replacement, structural reinforcement, sealing, and complete restoration for your outdoor living spaces." },
-    { title: "Gutter Cleaning", description: "Prevent water damage. Thorough removal of leaves and debris, downspout flushing, and minor repairs." },
+    { title: "General Repairs", description: "Fixing what's broken. Door repairs, fixture installation, drywall patching, and everyday maintenance." },
+    { title: "Painting", description: "Interior and exterior painting, trim work, deck staining, and touch-ups with attention to detail." },
+    { title: "Pressure Washing", description: "Restore curb appeal. Driveways, siding, decks, patios, and walkways cleaned safely and thoroughly." },
+    { title: "Carpentry & Woodwork", description: "Custom trim, molding, wainscoting, and minor wood repairs that add character to your space." },
+    { title: "Deck & Fence Work", description: "Board replacement, structural reinforcement, sealing, and full restoration for outdoor spaces." },
+    { title: "Gutter Cleaning", description: "Prevent water damage with thorough removal of leaves and debris, downspout flushing, and minor repairs." },
     { title: "Property Maintenance", description: "Recurring scheduled maintenance for landlords, property managers, and homeowners who want peace of mind." },
-    { title: "Minor Landscaping", description: "Shrub trimming, mulch installation, yard cleanup, and basic exterior aesthetic improvements." },
+    { title: "Landscaping", description: "Shrub trimming, mulch installation, yard cleanup, and basic exterior aesthetic improvements." },
   ],
+  setupComplete: false,
 };
 
 async function getCurrentSettings(): Promise<SiteSettings> {
@@ -138,6 +168,34 @@ router.post("/settings/reset", requireAdminSession, requireCsrfHeader, async (re
   } catch (error) {
     req.log.error({ err: error }, "Error resetting settings");
     res.status(500).json({ error: "Failed to reset settings" });
+  }
+});
+
+router.post("/settings/first-run", requireCsrfHeader, async (req: Request, res: Response) => {
+  try {
+    const current = await getCurrentSettings();
+    if (current.setupComplete) {
+      res.status(403).json({ error: "Setup already complete" });
+      return;
+    }
+    const merged = { ...current, ...(req.body as Partial<SiteSettings>), setupComplete: true };
+    const validated = SiteSettingsSchema.safeParse(merged);
+    if (!validated.success) {
+      res.status(400).json({ error: "Invalid settings" });
+      return;
+    }
+    const dataStr = JSON.stringify(validated.data);
+    await db
+      .insert(siteSettingsTable)
+      .values({ id: 1, data: dataStr })
+      .onConflictDoUpdate({
+        target: siteSettingsTable.id,
+        set: { data: dataStr, updatedAt: new Date() },
+      });
+    res.json(validated.data);
+  } catch (error) {
+    req.log.error({ err: error }, "Error during first-run setup");
+    res.status(500).json({ error: "Failed to save setup" });
   }
 });
 

@@ -12,20 +12,34 @@ export interface GalleryItem {
   description: string;
 }
 
+export interface Testimonial {
+  name: string;
+  location: string;
+  text: string;
+}
+
 export interface SiteSettings {
   companyName: string;
   tagline1: string;
   tagline2: string;
   tagline3: string;
+  heroSubtitle: string;
+  aboutTitle: string;
+  aboutText: string;
+  aboutQuote: string;
+  servicesHeading: string;
+  servicesSubtitle: string;
   phone: string;
   email: string;
   serviceArea: string;
   services: ServiceItem[];
   galleries: GalleryItem[];
+  testimonials: Testimonial[];
   colorBg: string;
   colorText: string;
   colorAccent: string;
   colorHeader: string;
+  setupComplete: boolean;
 }
 
 export const DEFAULT_SETTINGS: SiteSettings = {
@@ -33,27 +47,39 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   tagline1: "Quality Work.",
   tagline2: "Done Right.",
   tagline3: "Every Time.",
+  heroSubtitle: "Professional services tailored to your needs. We show up on time, work with care, and stand behind everything we do.",
+  aboutTitle: "A Team You Can Count On.",
+  aboutText: "We built this business because we saw a need for reliable, honest professionals in our community. We don't cut corners or leave messes. When we make a commitment, we keep it.",
+  aboutQuote: "Good work isn't just about how it looks — it's about how it lasts.",
+  servicesHeading: "What We Offer",
+  servicesSubtitle: "From small repairs to major projects, we bring professional tools and real expertise to every job.",
   phone: "(555) 000-0000",
   email: "hello@yourbusiness.com",
   serviceArea: "Your City, State",
   services: [
-    { title: "General Handyman", description: "Fixing what's broken. Door repairs, fixture installation, drywall patching, and everyday maintenance around the house." },
-    { title: "Painting", description: "Interior and exterior painting, trim work, deck staining, and touch-ups with meticulous attention to detail." },
-    { title: "Pressure Washing", description: "Restore your home's curb appeal. Driveways, siding, decks, patios, and walkways cleaned safely and thoroughly." },
-    { title: "Carpentry & Woodwork", description: "Custom trim, crown molding, baseboards, wainscoting, and minor wood repairs that add character to your home." },
-    { title: "Deck & Fence Repair", description: "Board replacement, structural reinforcement, sealing, and complete restoration for your outdoor living spaces." },
-    { title: "Gutter Cleaning", description: "Prevent water damage. Thorough removal of leaves and debris, downspout flushing, and minor repairs." },
+    { title: "General Repairs", description: "Fixing what's broken. Door repairs, fixture installation, drywall patching, and everyday maintenance." },
+    { title: "Painting", description: "Interior and exterior painting, trim work, deck staining, and touch-ups with attention to detail." },
+    { title: "Pressure Washing", description: "Restore curb appeal. Driveways, siding, decks, patios, and walkways cleaned safely and thoroughly." },
+    { title: "Carpentry & Woodwork", description: "Custom trim, molding, wainscoting, and minor wood repairs that add character to your space." },
+    { title: "Deck & Fence Work", description: "Board replacement, structural reinforcement, sealing, and full restoration for outdoor spaces." },
+    { title: "Gutter Cleaning", description: "Prevent water damage with thorough removal of leaves and debris, downspout flushing, and minor repairs." },
     { title: "Property Maintenance", description: "Recurring scheduled maintenance for landlords, property managers, and homeowners who want peace of mind." },
-    { title: "Minor Landscaping", description: "Shrub trimming, mulch installation, yard cleanup, and basic exterior aesthetic improvements." },
+    { title: "Landscaping", description: "Shrub trimming, mulch installation, yard cleanup, and basic exterior aesthetic improvements." },
   ],
   galleries: [
-    { key: "interior", label: "Interior", description: "Kitchen, bathroom, trim, and indoor projects" },
-    { key: "exterior", label: "Exterior", description: "Decks, siding, painting, and outdoor work" },
+    { key: "interior", label: "Interior", description: "Indoor projects and finished spaces" },
+    { key: "exterior", label: "Exterior", description: "Outdoor work and curb appeal projects" },
+  ],
+  testimonials: [
+    { name: "Customer Name", location: "City, State", text: "Replace this with a real review from one of your happy customers. Testimonials build trust and help new visitors feel confident reaching out." },
+    { name: "Customer Name", location: "City, State", text: "Add another review here. Ask satisfied customers to share their experience — even a few sentences makes a big difference." },
+    { name: "Customer Name", location: "City, State", text: "A third testimonial rounds out this section. Consider including customers who highlight different services or aspects of your work." },
   ],
   colorBg: "#0f172a",
   colorText: "#f1f5f9",
   colorAccent: "#2563eb",
   colorHeader: "#0f172a",
+  setupComplete: false,
 };
 
 const SiteSettingsContext = createContext<SiteSettings>(DEFAULT_SETTINGS);

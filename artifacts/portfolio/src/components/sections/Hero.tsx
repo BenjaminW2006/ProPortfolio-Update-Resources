@@ -35,7 +35,7 @@ export default function Hero() {
         <div className="absolute inset-0 bg-slate-900/70 mix-blend-multiply z-10" />
         <img
           src={heroBg}
-          alt="Beautiful Southern Home"
+          alt="Professional work"
           className="w-full h-full object-cover"
         />
       </div>
@@ -59,7 +59,7 @@ export default function Hero() {
             </h1>
 
             <p className="text-lg md:text-xl text-slate-200 mb-8 max-w-2xl leading-relaxed">
-              Your trusted neighbors for professional handyman and property maintenance services. From small repairs to major updates, we show up, work hard, and stand behind what we do.
+              {settings.heroSubtitle}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
