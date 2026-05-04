@@ -1190,7 +1190,7 @@ function SettingsView() {
   );
 
   return (
-    <div className="max-w-2xl space-y-8">
+    <div className="max-w-2xl mx-auto space-y-8">
       <div>
         <h2 className="text-2xl font-bold font-serif mb-1">Company Information</h2>
         <p className="text-slate-400 text-sm">Changes update the live website immediately after saving.</p>
