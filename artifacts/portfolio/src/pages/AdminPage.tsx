@@ -367,11 +367,13 @@ function CreateProjectForm({
           </div>
           <div>
             <label className="block text-slate-400 text-sm mb-1.5">Description</label>
-            <Input
+            <textarea
               value={form.description}
               onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+              onInput={(e) => { const t = e.currentTarget; t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; }}
               placeholder="Brief description of the work done"
-              className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
+              rows={1}
+              className="w-full rounded-md border border-slate-600 bg-slate-700 px-3 py-2 text-sm text-white placeholder:text-slate-500 resize-none overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
@@ -484,10 +486,12 @@ function EditProjectForm({
         </div>
         <div>
           <label className="block text-slate-400 text-sm mb-1.5">Description</label>
-          <Input
+          <textarea
             value={form.description}
             onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-            className="bg-slate-700 border-slate-600 text-white"
+            onInput={(e) => { const t = e.currentTarget; t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; }}
+            rows={1}
+            className="w-full rounded-md border border-slate-600 bg-slate-700 px-3 py-2 text-sm text-white placeholder:text-slate-500 resize-none overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       </div>
