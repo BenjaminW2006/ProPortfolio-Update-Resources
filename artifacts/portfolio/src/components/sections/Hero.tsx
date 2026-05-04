@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
 import { useSiteSettings } from "@/context/SiteSettingsContext";
 
 export default function Hero() {
@@ -26,11 +25,6 @@ export default function Hero() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" className="bg-site-accent text-white text-lg h-14 px-8 hover:opacity-90" asChild>
-                <a href="/contact">
-                  Get a Free Quote <ArrowRight className="ml-2 w-5 h-5" />
-                </a>
-              </Button>
               <Button size="lg" variant="outline" className="bg-white/10 hover:bg-white/20 text-white border-white/30 text-lg h-14 px-8 backdrop-blur-sm" asChild>
                 <a href="#services">Our Services</a>
               </Button>
