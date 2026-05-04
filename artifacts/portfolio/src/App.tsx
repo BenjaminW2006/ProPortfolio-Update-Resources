@@ -28,8 +28,8 @@ function Router() {
       <Route path="/gallery/project/:id" component={ProjectDetailPage} />
       <Route path="/gallery/:key" component={GalleryRoute} />
       <Route path="/gallery" component={DefaultGallery} />
-      <Route path="/admin/reset-password" component={ResetPasswordPage} />
-      <Route path="/admin" component={AdminPage} />
+      <Route path="/manager/reset-password" component={ResetPasswordPage} />
+      <Route path="/manager" component={AdminPage} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -57,7 +57,7 @@ function AppContent() {
   }
 
   // Admin routes handle their own auth and setup flow — never intercept them
-  const isAdminRoute = location.startsWith("/admin");
+  const isAdminRoute = location.startsWith("/manager");
 
   // Show wizard on first visit OR if no admin password has been set yet
   if (!isAdminRoute && (!settings?.setupComplete || !settings?.hasAdminPassword)) {

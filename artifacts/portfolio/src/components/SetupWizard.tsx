@@ -362,7 +362,7 @@ export default function SetupWizard({ onDone }: SetupWizardProps = {}) {
                     <Button
                       variant="ghost"
                       className="text-slate-400 hover:text-white hover:bg-slate-700 w-full"
-                      onClick={() => { window.location.href = "/admin"; }}
+                      onClick={() => { window.location.href = "/manager"; }}
                       disabled={saving}
                     >
                       Go to Admin Panel instead

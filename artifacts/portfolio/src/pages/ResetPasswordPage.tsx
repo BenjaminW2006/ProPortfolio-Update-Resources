@@ -26,7 +26,7 @@ export default function ResetPasswordPage() {
           <Button
             variant="ghost"
             className="text-slate-400 hover:text-white"
-            onClick={() => navigate("/admin")}
+            onClick={() => navigate("/manager")}
           >
             Back to login
           </Button>
@@ -90,7 +90,7 @@ export default function ResetPasswordPage() {
             <p className="text-slate-300 text-sm">You can now sign in with your new password.</p>
             <Button
               className="w-full bg-blue-600 hover:bg-blue-700"
-              onClick={() => navigate("/admin")}
+              onClick={() => navigate("/manager")}
             >
               Go to login
             </Button>
@@ -125,7 +125,7 @@ export default function ResetPasswordPage() {
               <button
                 type="button"
                 className="text-slate-500 hover:text-slate-300 text-sm transition-colors"
-                onClick={() => navigate("/admin")}
+                onClick={() => navigate("/manager")}
               >
                 Back to login
               </button>

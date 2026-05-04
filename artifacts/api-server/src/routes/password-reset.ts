@@ -87,7 +87,7 @@ router.post("/admin/reset-password/request", async (req: Request, res: Response)
     const baseUrl = domains.startsWith("localhost")
       ? `http://${domains}`
       : `https://${domains}`;
-    const resetLink = `${baseUrl}/admin/reset-password?token=${token}`;
+    const resetLink = `${baseUrl}/manager/reset-password?token=${token}`;
 
     const sent = await sendResetEmail(email.trim(), resetLink);
     if (!sent && process.env.NODE_ENV !== "production") {
