@@ -347,22 +347,9 @@ components:
         description:
           type: string
           description: Short subtitle shown on the tile and gallery page.
-    SiteTestimonial:
-      type: object
-      required: [name, location, text]
-      properties:
-        name:
-          type: string
-          description: Reviewer's name.
-        location:
-          type: string
-          description: Reviewer's city/location.
-        text:
-          type: string
-          description: Review text.
     SiteSettings:
       type: object
-      required: [companyName, tagline1, tagline2, tagline3, heroSubtitle, aboutTitle, aboutText, aboutQuote, servicesHeading, servicesSubtitle, phone, email, serviceArea, services, galleries, testimonials, colorBg, colorText, colorAccent, colorHeader, showHero, showGalleries, showServices, showAbout, showTestimonials, setupComplete]
+      required: [companyName, tagline1, tagline2, tagline3, heroSubtitle, aboutTitle, aboutText, aboutQuote, servicesHeading, servicesSubtitle, phone, email, serviceArea, services, galleries, colorBg, colorText, colorAccent, colorHeader, showHero, showGalleries, showServices, showAbout, setupComplete]
       properties:
         companyName:
           type: string
@@ -413,11 +400,6 @@ components:
           items:
             $ref: "#/components/schemas/SiteGallery"
           description: Ordered list of gallery categories shown as tiles on the home page.
-        testimonials:
-          type: array
-          items:
-            $ref: "#/components/schemas/SiteTestimonial"
-          description: Customer testimonials shown on the home page.
         colorBg:
           type: string
           pattern: "^#[0-9A-Fa-f]{6}$"
@@ -446,9 +428,6 @@ components:
         showAbout:
           type: boolean
           description: Whether the about/why-choose-us section is visible on the home page.
-        showTestimonials:
-          type: boolean
-          description: Whether the testimonials section is visible on the home page.
         setupComplete:
           type: boolean
           description: Whether the initial setup wizard has been completed.

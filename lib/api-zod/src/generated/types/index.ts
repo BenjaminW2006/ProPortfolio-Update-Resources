@@ -13,6 +13,5 @@ export * from "./setImageSlotRequest";
 export * from "./siteGallery";
 export * from "./siteService";
 export * from "./siteSettings";
-export * from "./siteTestimonial";
 export * from "./uploadUrlRequest";
 export * from "./uploadUrlResponse";

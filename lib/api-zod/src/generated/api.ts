@@ -139,15 +139,6 @@ export const GetSettingsResponse = zod.object({
     .describe(
       "Ordered list of gallery categories shown as tiles on the home page.",
     ),
-  testimonials: zod
-    .array(
-      zod.object({
-        name: zod.string().describe("Reviewer's name."),
-        location: zod.string().describe("Reviewer's city\/location."),
-        text: zod.string().describe("Review text."),
-      }),
-    )
-    .describe("Customer testimonials shown on the home page."),
   colorBg: zod
     .string()
     .regex(getSettingsResponseColorBgRegExp)
@@ -178,9 +169,6 @@ export const GetSettingsResponse = zod.object({
     .describe(
       "Whether the about\/why-choose-us section is visible on the home page.",
     ),
-  showTestimonials: zod
-    .boolean()
-    .describe("Whether the testimonials section is visible on the home page."),
   setupComplete: zod
     .boolean()
     .describe("Whether the initial setup wizard has been completed."),
@@ -260,15 +248,6 @@ export const UpdateSettingsBody = zod.object({
     .describe(
       "Ordered list of gallery categories shown as tiles on the home page.",
     ),
-  testimonials: zod
-    .array(
-      zod.object({
-        name: zod.string().describe("Reviewer's name."),
-        location: zod.string().describe("Reviewer's city\/location."),
-        text: zod.string().describe("Review text."),
-      }),
-    )
-    .describe("Customer testimonials shown on the home page."),
   colorBg: zod
     .string()
     .regex(updateSettingsBodyColorBgRegExp)
@@ -299,9 +278,6 @@ export const UpdateSettingsBody = zod.object({
     .describe(
       "Whether the about\/why-choose-us section is visible on the home page.",
     ),
-  showTestimonials: zod
-    .boolean()
-    .describe("Whether the testimonials section is visible on the home page."),
   setupComplete: zod
     .boolean()
     .describe("Whether the initial setup wizard has been completed."),
@@ -373,15 +349,6 @@ export const UpdateSettingsResponse = zod.object({
     .describe(
       "Ordered list of gallery categories shown as tiles on the home page.",
     ),
-  testimonials: zod
-    .array(
-      zod.object({
-        name: zod.string().describe("Reviewer's name."),
-        location: zod.string().describe("Reviewer's city\/location."),
-        text: zod.string().describe("Review text."),
-      }),
-    )
-    .describe("Customer testimonials shown on the home page."),
   colorBg: zod
     .string()
     .regex(updateSettingsResponseColorBgRegExp)
@@ -412,9 +379,6 @@ export const UpdateSettingsResponse = zod.object({
     .describe(
       "Whether the about\/why-choose-us section is visible on the home page.",
     ),
-  showTestimonials: zod
-    .boolean()
-    .describe("Whether the testimonials section is visible on the home page."),
   setupComplete: zod
     .boolean()
     .describe("Whether the initial setup wizard has been completed."),
@@ -496,15 +460,6 @@ export const ResetSettingsResponse = zod.object({
     .describe(
       "Ordered list of gallery categories shown as tiles on the home page.",
     ),
-  testimonials: zod
-    .array(
-      zod.object({
-        name: zod.string().describe("Reviewer's name."),
-        location: zod.string().describe("Reviewer's city\/location."),
-        text: zod.string().describe("Review text."),
-      }),
-    )
-    .describe("Customer testimonials shown on the home page."),
   colorBg: zod
     .string()
     .regex(resetSettingsResponseColorBgRegExp)
@@ -535,9 +490,6 @@ export const ResetSettingsResponse = zod.object({
     .describe(
       "Whether the about\/why-choose-us section is visible on the home page.",
     ),
-  showTestimonials: zod
-    .boolean()
-    .describe("Whether the testimonials section is visible on the home page."),
   setupComplete: zod
     .boolean()
     .describe("Whether the initial setup wizard has been completed."),

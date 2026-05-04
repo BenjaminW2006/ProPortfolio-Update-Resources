@@ -7,7 +7,6 @@
  */
 import type { SiteGallery } from "./siteGallery";
 import type { SiteService } from "./siteService";
-import type { SiteTestimonial } from "./siteTestimonial";
 
 export interface SiteSettings {
   /** Business name shown in the navbar and footer. */
@@ -40,8 +39,6 @@ export interface SiteSettings {
   services: SiteService[];
   /** Ordered list of gallery categories shown as tiles on the home page. */
   galleries: SiteGallery[];
-  /** Customer testimonials shown on the home page. */
-  testimonials: SiteTestimonial[];
   /**
    * Page background color as a hex value (e.g. #0f172a).
    * @pattern ^#[0-9A-Fa-f]{6}$
@@ -70,8 +67,6 @@ export interface SiteSettings {
   showServices: boolean;
   /** Whether the about/why-choose-us section is visible on the home page. */
   showAbout: boolean;
-  /** Whether the testimonials section is visible on the home page. */
-  showTestimonials: boolean;
   /** Whether the initial setup wizard has been completed. */
   setupComplete: boolean;
   /** URL of the uploaded logo image, or null if no logo is set. Server-computed; not accepted in request bodies. */

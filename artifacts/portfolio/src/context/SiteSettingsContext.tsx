@@ -12,12 +12,6 @@ export interface GalleryItem {
   description: string;
 }
 
-export interface Testimonial {
-  name: string;
-  location: string;
-  text: string;
-}
-
 export interface SiteSettings {
   companyName: string;
   tagline1: string;
@@ -34,7 +28,6 @@ export interface SiteSettings {
   serviceArea: string;
   services: ServiceItem[];
   galleries: GalleryItem[];
-  testimonials: Testimonial[];
   colorBg: string;
   colorText: string;
   colorAccent: string;
@@ -43,7 +36,6 @@ export interface SiteSettings {
   showGalleries: boolean;
   showServices: boolean;
   showAbout: boolean;
-  showTestimonials: boolean;
   setupComplete: boolean;
   adminEmail: string;
   hasAdminPassword: boolean;
@@ -78,11 +70,6 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     { key: "interior", label: "Interior", description: "Indoor projects and finished spaces" },
     { key: "exterior", label: "Exterior", description: "Outdoor work and curb appeal projects" },
   ],
-  testimonials: [
-    { name: "Customer Name", location: "City, State", text: "Replace this with a real review from one of your happy customers. Testimonials build trust and help new visitors feel confident reaching out." },
-    { name: "Customer Name", location: "City, State", text: "Add another review here. Ask satisfied customers to share their experience — even a few sentences makes a big difference." },
-    { name: "Customer Name", location: "City, State", text: "A third testimonial rounds out this section. Consider including customers who highlight different services or aspects of your work." },
-  ],
   colorBg: "#0f172a",
   colorText: "#f1f5f9",
   colorAccent: "#2563eb",
@@ -91,7 +78,6 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   showGalleries: true,
   showServices: true,
   showAbout: true,
-  showTestimonials: true,
   setupComplete: false,
   adminEmail: "",
   hasAdminPassword: false,

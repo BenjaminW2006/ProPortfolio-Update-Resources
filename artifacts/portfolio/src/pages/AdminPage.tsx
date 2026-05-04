@@ -1448,27 +1448,6 @@ function SettingsView() {
       f ? { ...f, services: f.services.map((s, idx) => idx === i ? { ...s, [field]: val } : s) } : f
     );
 
-  const addTestimonial = () =>
-    setForm((f) => f ? { ...f, testimonials: [...(f.testimonials ?? []), { name: "", location: "", text: "" }] } : f);
-
-  const removeTestimonial = (i: number) =>
-    setForm((f) => f ? { ...f, testimonials: (f.testimonials ?? []).filter((_, idx) => idx !== i) } : f);
-
-  const moveTestimonial = (i: number, dir: -1 | 1) =>
-    setForm((f) => {
-      if (!f) return f;
-      const t = [...(f.testimonials ?? [])];
-      const n = i + dir;
-      if (n < 0 || n >= t.length) return f;
-      [t[i], t[n]] = [t[n], t[i]];
-      return { ...f, testimonials: t };
-    });
-
-  const updateTestimonial = (i: number, key: "name" | "location" | "text", val: string) =>
-    setForm((f) =>
-      f ? { ...f, testimonials: (f.testimonials ?? []).map((t, idx) => idx === i ? { ...t, [key]: val } : t) } : f
-    );
-
   const field = (
     label: string,
     value: string,
@@ -1766,96 +1745,6 @@ function SettingsView() {
           ))}
           {form.services.length === 0 && (
             <p className="text-slate-500 text-sm text-center py-6">No services yet. Add one above.</p>
-          )}
-        </div>
-      </div>
-      <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <h3 className="text-base font-semibold font-serif text-slate-200">Testimonials</h3>
-            <p className="text-slate-500 text-xs mt-0.5">Customer reviews shown on the home page. Replace placeholder text with real reviews.</p>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              type="button"
-              onClick={() => setForm((f) => f ? { ...f, showTestimonials: !f.showTestimonials } : f)}
-              className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border font-medium transition-colors ${form.showTestimonials ? "border-slate-600 text-slate-400 hover:border-slate-500 hover:text-slate-300" : "border-orange-800/60 bg-orange-900/20 text-orange-400 hover:bg-orange-900/30"}`}
-            >
-              {form.showTestimonials ? <><Eye className="w-3 h-3" /> Visible</> : <><EyeOff className="w-3 h-3" /> N/A</>}
-            </button>
-            <Button type="button" size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={addTestimonial}>
-              <Plus className="w-3.5 h-3.5 mr-1.5" />
-              Add
-            </Button>
-          </div>
-        </div>
-        {!form.showTestimonials && (
-          <p className="text-xs text-slate-500 bg-slate-700/40 border border-slate-600/40 rounded-lg px-3 py-2">This section is hidden on your site.</p>
-        )}
-        <div className="space-y-3">
-          {(form.testimonials ?? []).map((t, i) => (
-            <div key={i} className="bg-slate-700/60 rounded-xl border border-slate-600 p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-slate-500 text-xs">#{i + 1}</span>
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => moveTestimonial(i, -1)}
-                    disabled={i === 0}
-                    className="px-1.5 py-0.5 text-slate-400 hover:text-white disabled:opacity-30 text-xs rounded hover:bg-slate-600 transition-colors"
-                    aria-label="Move up"
-                  >↑</button>
-                  <button
-                    type="button"
-                    onClick={() => moveTestimonial(i, 1)}
-                    disabled={i === (form.testimonials ?? []).length - 1}
-                    className="px-1.5 py-0.5 text-slate-400 hover:text-white disabled:opacity-30 text-xs rounded hover:bg-slate-600 transition-colors"
-                    aria-label="Move down"
-                  >↓</button>
-                  <button
-                    type="button"
-                    onClick={() => removeTestimonial(i)}
-                    className="p-1 text-red-400 hover:text-red-300 transition-colors ml-1"
-                    aria-label="Remove"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-400 text-xs mb-1">Name</label>
-                  <Input
-                    value={t.name}
-                    onChange={(e) => updateTestimonial(i, "name", e.target.value)}
-                    placeholder="Customer Name"
-                    className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-400 text-xs mb-1">Location</label>
-                  <Input
-                    value={t.location}
-                    onChange={(e) => updateTestimonial(i, "location", e.target.value)}
-                    placeholder="City, State"
-                    className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-slate-400 text-xs mb-1">Review text</label>
-                <textarea
-                  value={t.text}
-                  onChange={(e) => updateTestimonial(i, "text", e.target.value)}
-                  placeholder="What did this customer say about your work?"
-                  rows={3}
-                  className="w-full rounded-md border border-slate-600 bg-slate-700 px-3 py-2 text-white placeholder:text-slate-500 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
-          ))}
-          {(form.testimonials ?? []).length === 0 && (
-            <p className="text-slate-500 text-sm text-center py-6">No testimonials yet. Add one above.</p>
           )}
         </div>
       </div>

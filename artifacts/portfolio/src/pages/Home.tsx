@@ -4,11 +4,10 @@ import Hero from "@/components/sections/Hero";
 import Portfolio from "@/components/sections/Portfolio";
 import Services from "@/components/sections/Services";
 import WhyChooseUs from "@/components/sections/WhyChooseUs";
-import Testimonials from "@/components/sections/Testimonials";
 import { useSiteSettings } from "@/context/SiteSettingsContext";
 
 export default function Home() {
-  const { showHero, showGalleries, showServices, showAbout, showTestimonials } = useSiteSettings();
+  const { showHero, showGalleries, showServices, showAbout } = useSiteSettings();
 
   return (
     <div className="min-h-screen bg-site">
@@ -18,7 +17,6 @@ export default function Home() {
         {showGalleries && <Portfolio />}
         {showServices && <Services />}
         {showAbout && <WhyChooseUs />}
-        {showTestimonials && <Testimonials />}
       </main>
       <Footer />
     </div>

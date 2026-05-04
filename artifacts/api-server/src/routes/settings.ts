@@ -18,12 +18,6 @@ const GalleryItemSchema = z.object({
   description: z.string(),
 });
 
-const TestimonialSchema = z.object({
-  name: z.string(),
-  location: z.string(),
-  text: z.string(),
-});
-
 const hexColor = z.string().regex(/^#[0-9A-Fa-f]{6}$/);
 
 const SiteSettingsSchema = z.object({
@@ -45,11 +39,6 @@ const SiteSettingsSchema = z.object({
     { key: "interior", label: "Interior", description: "Indoor projects and finished spaces" },
     { key: "exterior", label: "Exterior", description: "Outdoor work and curb appeal projects" },
   ]),
-  testimonials: z.array(TestimonialSchema).default([
-    { name: "Customer Name", location: "City, State", text: "Replace this with a real review from one of your happy customers. Testimonials build trust and help new visitors feel confident reaching out." },
-    { name: "Customer Name", location: "City, State", text: "Add another review here. Ask satisfied customers to share their experience — even a few sentences makes a big difference." },
-    { name: "Customer Name", location: "City, State", text: "A third testimonial rounds out this section. Consider including customers who highlight different services or aspects of your work." },
-  ]),
   colorBg: hexColor.default("#0f172a"),
   colorText: hexColor.default("#f1f5f9"),
   colorAccent: hexColor.default("#2563eb"),
@@ -58,7 +47,6 @@ const SiteSettingsSchema = z.object({
   showGalleries: z.boolean().default(true),
   showServices: z.boolean().default(true),
   showAbout: z.boolean().default(true),
-  showTestimonials: z.boolean().default(true),
   setupComplete: z.boolean().default(false),
   adminEmail: z.string().default(""),
   adminPasswordHash: z.string().default(""),
@@ -88,11 +76,6 @@ const DEFAULT_SETTINGS: SiteSettings = {
     { key: "interior", label: "Interior", description: "Indoor projects and finished spaces" },
     { key: "exterior", label: "Exterior", description: "Outdoor work and curb appeal projects" },
   ],
-  testimonials: [
-    { name: "Customer Name", location: "City, State", text: "Replace this with a real review from one of your happy customers. Testimonials build trust and help new visitors feel confident reaching out." },
-    { name: "Customer Name", location: "City, State", text: "Add another review here. Ask satisfied customers to share their experience — even a few sentences makes a big difference." },
-    { name: "Customer Name", location: "City, State", text: "A third testimonial rounds out this section. Consider including customers who highlight different services or aspects of your work." },
-  ],
   services: [
     { title: "General Repairs", description: "Fixing what's broken. Door repairs, fixture installation, drywall patching, and everyday maintenance." },
     { title: "Painting", description: "Interior and exterior painting, trim work, deck staining, and touch-ups with attention to detail." },
@@ -107,7 +90,6 @@ const DEFAULT_SETTINGS: SiteSettings = {
   showGalleries: true,
   showServices: true,
   showAbout: true,
-  showTestimonials: true,
   setupComplete: false,
   adminEmail: "",
   adminPasswordHash: "",
