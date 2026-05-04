@@ -1,7 +1,9 @@
 CREATE TABLE "site_settings" (
-	"id" integer PRIMARY KEY NOT NULL,
-	"data" text NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL
+        "id" integer PRIMARY KEY NOT NULL,
+        "data" text NOT NULL,
+        "updated_at" timestamp DEFAULT now() NOT NULL
 );
+--> statement-breakpoint
+INSERT INTO "site_settings" ("id", "data") VALUES (1, '{"companyName":"Upstate Palmetto Property Services","tagline1":"Hard Work.","tagline2":"Done Right.","tagline3":"Every Time.","phone":"(864) 434-2842","email":"Upstate-Palmetto@outlook.com","serviceArea":"Upstate South Carolina","services":[{"title":"General Handyman","description":"Fixing what''s broken. Door repairs, fixture installation, drywall patching, and everyday maintenance around the house."},{"title":"Painting","description":"Interior and exterior painting, trim work, deck staining, and touch-ups with meticulous attention to detail."},{"title":"Pressure Washing","description":"Restore your home''s curb appeal. Driveways, siding, decks, patios, and walkways cleaned safely and thoroughly."},{"title":"Carpentry & Woodwork","description":"Custom trim, crown molding, baseboards, wainscoting, and minor wood repairs that add character to your home."},{"title":"Deck & Fence Repair","description":"Board replacement, structural reinforcement, sealing, and complete restoration for your outdoor living spaces."},{"title":"Gutter Cleaning","description":"Prevent water damage. Thorough removal of leaves and debris, downspout flushing, and minor repairs."},{"title":"Property Maintenance","description":"Recurring scheduled maintenance for landlords, property managers, and homeowners who want peace of mind."},{"title":"Minor Landscaping","description":"Shrub trimming, mulch installation, yard cleanup, and basic exterior aesthetic improvements."}]}') ON CONFLICT (id) DO NOTHING;
 --> statement-breakpoint
 ALTER TABLE "projects" ADD COLUMN "category" text;

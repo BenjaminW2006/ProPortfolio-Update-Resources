@@ -96,7 +96,7 @@ export const GetSettingsResponse = zod.object({
 });
 
 /**
- * Saves updated site settings. Requires admin session and X-CSRF-Token header.
+ * Saves updated site settings. Requires admin session and the x-csrf-protection: 1 header.
  * @summary Update site settings
  */
 export const UpdateSettingsBody = zod.object({
@@ -140,7 +140,7 @@ export const UpdateSettingsResponse = zod.object({
 });
 
 /**
- * Resets all site settings to factory defaults. Requires admin session and X-CSRF-Token header.
+ * Resets all site settings to factory defaults. Requires admin session and the x-csrf-protection: 1 header.
  * @summary Reset site settings to defaults
  */
 export const ResetSettingsResponse = zod.object({

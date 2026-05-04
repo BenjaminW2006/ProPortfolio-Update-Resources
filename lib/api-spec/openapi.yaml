@@ -149,7 +149,7 @@ paths:
       operationId: updateSettings
       tags: [settings]
       summary: Update site settings
-      description: Saves updated site settings. Requires admin session and X-CSRF-Token header.
+      description: "Saves updated site settings. Requires admin session and the x-csrf-protection: 1 header."
       requestBody:
         required: true
         content:
@@ -186,7 +186,7 @@ paths:
       operationId: resetSettings
       tags: [settings]
       summary: Reset site settings to defaults
-      description: Resets all site settings to factory defaults. Requires admin session and X-CSRF-Token header.
+      description: "Resets all site settings to factory defaults. Requires admin session and the x-csrf-protection: 1 header."
       responses:
         "200":
           description: Default settings restored

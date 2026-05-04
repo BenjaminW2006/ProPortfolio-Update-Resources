@@ -459,7 +459,7 @@ export function useGetSettings<
 }
 
 /**
- * Saves updated site settings. Requires admin session and X-CSRF-Token header.
+ * Saves updated site settings. Requires admin session and the x-csrf-protection: 1 header.
  * @summary Update site settings
  */
 export const getUpdateSettingsUrl = () => {
@@ -546,7 +546,7 @@ export const useUpdateSettings = <
 };
 
 /**
- * Resets all site settings to factory defaults. Requires admin session and X-CSRF-Token header.
+ * Resets all site settings to factory defaults. Requires admin session and the x-csrf-protection: 1 header.
  * @summary Reset site settings to defaults
  */
 export const getResetSettingsUrl = () => {
