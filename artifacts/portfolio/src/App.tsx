@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { Switch, Route, Router as WouterRouter, useParams, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { ClerkProvider, SignIn, useClerk } from "@clerk/react";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
 import { shadcn } from "@clerk/themes";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -90,14 +91,22 @@ const clerkAppearance = {
 };
 
 function ManagerSignInPage() {
+  const { companyName } = useSiteSettings();
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4">
-      <SignIn
-        routing="path"
-        path={`${basePath}/manager/sign-in`}
-        signUpUrl={`${basePath}/manager/sign-in`}
-        forceRedirectUrl={`${basePath}/manager`}
-      />
+      <div className="flex flex-col items-center gap-1">
+        {companyName && (
+          <p className="text-slate-400 text-sm font-medium tracking-wide uppercase mb-1">
+            {companyName}
+          </p>
+        )}
+        <SignIn
+          routing="path"
+          path={`${basePath}/manager/sign-in`}
+          signUpUrl={`${basePath}/manager/sign-in`}
+          forceRedirectUrl={`${basePath}/manager`}
+        />
+      </div>
     </div>
   );
 }
