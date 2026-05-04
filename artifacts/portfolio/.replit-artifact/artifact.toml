@@ -1,6 +1,6 @@
 kind = "web"
 previewPath = "/"
-title = "Upstate Palmetto Property Services"
+title = "Your Business Name"
 version = "1.0.0"
 id = "artifacts/portfolio"
 router = "path"
