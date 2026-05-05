@@ -266,10 +266,12 @@ function EditProjectForm({
   project,
   onSaved,
   onCancel,
+  onSavingChange,
 }: {
   project: Project;
   onSaved: (p: Project) => void;
   onCancel: () => void;
+  onSavingChange?: (saving: boolean) => void;
 }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -283,9 +285,14 @@ function EditProjectForm({
   });
   const [saving, setSaving] = useState(false);
 
+  const setSavingWithCallback = (val: boolean) => {
+    setSaving(val);
+    onSavingChange?.(val);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaving(true);
+    setSavingWithCallback(true);
     try {
       const res = await apiMutation(`/api/projects/${project.id}`, {
         method: "PATCH",
@@ -301,12 +308,12 @@ function EditProjectForm({
     } catch {
       toast({ title: "Error", description: "Failed to update project.", variant: "destructive" });
     } finally {
-      setSaving(false);
+      setSavingWithCallback(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form id="edit-project-form" onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-slate-400 text-sm mb-1.5">Project Name *</label>
@@ -353,24 +360,6 @@ function EditProjectForm({
             onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
           />
         </div>
-      </div>
-      <div className="flex gap-3">
-        <Button
-          type="submit"
-          className="bg-blue-600 hover:bg-blue-700"
-          disabled={saving || !form.name.trim() || !form.date.trim() || !form.location.trim()}
-        >
-          {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Check className="w-4 h-4 mr-2" />}
-          Save Changes
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          className="text-slate-400 hover:text-white hover:bg-slate-700"
-          onClick={onCancel}
-        >
-          Cancel
-        </Button>
       </div>
     </form>
   );
@@ -680,6 +669,7 @@ function ProjectPhotoGrid({ projectId }: { projectId: number }) {
 function ProjectManageView({ projectId, onBack }: { projectId: number; onBack: () => void }) {
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const { data: project, isLoading } = useQuery<ProjectDetail>({
     queryKey: ["admin-project", projectId],
@@ -750,15 +740,40 @@ function ProjectManageView({ projectId, onBack }: { projectId: number; onBack: (
               <p className="text-slate-400 text-sm mt-2 max-w-lg">{project.description}</p>
             )}
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="border-slate-600 text-slate-300 hover:bg-slate-700 shrink-0"
-            onClick={() => setEditing(!editing)}
-          >
-            <Pencil className="w-3.5 h-3.5 mr-1.5" />
-            {editing ? "Cancel Edit" : "Edit"}
-          </Button>
+          {editing ? (
+            <div className="flex items-center gap-2 shrink-0">
+              <Button
+                type="submit"
+                form="edit-project-form"
+                className="bg-blue-600 hover:bg-blue-700"
+                size="sm"
+                disabled={saving}
+              >
+                {saving
+                  ? <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                  : <Check className="w-3.5 h-3.5 mr-1.5" />}
+                Save Changes
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-slate-400 hover:text-white hover:bg-slate-700"
+                onClick={() => setEditing(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          ) : (
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-slate-600 text-slate-300 hover:bg-slate-700 shrink-0"
+              onClick={() => setEditing(true)}
+            >
+              <Pencil className="w-3.5 h-3.5 mr-1.5" />
+              Edit
+            </Button>
+          )}
         </div>
         {editing && (
           <EditProjectForm
@@ -770,6 +785,7 @@ function ProjectManageView({ projectId, onBack }: { projectId: number; onBack: (
               setEditing(false);
             }}
             onCancel={() => setEditing(false)}
+            onSavingChange={setSaving}
           />
         )}
       </div>
