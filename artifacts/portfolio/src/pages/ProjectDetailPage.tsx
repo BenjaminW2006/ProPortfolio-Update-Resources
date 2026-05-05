@@ -236,7 +236,7 @@ export default function ProjectDetailPage() {
                         show: { opacity: 1, y: 0, transition: { duration: 0.4 } },
                       }}
                       onClick={() => setLightboxIndex(i)}
-                      className="group relative aspect-square rounded-xl overflow-hidden cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+                      className="group relative aspect-square rounded-xl overflow-hidden cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 border border-slate-700"
                       aria-label={`View photo ${i + 1}`}
                     >
                       <img
