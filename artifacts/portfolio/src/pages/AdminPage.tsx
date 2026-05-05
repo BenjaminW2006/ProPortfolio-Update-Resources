@@ -1527,10 +1527,6 @@ function SettingsView() {
         )}
       </div>
       <div className="flex items-center justify-between gap-4 pb-4">
-        <Button className="bg-blue-600 hover:bg-blue-700 px-8" onClick={handleSave} disabled={saving}>
-          {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Check className="w-4 h-4 mr-2" />}
-          Save Settings
-        </Button>
         {confirmReset ? (
           <div className="flex items-center gap-2 bg-red-900/30 border border-red-800/50 rounded-lg px-3 py-2">
             <span className="text-red-300 text-sm">Reset all to defaults?</span>
