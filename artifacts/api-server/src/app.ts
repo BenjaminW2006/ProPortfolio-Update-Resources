@@ -100,12 +100,18 @@ app.use(
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true, limit: "2mb" }));
 
+// In development the frontend signs sessions with the test key (VITE_CLERK_PUBLISHABLE_KEY).
+// The backend must use the same key so those sessions validate correctly.
+// In production Replit automatically sets both vars to the live key.
 app.use(
   clerkMiddleware((req) => ({
-    publishableKey: publishableKeyFromHost(
-      getClerkProxyHost(req) ?? "",
-      process.env.CLERK_PUBLISHABLE_KEY,
-    ),
+    publishableKey:
+      process.env.NODE_ENV !== "production"
+        ? (process.env.VITE_CLERK_PUBLISHABLE_KEY ?? process.env.CLERK_PUBLISHABLE_KEY)
+        : publishableKeyFromHost(
+            getClerkProxyHost(req) ?? "",
+            process.env.CLERK_PUBLISHABLE_KEY,
+          ),
   })),
 );
 
