@@ -160,7 +160,7 @@ export default function ProjectDetailPage() {
     enabled: !!projectId,
   });
 
-  const labelOrder = (l?: "before" | "after" | null) => l === "before" ? 0 : l === "after" ? 2 : 1;
+  const labelOrder = (l?: "before" | "after" | null) => l === "before" ? 0 : l === "after" ? 1 : 2;
   const sortedImages = project
     ? [...project.images].sort((a, b) => labelOrder(a.label) - labelOrder(b.label))
     : [];

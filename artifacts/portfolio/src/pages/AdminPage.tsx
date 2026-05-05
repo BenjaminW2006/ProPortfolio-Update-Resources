@@ -565,7 +565,11 @@ function ProjectPhotoGrid({ projectId }: { projectId: number }) {
     }
   };
 
-  const images = project?.images ?? [];
+  const labelOrder = (l?: "before" | "after" | null) =>
+    l === "before" ? 0 : l === "after" ? 1 : 2;
+  const images = [...(project?.images ?? [])].sort(
+    (a, b) => labelOrder(a.label) - labelOrder(b.label)
+  );
 
   return (
     <div className="space-y-4">
