@@ -1414,6 +1414,35 @@ function SettingsView() {
           />
         </div>
       </div>
+      <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-5">
+        <h3 className="text-base font-semibold font-serif text-slate-200">Brand Colors</h3>
+        {(
+          [
+            { label: "Page Background", key: "colorBg" },
+            { label: "Text", key: "colorText" },
+            { label: "Accent / Buttons", key: "colorAccent" },
+            { label: "Header / Navbar", key: "colorHeader" },
+          ] as { label: string; key: "colorBg" | "colorText" | "colorAccent" | "colorHeader" }[]
+        ).map(({ label, key }) => (
+          <div key={key} className="flex items-center justify-between gap-4">
+            <label className="text-slate-400 text-sm shrink-0">{label}</label>
+            <div className="flex items-center gap-2">
+              <input
+                type="color"
+                value={form[key] ?? "#000000"}
+                onChange={(e) => setForm((f) => f ? { ...f, [key]: e.target.value } : f)}
+                className="w-9 h-9 rounded-lg border border-slate-600 bg-slate-700 cursor-pointer p-0.5"
+              />
+              <Input
+                value={form[key] ?? ""}
+                onChange={(e) => setForm((f) => f ? { ...f, [key]: e.target.value } : f)}
+                placeholder="#000000"
+                className="w-28 bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 font-mono text-sm"
+              />
+            </div>
+          </div>
+        ))}
+      </div>
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-base font-semibold font-serif text-slate-200">Hero Section</h3>
