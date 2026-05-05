@@ -708,7 +708,7 @@ function ProjectManageView({ projectId, onBack }: { projectId: number; onBack: (
   }
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-6 max-w-4xl mx-auto">
       <div className="flex items-start justify-between gap-4">
         <button
           onClick={onBack}
