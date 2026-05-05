@@ -38,7 +38,7 @@ export const CreateProjectBody = z.object({
   date: z.string().min(1),
   location: z.string().min(1),
   description: z.string().default(""),
-  category: z.enum(["interior", "exterior"]).nullable().default(null),
+  category: z.string().nullable().default(null),
 });
 export type CreateProjectBody = z.infer<typeof CreateProjectBody>;
 
@@ -47,7 +47,7 @@ export const UpdateProjectBody = z.object({
   date: z.string().min(1).optional(),
   location: z.string().min(1).optional(),
   description: z.string().optional(),
-  category: z.enum(["interior", "exterior"]).nullable().optional(),
+  category: z.string().nullable().optional(),
   coverObjectPath: z.string().nullable().optional(),
 });
 export type UpdateProjectBody = z.infer<typeof UpdateProjectBody>;
