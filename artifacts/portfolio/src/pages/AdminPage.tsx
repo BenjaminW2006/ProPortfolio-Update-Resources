@@ -744,30 +744,7 @@ function ProjectManageView({ projectId, onBack }: { projectId: number; onBack: (
               <p className="text-slate-400 text-sm mt-2 max-w-lg">{project.description}</p>
             )}
           </div>
-          {editing ? (
-            <div className="flex items-center gap-2 shrink-0">
-              <Button
-                type="submit"
-                form="edit-project-form"
-                className="bg-blue-600 hover:bg-blue-700"
-                size="sm"
-                disabled={saving}
-              >
-                {saving
-                  ? <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
-                  : <Check className="w-3.5 h-3.5 mr-1.5" />}
-                Save Changes
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-slate-400 hover:text-white hover:bg-slate-700"
-                onClick={() => setEditing(false)}
-              >
-                Cancel
-              </Button>
-            </div>
-          ) : (
+          {editing ? null : (
             <Button
               variant="outline"
               size="sm"
@@ -780,17 +757,39 @@ function ProjectManageView({ projectId, onBack }: { projectId: number; onBack: (
           )}
         </div>
         {editing && (
-          <EditProjectForm
-            project={project}
-            onSaved={(p) => {
-              queryClient.setQueryData(["admin-project", projectId], (old: ProjectDetail | undefined) =>
-                old ? { ...old, ...p } : old
-              );
-              setEditing(false);
-            }}
-            onCancel={() => setEditing(false)}
-            onSavingChange={setSaving}
-          />
+          <>
+            <EditProjectForm
+              project={project}
+              onSaved={(p) => {
+                queryClient.setQueryData(["admin-project", projectId], (old: ProjectDetail | undefined) =>
+                  old ? { ...old, ...p } : old
+                );
+                setEditing(false);
+              }}
+              onCancel={() => setEditing(false)}
+              onSavingChange={setSaving}
+            />
+            <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2">
+              <Button
+                variant="ghost"
+                className="text-slate-300 hover:text-white hover:bg-slate-700 shadow-lg shadow-black/40 px-5 h-11 rounded-full"
+                onClick={() => setEditing(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                form="edit-project-form"
+                className="bg-blue-600 hover:bg-blue-700 shadow-lg shadow-black/40 px-6 h-11 rounded-full"
+                disabled={saving}
+              >
+                {saving
+                  ? <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  : <Check className="w-4 h-4 mr-2" />}
+                Save Changes
+              </Button>
+            </div>
+          </>
         )}
       </div>
 
