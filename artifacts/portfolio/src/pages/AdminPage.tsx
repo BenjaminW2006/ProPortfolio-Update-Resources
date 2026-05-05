@@ -1274,6 +1274,17 @@ function SettingsView() {
     if (current && !form) setForm(current);
   }, [current, form]);
 
+  // Apply color changes to CSS vars in real-time so the public site preview
+  // and the mini color preview below update instantly without saving.
+  useEffect(() => {
+    if (!form) return;
+    const root = document.documentElement;
+    root.style.setProperty("--site-bg", form.colorBg);
+    root.style.setProperty("--site-text", form.colorText);
+    root.style.setProperty("--site-accent", form.colorAccent);
+    root.style.setProperty("--site-header", form.colorHeader);
+  }, [form?.colorBg, form?.colorText, form?.colorAccent, form?.colorHeader]);
+
   if (isLoading || !form) {
     return (
       <div className="flex items-center justify-center py-32">
@@ -1472,6 +1483,49 @@ function SettingsView() {
             </div>
           </div>
         ))}
+
+        {/* Live preview */}
+        <div className="pt-2">
+          <p className="text-slate-500 text-xs mb-2">Preview</p>
+          <div className="rounded-xl overflow-hidden border border-slate-600 text-sm select-none">
+            {/* Navbar */}
+            <div
+              className="flex items-center justify-between px-4 py-2.5"
+              style={{ backgroundColor: form.colorHeader }}
+            >
+              <div className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded" style={{ backgroundColor: form.colorAccent }} />
+                <span className="font-semibold text-xs" style={{ color: form.colorText }}>{form.companyName || "Your Business"}</span>
+              </div>
+              <div className="flex gap-3">
+                {["Home", "Gallery", "Contact"].map((item) => (
+                  <span key={item} className="text-xs opacity-70" style={{ color: form.colorText }}>{item}</span>
+                ))}
+              </div>
+            </div>
+            {/* Body */}
+            <div className="px-5 py-5 space-y-3" style={{ backgroundColor: form.colorBg }}>
+              <div className="space-y-1">
+                <p className="font-bold text-base leading-tight" style={{ color: form.colorText }}>Quality Work.</p>
+                <p className="text-xs opacity-60" style={{ color: form.colorText }}>Professional services tailored to your needs.</p>
+              </div>
+              <div className="flex gap-2 pt-1">
+                <span
+                  className="px-3 py-1.5 rounded-md text-xs font-semibold"
+                  style={{ backgroundColor: form.colorAccent, color: "#ffffff" }}
+                >
+                  Get a Quote
+                </span>
+                <span
+                  className="px-3 py-1.5 rounded-md text-xs font-semibold border"
+                  style={{ borderColor: form.colorAccent, color: form.colorAccent }}
+                >
+                  View Work
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
         <div className="flex items-center justify-between">
