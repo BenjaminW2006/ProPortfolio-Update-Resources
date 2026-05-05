@@ -1401,7 +1401,26 @@ function SettingsView() {
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
         <h3 className="text-base font-semibold font-serif text-slate-200">Company Info</h3>
         {field("Company Name", form.companyName, (v) => setForm((f) => f ? { ...f, companyName: v } : f))}
-        {field("Phone", form.phone, (v) => setForm((f) => f ? { ...f, phone: v } : f), "(864) 555-0000")}
+        <div>
+          <label className="block text-slate-400 text-sm mb-1.5">Phone</label>
+          <Input
+            value={form.phone}
+            onChange={(e) => {
+              const digits = e.target.value.replace(/\D/g, "").slice(0, 10);
+              let formatted = digits;
+              if (digits.length >= 7) {
+                formatted = `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+              } else if (digits.length >= 4) {
+                formatted = `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+              } else if (digits.length >= 1) {
+                formatted = `(${digits}`;
+              }
+              setForm((f) => f ? { ...f, phone: formatted } : f);
+            }}
+            placeholder="(864) 555-0000"
+            className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
+          />
+        </div>
         {field("Email", form.email, (v) => setForm((f) => f ? { ...f, email: v } : f), "company@example.com")}
         {field("Service Area", form.serviceArea, (v) => setForm((f) => f ? { ...f, serviceArea: v } : f), "e.g. Austin, Texas")}
       </div>
