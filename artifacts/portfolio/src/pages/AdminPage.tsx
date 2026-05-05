@@ -1404,15 +1404,6 @@ function SettingsView() {
         {field("Phone", form.phone, (v) => setForm((f) => f ? { ...f, phone: v } : f), "(864) 555-0000")}
         {field("Email", form.email, (v) => setForm((f) => f ? { ...f, email: v } : f), "company@example.com")}
         {field("Service Area", form.serviceArea, (v) => setForm((f) => f ? { ...f, serviceArea: v } : f), "e.g. Austin, Texas")}
-        <div>
-          <label className="block text-slate-400 text-sm mb-1.5">Address</label>
-          <Input
-            value={(form as SiteSettings & { address?: string }).address ?? ""}
-            onChange={(e) => setForm((f) => f ? { ...f, address: e.target.value } as SiteSettings : f)}
-            placeholder="123 Main St, City, State"
-            className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
-          />
-        </div>
       </div>
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-5">
         <h3 className="text-base font-semibold font-serif text-slate-200">Brand Colors</h3>
