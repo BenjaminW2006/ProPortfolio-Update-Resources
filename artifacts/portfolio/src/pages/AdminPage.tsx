@@ -1711,6 +1711,33 @@ export default function AdminPage() {
           </Button>
         </div>
       </header>
+
+      {/* Mobile tab bar */}
+      <div className="sm:hidden flex border-b border-slate-700 bg-slate-800/60">
+        <button
+          className={`flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-3 text-sm font-medium transition-colors ${
+            activeTab === "projects"
+              ? "text-white border-b-2 border-blue-500"
+              : "text-slate-400 hover:text-white"
+          }`}
+          onClick={() => setView({ type: "list" })}
+        >
+          <FolderOpen className="w-4 h-4" />
+          Projects
+        </button>
+        <button
+          className={`flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-3 text-sm font-medium transition-colors ${
+            activeTab === "settings"
+              ? "text-white border-b-2 border-blue-500"
+              : "text-slate-400 hover:text-white"
+          }`}
+          onClick={() => setView({ type: "settings" })}
+        >
+          <Settings className="w-4 h-4" />
+          Site Settings
+        </button>
+      </div>
+
       <main className="container mx-auto px-4 md:px-6 py-10">
         {view.type === "list" && (
           <ProjectListView
