@@ -46,8 +46,8 @@ export default function Navbar() {
         }}
       >
         <div className="flex items-center justify-between px-4 py-2.5">
-          <Link href="/">
-            <span className="flex items-center gap-2 text-white font-semibold tracking-wide cursor-pointer hover:opacity-90 transition-opacity">
+          <Link href="/" className="min-w-0">
+            <span className="flex items-center gap-2 text-white font-semibold tracking-wide cursor-pointer hover:opacity-90 transition-opacity min-w-0">
               {settings.logoUrl ? (
                 <img
                   src={settings.logoUrl}
@@ -57,12 +57,12 @@ export default function Navbar() {
               ) : (
                 <GiPalmTree className="text-xl shrink-0" />
               )}
-              <span className="text-sm">{settings.companyName}</span>
+              <span className="text-sm truncate">{settings.companyName}</span>
             </span>
           </Link>
 
           {/* Desktop links */}
-          <div className="hidden sm:flex items-center gap-1">
+          <div className="hidden sm:flex items-center gap-1 shrink-0">
             {navLinks.map((link) => (
               <Link key={link.href} href={link.href}>
                 <span className={linkClass(link.href)}>{link.label}</span>
@@ -72,7 +72,7 @@ export default function Navbar() {
 
           {/* Mobile hamburger */}
           <button
-            className="sm:hidden flex items-center justify-center w-8 h-8 rounded-md text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
+            className="sm:hidden shrink-0 flex items-center justify-center w-8 h-8 rounded-md text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
             onClick={() => setMenuOpen((prev) => !prev)}
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
