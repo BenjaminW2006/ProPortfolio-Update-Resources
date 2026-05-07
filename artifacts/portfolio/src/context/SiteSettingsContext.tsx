@@ -76,9 +76,30 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   logoUrl: null,
 };
 
+const CACHE_KEY = "site-settings-cache";
+
+function readCache(): SiteSettings | undefined {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    return raw ? (JSON.parse(raw) as SiteSettings) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function writeCache(settings: SiteSettings) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify(settings));
+  } catch {
+    // storage quota exceeded or private browsing — silently skip
+  }
+}
+
 const SiteSettingsContext = createContext<SiteSettings>(DEFAULT_SETTINGS);
 
 export function SiteSettingsProvider({ children }: { children: ReactNode }) {
+  const cached = readCache();
+
   const { data } = useQuery<SiteSettings>({
     queryKey: ["site-settings"],
     queryFn: async () => {
@@ -86,11 +107,16 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
       if (!res.ok) return DEFAULT_SETTINGS;
       return res.json() as Promise<SiteSettings>;
     },
+    placeholderData: cached ?? DEFAULT_SETTINGS,
     staleTime: 60 * 1000,
     retry: false,
   });
 
-  const settings = data ?? DEFAULT_SETTINGS;
+  const settings = data ?? cached ?? DEFAULT_SETTINGS;
+
+  useEffect(() => {
+    if (data) writeCache(data);
+  }, [data]);
 
   useEffect(() => {
     const root = document.documentElement;
