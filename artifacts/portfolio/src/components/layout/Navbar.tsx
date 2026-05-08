@@ -49,15 +49,20 @@ export default function Navbar() {
           <Link href="/" className="min-w-0">
             <span className="flex items-center gap-2 text-white font-semibold tracking-wide cursor-pointer hover:opacity-90 transition-opacity min-w-0">
               {settings.logoUrl ? (
-                <img
-                  src={settings.logoUrl}
-                  alt={settings.companyName}
-                  className="h-7 w-auto max-w-[120px] object-contain shrink-0"
-                />
+                <>
+                  <img
+                    src={settings.logoUrl}
+                    alt={settings.companyName}
+                    className="h-7 w-auto max-w-[140px] object-contain shrink-0"
+                  />
+                  <span className="hidden sm:block text-sm truncate">{settings.companyName}</span>
+                </>
               ) : (
-                <GiPalmTree className="text-xl shrink-0" />
+                <>
+                  <GiPalmTree className="text-xl shrink-0" />
+                  <span className="text-xs sm:text-sm truncate">{settings.companyName}</span>
+                </>
               )}
-              <span className="text-sm truncate">{settings.companyName}</span>
             </span>
           </Link>
 
