@@ -4,6 +4,14 @@ import { GiPalmTree } from "react-icons/gi";
 import { Menu, X } from "lucide-react";
 import { useSiteSettings } from "@/context/SiteSettingsContext";
 
+function toAcronym(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((w) => w[0].toUpperCase())
+    .join("");
+}
+
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -60,7 +68,8 @@ export default function Navbar() {
               ) : (
                 <>
                   <GiPalmTree className="text-xl shrink-0" />
-                  <span className="text-xs sm:text-sm truncate">{settings.companyName}</span>
+                  <span className="sm:hidden text-sm font-bold tracking-wider">{toAcronym(settings.companyName)}</span>
+                  <span className="hidden sm:block text-sm truncate">{settings.companyName}</span>
                 </>
               )}
             </span>
