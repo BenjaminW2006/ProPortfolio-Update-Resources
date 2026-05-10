@@ -27,6 +27,10 @@ import { DEFAULT_SETTINGS, useSiteSettings, type SiteSettings } from "@/context/
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
+function toAcronym(name: string): string {
+  return name.split(/\s+/).filter(Boolean).map((w) => w[0].toUpperCase()).join("");
+}
+
 function AutoTextarea({ value, onChange, placeholder, className }: {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
@@ -1431,6 +1435,10 @@ function SettingsView() {
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
         <h3 className="text-base font-semibold font-serif text-slate-200">Company Info</h3>
         {field("Company Name", form.companyName, (v) => setForm((f) => f ? { ...f, companyName: v } : f))}
+        <div>
+          {field("Mobile Acronym", form.navAcronym ?? "", (v) => setForm((f) => f ? { ...f, navAcronym: v } : f), toAcronym(form.companyName))}
+          <p className="text-slate-500 text-xs mt-1">Shown in the mobile navbar. Leave blank to auto-generate from the company name.</p>
+        </div>
         <div>
           <label className="block text-slate-400 text-sm mb-1.5">Phone</label>
           <Input

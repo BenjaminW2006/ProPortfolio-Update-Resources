@@ -22,6 +22,7 @@ const hexColor = z.string().regex(/^#[0-9A-Fa-f]{6}$/);
 
 const SiteSettingsSchema = z.object({
   companyName: z.string(),
+  navAcronym: z.string().default(""),
   tagline1: z.string(),
   tagline2: z.string(),
   tagline3: z.string(),
@@ -52,6 +53,7 @@ type SiteSettings = z.infer<typeof SiteSettingsSchema>;
 
 const DEFAULT_SETTINGS: SiteSettings = {
   companyName: "Your Business Name",
+  navAcronym: "",
   tagline1: "Quality Work.",
   tagline2: "Done Right.",
   tagline3: "Every Time.",

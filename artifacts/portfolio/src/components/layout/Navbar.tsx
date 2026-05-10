@@ -29,7 +29,7 @@ export default function Navbar() {
   }, [location]);
 
   const navLinks = [
-    ...(settings.showAbout ? [{ href: "/", label: "About" }] : []),
+    { href: "/", label: "Home" },
     ...(settings.showGalleries ? [{ href: "/gallery", label: "Gallery" }] : []),
     { href: "/contact", label: "Contact" },
   ];
@@ -65,7 +65,7 @@ export default function Navbar() {
               ) : (
                 <GiPalmTree className="text-xl shrink-0" />
               )}
-              <span className="sm:hidden text-sm font-bold tracking-wider">{toAcronym(settings.companyName)}</span>
+              <span className="sm:hidden text-sm font-bold tracking-wider">{settings.navAcronym || toAcronym(settings.companyName)}</span>
               <span className="hidden sm:block text-sm truncate">{settings.companyName}</span>
             </span>
           </Link>

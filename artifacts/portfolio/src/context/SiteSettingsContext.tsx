@@ -14,6 +14,7 @@ export interface GalleryItem {
 
 export interface SiteSettings {
   companyName: string;
+  navAcronym: string;
   tagline1: string;
   tagline2: string;
   tagline3: string;
@@ -40,6 +41,7 @@ export interface SiteSettings {
 
 export const DEFAULT_SETTINGS: SiteSettings = {
   companyName: "Your Business Name",
+  navAcronym: "",
   tagline1: "Quality Work.",
   tagline2: "Done Right.",
   tagline3: "Every Time.",
