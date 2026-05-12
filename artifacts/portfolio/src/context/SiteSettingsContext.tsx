@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 export interface ServiceItem {
@@ -95,6 +95,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
 };
 
 const CACHE_KEY = "site-settings-cache";
+const PREVIEW_KEY = "site-editor-preview";
 
 function readCache(): SiteSettings | undefined {
   try {
@@ -108,10 +109,16 @@ function readCache(): SiteSettings | undefined {
 function writeCache(settings: SiteSettings) {
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify(settings));
-  } catch {
-    // storage quota exceeded or private browsing — silently skip
-  }
+  } catch {}
 }
+
+// Detect if this page is embedded in the visual editor iframe.
+// SiteSettingsProvider mounts once at the app root, so checking the initial
+// URL params is reliable even if the user navigates within the iframe later.
+const isEditorFrame =
+  typeof window !== "undefined" &&
+  window !== window.top &&
+  new URLSearchParams(window.location.search).has("editor");
 
 const SiteSettingsContext = createContext<SiteSettings>(DEFAULT_SETTINGS);
 
@@ -130,11 +137,36 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     retry: false,
   });
 
-  const settings = { ...DEFAULT_SETTINGS, ...(data ?? cached ?? {}) };
+  // Live preview override — populated from localStorage when embedded in the editor.
+  const [previewOverride, setPreviewOverride] = useState<Partial<SiteSettings>>(() => {
+    if (!isEditorFrame) return {};
+    try {
+      const raw = localStorage.getItem(PREVIEW_KEY);
+      return raw ? (JSON.parse(raw) as Partial<SiteSettings>) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  const settings = { ...DEFAULT_SETTINGS, ...(data ?? cached ?? {}), ...previewOverride };
 
   useEffect(() => {
     if (data) writeCache(data);
   }, [data]);
+
+  // When in the editor iframe, listen for the admin panel writing new preview
+  // settings to localStorage — storage events fire cross-window on same origin.
+  useEffect(() => {
+    if (!isEditorFrame) return;
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key !== PREVIEW_KEY) return;
+      try {
+        setPreviewOverride(e.newValue ? (JSON.parse(e.newValue) as Partial<SiteSettings>) : {});
+      } catch {}
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -148,6 +180,7 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const load = (family: string) => {
+      if (!family) return;
       const id = `gfont-${family.replace(/\s+/g, "-")}`;
       if (document.getElementById(id)) return;
       const link = document.createElement("link");

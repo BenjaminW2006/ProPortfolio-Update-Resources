@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, type Dispatch, type SetStateAction } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth, useClerk } from "@clerk/react";
 import { useLocation } from "wouter";
@@ -23,6 +23,7 @@ import {
   Settings,
   FolderOpen,
   Building2,
+  Layout,
 } from "lucide-react";
 import { DEFAULT_SETTINGS, useSiteSettings, type SiteSettings } from "@/context/SiteSettingsContext";
 
@@ -1787,11 +1788,387 @@ function OnboardingView({ onComplete }: { onComplete: () => void }) {
   );
 }
 
+// ── Visual Editor panel helpers ───────────────────────────────────────────────
+
+type SetForm = Dispatch<SetStateAction<SiteSettings | null>>;
+
+function edField(label: string, value: string, onChange: (v: string) => void, placeholder?: string) {
+  return (
+    <div>
+      <label className="block text-slate-400 text-xs font-medium mb-1">{label}</label>
+      <Input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-600 text-sm h-8"
+      />
+    </div>
+  );
+}
+
+function edTextarea(label: string, value: string, onChange: (v: string) => void, placeholder?: string) {
+  return (
+    <div>
+      <label className="block text-slate-400 text-xs font-medium mb-1">{label}</label>
+      <AutoTextarea
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+      />
+    </div>
+  );
+}
+
+function EdToggle({ label, value, onChange }: { label: string; value: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-slate-300 text-sm">{label}</span>
+      <button
+        type="button"
+        onClick={() => onChange(!value)}
+        className={`relative inline-flex h-5 w-9 flex-shrink-0 items-center rounded-full transition-colors ${value ? "bg-blue-600" : "bg-slate-600"}`}
+      >
+        <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${value ? "translate-x-[18px]" : "translate-x-[2px]"}`} />
+      </button>
+    </div>
+  );
+}
+
+function EditorNavbarPanel({ form, setForm }: { form: SiteSettings; setForm: SetForm }) {
+  const upd = (fn: (f: SiteSettings) => SiteSettings) => setForm((f) => (f ? fn(f) : f));
+  return (
+    <div className="space-y-3">
+      {edField("Company Name", form.companyName, (v) => upd((f) => ({ ...f, companyName: v })))}
+      <div>
+        {edField("Mobile Acronym", form.navAcronym ?? "", (v) => upd((f) => ({ ...f, navAcronym: v })), toAcronym(form.companyName))}
+        <p className="text-slate-600 text-xs mt-1">Leave blank to auto-generate from company name.</p>
+      </div>
+      {edField("Phone", form.phone, (v) => upd((f) => ({ ...f, phone: v })), "(555) 000-0000")}
+      {edField("Email", form.email, (v) => upd((f) => ({ ...f, email: v })), "hello@company.com")}
+      {edField("Service Area", form.serviceArea, (v) => upd((f) => ({ ...f, serviceArea: v })), "City, State")}
+    </div>
+  );
+}
+
+function EditorHeroPanel({ form, setForm }: { form: SiteSettings; setForm: SetForm }) {
+  const upd = (fn: (f: SiteSettings) => SiteSettings) => setForm((f) => (f ? fn(f) : f));
+  return (
+    <div className="space-y-3">
+      <EdToggle label="Show Hero" value={form.showHero} onChange={(v) => upd((f) => ({ ...f, showHero: v }))} />
+      <div className="border-t border-slate-800 pt-3 space-y-3">
+        <p className="text-slate-500 text-xs">Tagline (3 lines)</p>
+        {edField("Line 1", form.tagline1, (v) => upd((f) => ({ ...f, tagline1: v })))}
+        {edField("Line 2", form.tagline2, (v) => upd((f) => ({ ...f, tagline2: v })))}
+        {edField("Line 3 (accent color)", form.tagline3, (v) => upd((f) => ({ ...f, tagline3: v })))}
+      </div>
+      {edTextarea("Subtitle", form.heroSubtitle, (v) => upd((f) => ({ ...f, heroSubtitle: v })))}
+      <div className="border-t border-slate-800 pt-3 space-y-3">
+        <p className="text-slate-500 text-xs">CTA Buttons (clear to hide)</p>
+        {edField("Primary Button", form.heroCta1Text, (v) => upd((f) => ({ ...f, heroCta1Text: v })), "Get a Quote")}
+        {edField("Secondary Button", form.heroCta2Text, (v) => upd((f) => ({ ...f, heroCta2Text: v })), "View Our Work")}
+      </div>
+    </div>
+  );
+}
+
+function EditorServicesPanel({ form, setForm }: { form: SiteSettings; setForm: SetForm }) {
+  const upd = (fn: (f: SiteSettings) => SiteSettings) => setForm((f) => (f ? fn(f) : f));
+  return (
+    <div className="space-y-3">
+      <EdToggle label="Show Services" value={form.showServices} onChange={(v) => upd((f) => ({ ...f, showServices: v }))} />
+      <div className="border-t border-slate-800 pt-3 space-y-3">
+        {edField("Section Heading", form.servicesHeading, (v) => upd((f) => ({ ...f, servicesHeading: v })))}
+        {edTextarea("Subtitle", form.servicesSubtitle, (v) => upd((f) => ({ ...f, servicesSubtitle: v })))}
+      </div>
+      <div className="border-t border-slate-800 pt-3">
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-slate-400 text-xs font-medium">Services List</label>
+          <button
+            onClick={() => upd((f) => ({ ...f, services: [...f.services, { title: "", description: "" }] }))}
+            className="text-blue-400 text-xs hover:text-blue-300 flex items-center gap-1 transition-colors"
+          >
+            <Plus className="w-3 h-3" /> Add
+          </button>
+        </div>
+        <div className="space-y-2">
+          {form.services.map((svc, i) => (
+            <div key={i} className="bg-slate-800 rounded-lg p-2.5 space-y-1.5">
+              <div className="flex items-center gap-1.5">
+                <Input
+                  value={svc.title}
+                  onChange={(e) => upd((f) => ({ ...f, services: f.services.map((s, idx) => idx === i ? { ...s, title: e.target.value } : s) }))}
+                  placeholder="Service name"
+                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 text-xs h-7 flex-1"
+                />
+                <button onClick={() => upd((f) => ({ ...f, services: f.services.filter((_, idx) => idx !== i) }))} className="text-red-400 hover:text-red-300 shrink-0">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <AutoTextarea
+                value={svc.description}
+                onChange={(e) => upd((f) => ({ ...f, services: f.services.map((s, idx) => idx === i ? { ...s, description: e.target.value } : s) }))}
+                placeholder="Brief description"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EditorAboutPanel({ form, setForm }: { form: SiteSettings; setForm: SetForm }) {
+  const upd = (fn: (f: SiteSettings) => SiteSettings) => setForm((f) => (f ? fn(f) : f));
+  return (
+    <div className="space-y-3">
+      <EdToggle label="Show About Section" value={form.showAbout} onChange={(v) => upd((f) => ({ ...f, showAbout: v }))} />
+      <div className="border-t border-slate-800 pt-3 space-y-3">
+        {edField("Section Title", form.aboutTitle, (v) => upd((f) => ({ ...f, aboutTitle: v })))}
+        {edTextarea("Body Text", form.aboutText, (v) => upd((f) => ({ ...f, aboutText: v })))}
+      </div>
+    </div>
+  );
+}
+
+function EditorColorsPanel({ form, setForm }: { form: SiteSettings; setForm: SetForm }) {
+  const upd = (key: "colorBg" | "colorText" | "colorAccent" | "colorHeader" | "colorTileBg" | "colorTileBorder", value: string) =>
+    setForm((f) => (f ? { ...f, [key]: value } : f));
+  const colorFields: { label: string; key: "colorBg" | "colorText" | "colorAccent" | "colorHeader" | "colorTileBg" | "colorTileBorder" }[] = [
+    { label: "Page Background", key: "colorBg" },
+    { label: "Text Color", key: "colorText" },
+    { label: "Accent / Buttons", key: "colorAccent" },
+    { label: "Header / Navbar", key: "colorHeader" },
+    { label: "Gallery Tile Bg", key: "colorTileBg" },
+    { label: "Gallery Tile Border", key: "colorTileBorder" },
+  ];
+  return (
+    <div className="space-y-3">
+      {colorFields.map(({ label, key }) => (
+        <div key={key} className="flex items-center justify-between gap-2">
+          <label className="text-slate-400 text-xs flex-1 min-w-0 truncate">{label}</label>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <input
+              type="color"
+              value={form[key] ?? "#000000"}
+              onChange={(e) => upd(key, e.target.value)}
+              className="w-7 h-7 rounded border border-slate-600 bg-slate-700 cursor-pointer p-0.5 shrink-0"
+            />
+            <Input
+              value={form[key] ?? ""}
+              onChange={(e) => upd(key, e.target.value)}
+              className="w-[5.5rem] bg-slate-800 border-slate-700 text-white font-mono text-xs h-7"
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function EditorTypographyPanel({ form, setForm }: { form: SiteSettings; setForm: SetForm }) {
+  const upd = (fn: (f: SiteSettings) => SiteSettings) => setForm((f) => (f ? fn(f) : f));
+  return (
+    <div className="space-y-5">
+      <div>
+        <label className="text-slate-400 text-xs font-medium block mb-2">Heading Font</label>
+        <div className="space-y-1.5">
+          {HEADING_FONTS.map((font) => (
+            <button
+              key={font}
+              onClick={() => { loadGoogleFont(font); upd((f) => ({ ...f, fontHeading: font })); }}
+              className={`w-full text-left px-3 py-2 rounded-lg text-sm border transition-colors ${form.fontHeading === font ? "border-blue-500 bg-blue-600/20 text-white" : "border-slate-700 bg-slate-800 text-slate-300 hover:border-slate-600 hover:text-white"}`}
+              style={{ fontFamily: `'${font}', serif` }}
+            >
+              {font}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div>
+        <label className="text-slate-400 text-xs font-medium block mb-2">Body Font</label>
+        <div className="space-y-1.5">
+          {BODY_FONTS.map((font) => (
+            <button
+              key={font}
+              onClick={() => { loadGoogleFont(font); upd((f) => ({ ...f, fontBody: font })); }}
+              className={`w-full text-left px-3 py-2 rounded-lg text-sm border transition-colors ${form.fontBody === font ? "border-blue-500 bg-blue-600/20 text-white" : "border-slate-700 bg-slate-800 text-slate-300 hover:border-slate-600 hover:text-white"}`}
+              style={{ fontFamily: `'${font}', sans-serif` }}
+            >
+              {font}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function EditorView({ onExit }: { onExit: () => void }) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [saving, setSaving] = useState(false);
+  const [activePanel, setActivePanel] = useState<string>("hero");
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  const { data: current } = useQuery<SiteSettings>({
+    queryKey: ["admin-settings"],
+    queryFn: async () => {
+      const res = await apiCall("/api/admin/settings");
+      if (!res.ok) return DEFAULT_SETTINGS;
+      return res.json() as Promise<SiteSettings>;
+    },
+    staleTime: 0,
+  });
+
+  const [form, setForm] = useState<SiteSettings | null>(null);
+
+  useEffect(() => {
+    if (current && !form) setForm({ ...DEFAULT_SETTINGS, ...current });
+  }, [current, form]);
+
+  useEffect(() => {
+    [...HEADING_FONTS, ...BODY_FONTS].forEach(loadGoogleFont);
+  }, []);
+
+  // Broadcast every form change to the iframe via localStorage storage events
+  useEffect(() => {
+    if (!form) return;
+    try { localStorage.setItem("site-editor-preview", JSON.stringify(form)); } catch {}
+  }, [form]);
+
+  // Clear the preview key when the editor unmounts
+  useEffect(() => {
+    return () => { try { localStorage.removeItem("site-editor-preview"); } catch {} };
+  }, []);
+
+  // Listen for section-focus postMessages sent by the editor overlays in the iframe
+  useEffect(() => {
+    const handler = (e: MessageEvent) => {
+      if (e.data?.type === "section-focus" && typeof e.data.section === "string") {
+        setActivePanel(e.data.section);
+      }
+    };
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
+  }, []);
+
+  const handleSave = async () => {
+    if (!form) return;
+    setSaving(true);
+    try {
+      const res = await apiMutation("/api/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error("Failed to save");
+      const updated = (await res.json()) as SiteSettings;
+      queryClient.setQueryData(["admin-settings"], updated);
+      queryClient.invalidateQueries({ queryKey: ["site-settings"] });
+      toast({ title: "Settings saved!" });
+    } catch {
+      toast({ title: "Error", description: "Failed to save settings.", variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const PANELS = [
+    { id: "navbar", label: "Navbar" },
+    { id: "hero", label: "Hero" },
+    { id: "services", label: "Services" },
+    { id: "about", label: "About" },
+    { id: "colors", label: "Colors" },
+    { id: "typography", label: "Fonts" },
+  ];
+
+  if (!form) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-screen bg-slate-950 overflow-hidden">
+      {/* Left: live site iframe */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Minimal browser-like toolbar */}
+        <div className="h-10 bg-slate-900 border-b border-slate-700 flex items-center gap-2 px-3 shrink-0">
+          <button
+            onClick={onExit}
+            className="flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors text-xs shrink-0"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            Exit Editor
+          </button>
+          <div className="flex-1 bg-slate-800 rounded px-3 py-1 text-xs text-slate-500 font-mono truncate">
+            {window.location.origin}{basePath}
+          </div>
+          <Button
+            size="sm"
+            className="h-7 text-xs px-4 bg-blue-600 hover:bg-blue-700 shrink-0 rounded-md"
+            onClick={handleSave}
+            disabled={saving}
+          >
+            {saving ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Check className="w-3 h-3 mr-1" />}
+            {saving ? "Saving…" : "Save"}
+          </Button>
+        </div>
+        <iframe
+          ref={iframeRef}
+          src={`${basePath}/?editor=1`}
+          className="flex-1 w-full border-0 bg-white"
+          title="Site Preview"
+        />
+      </div>
+
+      {/* Right: contextual editing panel */}
+      <div className="w-80 bg-slate-900 border-l border-slate-700 flex flex-col shrink-0">
+        {/* Section tabs */}
+        <div className="border-b border-slate-700 p-2">
+          <div className="flex flex-wrap gap-1">
+            {PANELS.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => setActivePanel(p.id)}
+                className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors ${activePanel === p.id ? "bg-blue-600 text-white" : "text-slate-400 hover:text-white hover:bg-slate-800"}`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Panel content */}
+        <div className="flex-1 overflow-y-auto p-4">
+          {activePanel === "navbar" && <EditorNavbarPanel form={form} setForm={setForm} />}
+          {activePanel === "hero" && <EditorHeroPanel form={form} setForm={setForm} />}
+          {activePanel === "services" && <EditorServicesPanel form={form} setForm={setForm} />}
+          {activePanel === "about" && <EditorAboutPanel form={form} setForm={setForm} />}
+          {activePanel === "colors" && <EditorColorsPanel form={form} setForm={setForm} />}
+          {activePanel === "typography" && <EditorTypographyPanel form={form} setForm={setForm} />}
+        </div>
+
+        <div className="p-3 border-t border-slate-700">
+          <p className="text-slate-600 text-xs text-center">
+            Hover a section in the preview and click "Edit" to jump to its settings
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 type View =
   | { type: "list" }
   | { type: "create" }
   | { type: "manage"; projectId: number }
-  | { type: "settings" };
+  | { type: "settings" }
+  | { type: "editor" };
 
 export default function AdminPage() {
   const { isLoaded, isSignedIn } = useAuth();
@@ -1837,6 +2214,10 @@ export default function AdminPage() {
     );
   }
 
+  if (view.type === "editor") {
+    return <EditorView onExit={() => setView({ type: "settings" })} />;
+  }
+
   const activeTab = view.type === "settings" ? "settings" : "projects";
 
   const tabClass = (tab: string) =>
@@ -1869,6 +2250,13 @@ export default function AdminPage() {
               >
                 <Settings className="w-4 h-4" />
                 Site Settings
+              </button>
+              <button
+                className={tabClass("editor")}
+                onClick={() => setView({ type: "editor" })}
+              >
+                <Layout className="w-4 h-4" />
+                Visual Editor
               </button>
             </nav>
           </div>
@@ -1906,7 +2294,14 @@ export default function AdminPage() {
           onClick={() => setView({ type: "settings" })}
         >
           <Settings className="w-4 h-4" />
-          Site Settings
+          Settings
+        </button>
+        <button
+          className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-3 text-sm font-medium transition-colors text-slate-400 hover:text-white"
+          onClick={() => setView({ type: "editor" })}
+        >
+          <Layout className="w-4 h-4" />
+          Editor
         </button>
       </div>
 
