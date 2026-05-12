@@ -36,6 +36,7 @@ export interface SiteSettings {
   showGalleries: boolean;
   showServices: boolean;
   showAbout: boolean;
+  onboardingComplete: boolean;
   logoUrl: string | null;
 }
 
@@ -75,6 +76,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   showGalleries: true,
   showServices: true,
   showAbout: true,
+  onboardingComplete: false,
   logoUrl: null,
 };
 

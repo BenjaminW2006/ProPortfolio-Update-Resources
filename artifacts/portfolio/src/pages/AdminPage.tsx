@@ -22,6 +22,7 @@ import {
   Star,
   Settings,
   FolderOpen,
+  Building2,
 } from "lucide-react";
 import { DEFAULT_SETTINGS, useSiteSettings, type SiteSettings } from "@/context/SiteSettingsContext";
 
@@ -1646,6 +1647,129 @@ function SettingsView() {
   );
 }
 
+function OnboardingView({ onComplete }: { onComplete: () => void }) {
+  const { toast } = useToast();
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({ companyName: "", navAcronym: "", phone: "", email: "", serviceArea: "" });
+
+  const acronymPreview = form.navAcronym || toAcronym(form.companyName);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.companyName.trim()) {
+      toast({ title: "Company name is required.", variant: "destructive" });
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await apiMutation("/api/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, onboardingComplete: true }),
+      });
+      if (!res.ok) throw new Error();
+      onComplete();
+    } catch {
+      toast({ title: "Error", description: "Failed to save. Please try again.", variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center p-4">
+      <div className="w-full max-w-lg">
+        <div className="text-center mb-8">
+          <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-5">
+            <Building2 className="w-7 h-7 text-white" />
+          </div>
+          <h1 className="text-3xl font-bold font-serif mb-2">Welcome to Company Manager</h1>
+          <p className="text-slate-400 text-sm">Let's set up your site. You can update everything later in Settings.</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-5">
+          <div>
+            <label className="block text-slate-400 text-sm mb-1.5">
+              Company Name <span className="text-red-400">*</span>
+            </label>
+            <Input
+              value={form.companyName}
+              onChange={(e) => setForm((f) => ({ ...f, companyName: e.target.value }))}
+              placeholder="e.g. Upstate Property Services"
+              className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
+              autoFocus
+            />
+          </div>
+
+          <div>
+            <label className="block text-slate-400 text-sm mb-1.5">
+              Mobile Abbreviation <span className="text-slate-500 text-xs font-normal">(optional)</span>
+            </label>
+            <Input
+              value={form.navAcronym}
+              onChange={(e) => setForm((f) => ({ ...f, navAcronym: e.target.value }))}
+              placeholder={acronymPreview || "ABC"}
+              className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
+            />
+            {form.companyName && (
+              <p className="text-slate-500 text-xs mt-1.5">
+                Mobile navbar will show: <span className="text-white font-bold tracking-wider">{acronymPreview}</span>
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-slate-400 text-sm mb-1.5">Phone</label>
+            <Input
+              value={form.phone}
+              onChange={(e) => {
+                const digits = e.target.value.replace(/\D/g, "").slice(0, 10);
+                let formatted = digits;
+                if (digits.length >= 7) formatted = `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+                else if (digits.length >= 4) formatted = `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+                else if (digits.length >= 1) formatted = `(${digits}`;
+                setForm((f) => ({ ...f, phone: formatted }));
+              }}
+              placeholder="(864) 555-0000"
+              className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-slate-400 text-sm mb-1.5">Email</label>
+            <Input
+              type="email"
+              value={form.email}
+              onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+              placeholder="company@example.com"
+              className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-slate-400 text-sm mb-1.5">Service Area</label>
+            <Input
+              value={form.serviceArea}
+              onChange={(e) => setForm((f) => ({ ...f, serviceArea: e.target.value }))}
+              placeholder="e.g. Greenville, South Carolina"
+              className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-500"
+            />
+          </div>
+
+          <Button
+            type="submit"
+            disabled={saving || !form.companyName.trim()}
+            className="w-full bg-blue-600 hover:bg-blue-700 h-11 mt-2"
+          >
+            {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Check className="w-4 h-4 mr-2" />}
+            Get Started
+          </Button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 type View =
   | { type: "list" }
   | { type: "create" }
@@ -1658,6 +1782,7 @@ export default function AdminPage() {
   const [, setLocation] = useLocation();
   const [view, setView] = useState<View>({ type: "list" });
   const { companyName } = useSiteSettings();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
@@ -1665,11 +1790,33 @@ export default function AdminPage() {
     }
   }, [isLoaded, isSignedIn, setLocation]);
 
-  if (!isLoaded || !isSignedIn) {
+  const { data: adminSettings, isLoading: settingsLoading } = useQuery<SiteSettings>({
+    queryKey: ["admin-settings"],
+    queryFn: async () => {
+      const res = await apiCall("/api/admin/settings");
+      if (!res.ok) return DEFAULT_SETTINGS;
+      return res.json() as Promise<SiteSettings>;
+    },
+    staleTime: 0,
+    enabled: isLoaded && !!isSignedIn,
+  });
+
+  if (!isLoaded || !isSignedIn || settingsLoading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
       </div>
+    );
+  }
+
+  if (adminSettings && !adminSettings.onboardingComplete) {
+    return (
+      <OnboardingView
+        onComplete={() => {
+          queryClient.invalidateQueries({ queryKey: ["admin-settings"] });
+          queryClient.invalidateQueries({ queryKey: ["site-settings"] });
+        }}
+      />
     );
   }
 

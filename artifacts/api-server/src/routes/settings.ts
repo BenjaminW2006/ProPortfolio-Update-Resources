@@ -47,6 +47,7 @@ const SiteSettingsSchema = z.object({
   showGalleries: z.boolean().default(true),
   showServices: z.boolean().default(true),
   showAbout: z.boolean().default(true),
+  onboardingComplete: z.boolean().default(false),
 });
 
 type SiteSettings = z.infer<typeof SiteSettingsSchema>;
@@ -87,14 +88,20 @@ const DEFAULT_SETTINGS: SiteSettings = {
   showGalleries: true,
   showServices: true,
   showAbout: true,
+  onboardingComplete: false,
 };
 
 export async function getCurrentSettings(): Promise<SiteSettings> {
   const [row] = await db.select().from(siteSettingsTable).where(eq(siteSettingsTable.id, 1));
   if (!row) return DEFAULT_SETTINGS;
   try {
-    const parsed = JSON.parse(row.data) as unknown;
-    const result = SiteSettingsSchema.safeParse({ ...DEFAULT_SETTINGS, ...(parsed as object) });
+    const parsed = JSON.parse(row.data) as Record<string, unknown>;
+    // Migration: existing installs predate onboardingComplete — if they have
+    // a real company name already saved, treat onboarding as done.
+    if (!("onboardingComplete" in parsed) && parsed.companyName && parsed.companyName !== DEFAULT_SETTINGS.companyName) {
+      parsed.onboardingComplete = true;
+    }
+    const result = SiteSettingsSchema.safeParse({ ...DEFAULT_SETTINGS, ...parsed });
     return result.success ? result.data : DEFAULT_SETTINGS;
   } catch {
     return DEFAULT_SETTINGS;
