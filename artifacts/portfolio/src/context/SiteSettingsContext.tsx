@@ -34,6 +34,11 @@ export interface SiteSettings {
   colorHeader: string;
   colorTileBg: string;
   colorTileBorder: string;
+  fontHeading: string;
+  fontBody: string;
+  heroCta1Text: string;
+  heroCta2Text: string;
+  sectionOrder: string[];
   showHero: boolean;
   showGalleries: boolean;
   showServices: boolean;
@@ -76,6 +81,11 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   colorHeader: "#0f172a",
   colorTileBg: "#0f172a",
   colorTileBorder: "#2563eb",
+  fontHeading: "Playfair Display",
+  fontBody: "Inter",
+  heroCta1Text: "Get a Quote",
+  heroCta2Text: "View Our Work",
+  sectionOrder: ["hero", "services", "about"],
   showHero: true,
   showGalleries: true,
   showServices: true,
@@ -120,7 +130,7 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     retry: false,
   });
 
-  const settings = data ?? cached ?? DEFAULT_SETTINGS;
+  const settings = { ...DEFAULT_SETTINGS, ...(data ?? cached ?? {}) };
 
   useEffect(() => {
     if (data) writeCache(data);
@@ -135,6 +145,23 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     root.style.setProperty("--site-tile-bg", settings.colorTileBg);
     root.style.setProperty("--site-tile-border", settings.colorTileBorder);
   }, [settings.colorBg, settings.colorText, settings.colorAccent, settings.colorHeader, settings.colorTileBg, settings.colorTileBorder]);
+
+  useEffect(() => {
+    const load = (family: string) => {
+      const id = `gfont-${family.replace(/\s+/g, "-")}`;
+      if (document.getElementById(id)) return;
+      const link = document.createElement("link");
+      link.id = id;
+      link.rel = "stylesheet";
+      link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}:wght@400;600;700&display=swap`;
+      document.head.appendChild(link);
+    };
+    load(settings.fontHeading);
+    load(settings.fontBody);
+    const root = document.documentElement;
+    root.style.setProperty("--font-heading", `'${settings.fontHeading}', serif`);
+    root.style.setProperty("--font-body", `'${settings.fontBody}', sans-serif`);
+  }, [settings.fontHeading, settings.fontBody]);
 
   useEffect(() => {
     if (settings.companyName) {

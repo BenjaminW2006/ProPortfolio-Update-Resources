@@ -28,6 +28,25 @@ import { DEFAULT_SETTINGS, useSiteSettings, type SiteSettings } from "@/context/
 
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
+const HEADING_FONTS = [
+  "Playfair Display", "Merriweather", "Lora", "Cormorant Garamond",
+  "DM Serif Display", "Libre Baskerville", "EB Garamond", "Crimson Text",
+];
+
+const BODY_FONTS = [
+  "Inter", "Outfit", "Raleway", "Source Sans 3", "Nunito", "Open Sans",
+];
+
+function loadGoogleFont(family: string) {
+  const id = `gfont-${family.replace(/\s+/g, "-")}`;
+  if (document.getElementById(id)) return;
+  const link = document.createElement("link");
+  link.id = id;
+  link.rel = "stylesheet";
+  link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}:wght@400;600;700&display=swap`;
+  document.head.appendChild(link);
+}
+
 function toAcronym(name: string): string {
   return name.split(/\s+/).filter(Boolean).map((w) => w[0].toUpperCase()).join("");
 }
@@ -1183,8 +1202,13 @@ function SettingsView() {
     if (current && !form) setForm(current);
   }, [current, form]);
 
-  // Apply color changes to CSS vars in real-time so the public site preview
-  // and the mini color preview below update instantly without saving.
+  // Preload all font options so picker previews render correctly
+  useEffect(() => {
+    [...HEADING_FONTS, ...BODY_FONTS].forEach(loadGoogleFont);
+  }, []);
+
+  // Apply color + font changes to CSS vars in real-time so the public site preview
+  // and the mini previews below update instantly without saving.
   useEffect(() => {
     if (!form) return;
     const root = document.documentElement;
@@ -1195,6 +1219,15 @@ function SettingsView() {
     root.style.setProperty("--site-tile-bg", form.colorTileBg);
     root.style.setProperty("--site-tile-border", form.colorTileBorder);
   }, [form?.colorBg, form?.colorText, form?.colorAccent, form?.colorHeader, form?.colorTileBg, form?.colorTileBorder]);
+
+  useEffect(() => {
+    if (!form) return;
+    loadGoogleFont(form.fontHeading);
+    loadGoogleFont(form.fontBody);
+    const root = document.documentElement;
+    root.style.setProperty("--font-heading", `'${form.fontHeading}', serif`);
+    root.style.setProperty("--font-body", `'${form.fontBody}', sans-serif`);
+  }, [form?.fontHeading, form?.fontBody]);
 
   if (isLoading || !form) {
     return (
@@ -1444,6 +1477,72 @@ function SettingsView() {
           </div>
         </div>
       </div>
+      <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-5">
+        <h3 className="text-base font-semibold font-serif text-slate-200">Typography</h3>
+        <div>
+          <label className="block text-slate-400 text-sm mb-2">Heading Font</label>
+          <select
+            value={form.fontHeading}
+            onChange={(e) => { loadGoogleFont(e.target.value); setForm((f) => f ? { ...f, fontHeading: e.target.value } : f); }}
+            className="w-full bg-slate-700 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm"
+          >
+            {HEADING_FONTS.map((font) => (
+              <option key={font} value={font}>{font}</option>
+            ))}
+          </select>
+          <p className="text-slate-500 text-xs mt-1.5">
+            Preview:{" "}
+            <span style={{ fontFamily: `'${form.fontHeading}', serif`, fontSize: "15px", color: "#e2e8f0" }}>
+              {form.companyName || "Your Company Name"}
+            </span>
+          </p>
+        </div>
+        <div>
+          <label className="block text-slate-400 text-sm mb-2">Body Font</label>
+          <select
+            value={form.fontBody}
+            onChange={(e) => { loadGoogleFont(e.target.value); setForm((f) => f ? { ...f, fontBody: e.target.value } : f); }}
+            className="w-full bg-slate-700 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm"
+          >
+            {BODY_FONTS.map((font) => (
+              <option key={font} value={font}>{font}</option>
+            ))}
+          </select>
+          <p className="text-slate-500 text-xs mt-1.5">
+            Preview:{" "}
+            <span style={{ fontFamily: `'${form.fontBody}', sans-serif`, color: "#e2e8f0" }}>
+              The quick brown fox jumps over the lazy dog.
+            </span>
+          </p>
+        </div>
+      </div>
+
+      <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-3">
+        <div>
+          <h3 className="text-base font-semibold font-serif text-slate-200">Section Order</h3>
+          <p className="text-slate-500 text-xs mt-0.5">Use arrows to reorder home page sections.</p>
+        </div>
+        {(form.sectionOrder ?? ["hero", "services", "about"]).map((key, i, arr) => {
+          const labels: Record<string, string> = { hero: "Hero", services: "Services", about: "About" };
+          const move = (dir: -1 | 1) => {
+            const next = [...arr];
+            [next[i + dir], next[i]] = [next[i], next[i + dir]];
+            setForm((f) => f ? { ...f, sectionOrder: next } : f);
+          };
+          return (
+            <div key={key} className="flex items-center justify-between bg-slate-700/50 rounded-xl px-4 py-3">
+              <span className="text-white text-sm font-medium">{labels[key] ?? key}</span>
+              <div className="flex items-center gap-1">
+                <button type="button" onClick={() => move(-1)} disabled={i === 0}
+                  className="px-1.5 py-0.5 text-slate-400 hover:text-white disabled:opacity-30 text-xs rounded hover:bg-slate-600 transition-colors">↑</button>
+                <button type="button" onClick={() => move(1)} disabled={i === arr.length - 1}
+                  className="px-1.5 py-0.5 text-slate-400 hover:text-white disabled:opacity-30 text-xs rounded hover:bg-slate-600 transition-colors">↓</button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-base font-semibold font-serif text-slate-200">Hero Section</h3>
@@ -1453,6 +1552,12 @@ function SettingsView() {
         {field("Tagline — Line 2", form.tagline2, (v) => setForm((f) => f ? { ...f, tagline2: v } : f), "Done Right.")}
         {field("Tagline — Line 3", form.tagline3, (v) => setForm((f) => f ? { ...f, tagline3: v } : f), "Every Time.")}
         {textareaField("Hero Subtitle", form.heroSubtitle, (v) => setForm((f) => f ? { ...f, heroSubtitle: v } : f))}
+        <div className="pt-1 border-t border-slate-700 space-y-3">
+          <p className="text-slate-400 text-xs font-medium uppercase tracking-wider pt-1">Call-to-Action Buttons</p>
+          {field("Primary Button", form.heroCta1Text, (v) => setForm((f) => f ? { ...f, heroCta1Text: v } : f), "Get a Quote")}
+          {field("Secondary Button", form.heroCta2Text, (v) => setForm((f) => f ? { ...f, heroCta2Text: v } : f), "View Our Work")}
+          <p className="text-slate-600 text-xs">Clear a button label to hide that button.</p>
+        </div>
       </div>
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
         <div className="flex items-center justify-between">
@@ -1463,7 +1568,10 @@ function SettingsView() {
         {textareaField("About Text", form.aboutText, (v) => setForm((f) => f ? { ...f, aboutText: v } : f))}
       </div>
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
-        <h3 className="text-base font-semibold font-serif text-slate-200">Services Section</h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-base font-semibold font-serif text-slate-200">Services Section</h3>
+          {sectionToggle(form.showServices ?? true, (v) => setForm((f) => f ? { ...f, showServices: v } : f))}
+        </div>
         {field("Section Heading", form.servicesHeading, (v) => setForm((f) => f ? { ...f, servicesHeading: v } : f))}
         {textareaField("Section Subtitle", form.servicesSubtitle, (v) => setForm((f) => f ? { ...f, servicesSubtitle: v } : f))}
       </div>
