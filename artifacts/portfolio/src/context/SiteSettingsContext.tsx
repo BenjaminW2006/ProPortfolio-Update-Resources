@@ -186,8 +186,22 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     if (data) writeCache(data);
   }, [data]);
 
-  // When in the editor iframe, listen for the admin panel writing new preview
-  // settings to localStorage — storage events fire cross-window on same origin.
+  // When in the editor iframe, listen for direct postMessage from the parent editor
+  // (more reliable than localStorage storage events across nested iframes).
+  useEffect(() => {
+    if (!isEditorFrame) return;
+    const handleMessage = (e: MessageEvent) => {
+      if (e.data?.type === "preview-settings") {
+        try {
+          setPreviewOverride(e.data.settings as Partial<SiteSettings>);
+        } catch {}
+      }
+    };
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
+
+  // Also keep localStorage storage event as fallback for initial load.
   useEffect(() => {
     if (!isEditorFrame) return;
     const handleStorage = (e: StorageEvent) => {

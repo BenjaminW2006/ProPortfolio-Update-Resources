@@ -1772,13 +1772,15 @@ function EdToggle({ label, value, onChange }: { label: string; value: boolean; o
 function EditorNavbarPanel({ form, setForm, iframePath = "/" }: { form: SiteSettings; setForm: SetForm; iframePath?: string }) {
   const upd = (fn: (f: SiteSettings) => SiteSettings) => setForm((f) => (f ? fn(f) : f));
 
-  // The background visible behind the navbar changes per page
+  // The background visible behind the navbar changes per page and depends on whether the hero is shown
   const pageBgConfig: { label: string; key: keyof SiteSettings } =
     iframePath.startsWith("/gallery")
       ? { label: "Page Background (Gallery)", key: "colorGalleryBg" }
       : iframePath.startsWith("/contact")
       ? { label: "Page Background (Contact)", key: "colorContactBg" }
-      : { label: "Page Background (Home)", key: "colorHeroBg" };
+      : form.showHero
+      ? { label: "Hero Background (Home)", key: "colorHeroBg" }
+      : { label: "Page Background (Home)", key: "colorBg" };
 
   return (
     <div className="space-y-5 divide-y divide-slate-800">
@@ -2090,11 +2092,25 @@ function EditorView({ onExit }: { onExit: () => void }) {
     [...HEADING_FONTS, ...BODY_FONTS].forEach(loadGoogleFont);
   }, []);
 
-  // Broadcast every form change to the iframe via localStorage storage events
+  // Broadcast every form change directly to the iframe via postMessage (reliable parent→child)
+  // Also write to localStorage so the iframe can read current state on page reload.
   useEffect(() => {
     if (!form) return;
     try { localStorage.setItem("site-editor-preview", JSON.stringify(form)); } catch {}
+    iframeRef.current?.contentWindow?.postMessage(
+      { type: "preview-settings", settings: form },
+      "*"
+    );
   }, [form]);
+
+  // When the iframe (re)loads (e.g. page tab switch), re-send current settings immediately
+  const handleIframeLoad = () => {
+    if (!form) return;
+    iframeRef.current?.contentWindow?.postMessage(
+      { type: "preview-settings", settings: form },
+      "*"
+    );
+  };
 
   // Clear the preview key when the editor unmounts
   useEffect(() => {
@@ -2205,6 +2221,7 @@ function EditorView({ onExit }: { onExit: () => void }) {
           src={`${basePath}${iframePath}?editor=1`}
           className="flex-1 w-full border-0 bg-white"
           title="Site Preview"
+          onLoad={handleIframeLoad}
         />
       </div>
 
