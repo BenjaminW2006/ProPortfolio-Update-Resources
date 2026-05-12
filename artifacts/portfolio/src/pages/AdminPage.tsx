@@ -1404,79 +1404,14 @@ function SettingsView() {
         {field("Email", form.email, (v) => setForm((f) => f ? { ...f, email: v } : f), "company@example.com")}
         {field("Service Area", form.serviceArea, (v) => setForm((f) => f ? { ...f, serviceArea: v } : f), "e.g. Austin, Texas")}
       </div>
-      <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-5">
-        <h3 className="text-base font-semibold font-serif text-slate-200">Brand Colors</h3>
-        {(
-          [
-            { label: "Page Background", key: "colorBg" },
-            { label: "Text", key: "colorText" },
-            { label: "Accent / Buttons", key: "colorAccent" },
-            { label: "Header / Navbar", key: "colorHeader" },
-            { label: "Gallery Tile Background", key: "colorTileBg" },
-            { label: "Gallery Tile Border", key: "colorTileBorder" },
-          ] as { label: string; key: "colorBg" | "colorText" | "colorAccent" | "colorHeader" | "colorTileBg" | "colorTileBorder" }[]
-        ).map(({ label, key }) => (
-          <div key={key} className="flex items-center justify-between gap-4">
-            <label className="text-slate-400 text-sm shrink-0">{label}</label>
-            <div className="flex items-center gap-2">
-              <input
-                type="color"
-                value={form[key] ?? "#000000"}
-                onChange={(e) => setForm((f) => f ? { ...f, [key]: e.target.value } : f)}
-                className="w-9 h-9 rounded-lg border border-slate-600 bg-slate-700 cursor-pointer p-0.5"
-              />
-              <Input
-                value={form[key] ?? ""}
-                onChange={(e) => setForm((f) => f ? { ...f, [key]: e.target.value } : f)}
-                placeholder="#000000"
-                className="w-28 bg-slate-700 border-slate-600 text-white placeholder:text-slate-500 font-mono text-sm"
-              />
-            </div>
-          </div>
-        ))}
-
-        {/* Live preview */}
-        <div className="pt-2">
-          <p className="text-slate-500 text-xs mb-2">Preview</p>
-          <div className="rounded-xl overflow-hidden border border-slate-600 text-sm select-none">
-            {/* Navbar */}
-            <div
-              className="flex items-center justify-between px-4 py-2.5"
-              style={{ backgroundColor: form.colorHeader }}
-            >
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded" style={{ backgroundColor: form.colorAccent }} />
-                <span className="font-semibold text-xs" style={{ color: form.colorText }}>{form.companyName || "Your Business"}</span>
-              </div>
-              <div className="flex gap-3">
-                {["Home", "Gallery", "Contact"].map((item) => (
-                  <span key={item} className="text-xs opacity-70" style={{ color: form.colorText }}>{item}</span>
-                ))}
-              </div>
-            </div>
-            {/* Body */}
-            <div className="px-5 py-5 space-y-3" style={{ backgroundColor: form.colorBg }}>
-              <div className="space-y-1">
-                <p className="font-bold text-base leading-tight" style={{ color: form.colorText }}>Quality Work.</p>
-                <p className="text-xs opacity-60" style={{ color: form.colorText }}>Professional services tailored to your needs.</p>
-              </div>
-              <div className="flex gap-2 pt-1">
-                <span
-                  className="px-3 py-1.5 rounded-md text-xs font-semibold"
-                  style={{ backgroundColor: form.colorAccent, color: "#ffffff" }}
-                >
-                  Get a Quote
-                </span>
-                <span
-                  className="px-3 py-1.5 rounded-md text-xs font-semibold border"
-                  style={{ borderColor: form.colorAccent, color: form.colorAccent }}
-                >
-                  View Work
-                </span>
-              </div>
-            </div>
-          </div>
+      <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-4">
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="text-base font-semibold font-serif text-slate-200">Brand Colors</h3>
+          <span className="text-xs text-slate-500 bg-slate-700 rounded px-2 py-0.5 shrink-0">Moved to Visual Editor → Colors</span>
         </div>
+        <p className="text-slate-400 text-sm">
+          Color settings have moved to the <strong className="text-slate-200">Visual Editor</strong>. Open it from the tab above to edit colors with a live preview of your site.
+        </p>
       </div>
       <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6 space-y-5">
         <h3 className="text-base font-semibold font-serif text-slate-200">Typography</h3>
@@ -1930,10 +1865,12 @@ function EditorAboutPanel({ form, setForm }: { form: SiteSettings; setForm: SetF
   );
 }
 
+type ColorKey = "colorBg" | "colorText" | "colorAccent" | "colorHeader" | "colorTileBg" | "colorTileBorder";
+
 function EditorColorsPanel({ form, setForm }: { form: SiteSettings; setForm: SetForm }) {
-  const upd = (key: "colorBg" | "colorText" | "colorAccent" | "colorHeader" | "colorTileBg" | "colorTileBorder", value: string) =>
+  const upd = (key: ColorKey, value: string) =>
     setForm((f) => (f ? { ...f, [key]: value } : f));
-  const colorFields: { label: string; key: "colorBg" | "colorText" | "colorAccent" | "colorHeader" | "colorTileBg" | "colorTileBorder" }[] = [
+  const colorFields: { label: string; key: ColorKey }[] = [
     { label: "Page Background", key: "colorBg" },
     { label: "Text Color", key: "colorText" },
     { label: "Accent / Buttons", key: "colorAccent" },
@@ -1942,7 +1879,7 @@ function EditorColorsPanel({ form, setForm }: { form: SiteSettings; setForm: Set
     { label: "Gallery Tile Border", key: "colorTileBorder" },
   ];
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {colorFields.map(({ label, key }) => (
         <div key={key} className="flex items-center justify-between gap-2">
           <label className="text-slate-400 text-xs flex-1 min-w-0 truncate">{label}</label>
@@ -1961,6 +1898,60 @@ function EditorColorsPanel({ form, setForm }: { form: SiteSettings; setForm: Set
           </div>
         </div>
       ))}
+
+      {/* Live mini-preview */}
+      <div className="pt-1">
+        <p className="text-slate-500 text-xs mb-2">Preview</p>
+        <div className="rounded-lg overflow-hidden border border-slate-700 text-xs select-none">
+          <div
+            className="flex items-center justify-between px-3 py-2"
+            style={{ backgroundColor: form.colorHeader }}
+          >
+            <div className="flex items-center gap-1.5">
+              <div className="w-4 h-4 rounded" style={{ backgroundColor: form.colorAccent }} />
+              <span className="font-semibold" style={{ color: form.colorText }}>
+                {form.companyName || "Your Business"}
+              </span>
+            </div>
+            <div className="flex gap-2">
+              {["Home", "Gallery", "Contact"].map((item) => (
+                <span key={item} className="opacity-70" style={{ color: form.colorText }}>{item}</span>
+              ))}
+            </div>
+          </div>
+          <div className="px-4 py-4 space-y-2.5" style={{ backgroundColor: form.colorBg }}>
+            <div className="space-y-0.5">
+              <p className="font-bold text-sm leading-tight" style={{ color: form.colorText }}>Quality Work.</p>
+              <p className="opacity-60" style={{ color: form.colorText }}>Professional services tailored to your needs.</p>
+            </div>
+            <div className="flex gap-1.5 pt-0.5">
+              <span
+                className="px-2.5 py-1 rounded font-semibold"
+                style={{ backgroundColor: form.colorAccent, color: "#ffffff" }}
+              >
+                Get a Quote
+              </span>
+              <span
+                className="px-2.5 py-1 rounded font-semibold border"
+                style={{ borderColor: form.colorAccent, color: form.colorAccent }}
+              >
+                View Work
+              </span>
+            </div>
+            <div
+              className="flex gap-2 pt-1"
+            >
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="flex-1 h-10 rounded border"
+                  style={{ backgroundColor: form.colorTileBg, borderColor: form.colorTileBorder }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
