@@ -1922,7 +1922,7 @@ type ColorKey = keyof Pick<SiteSettings,
   "colorHeroBg" | "colorHeroText" |
   "colorServicesBg" | "colorServicesText" | "colorServicesCardBg" |
   "colorAboutBg" | "colorAboutText" |
-  "colorContactBg" | "colorContactText" | "colorContactCardBg" |
+  "colorContactBg" | "colorContactText" | "colorContactCardBg" | "colorContactIconBg" | "colorContactIconColor" |
   "colorGalleryBg" | "colorGalleryText" | "colorTileBg" | "colorTileBorder"
 >;
 
@@ -2001,6 +2001,8 @@ function EditorColorsPanel({ form, setForm }: { form: SiteSettings; setForm: Set
             <ColorRow label="Background" value={form.colorContactBg} onChange={(v) => upd("colorContactBg", v)} />
             <ColorRow label="Text" value={form.colorContactText} onChange={(v) => upd("colorContactText", v)} />
             <ColorRow label="Card Background" value={form.colorContactCardBg} onChange={(v) => upd("colorContactCardBg", v)} />
+            <ColorRow label="Icon Circle" value={form.colorContactIconBg} onChange={(v) => upd("colorContactIconBg", v)} />
+            <ColorRow label="Icon Color" value={form.colorContactIconColor} onChange={(v) => upd("colorContactIconColor", v)} />
           </ColorGroup>
         </div>
       </div>

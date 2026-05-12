@@ -44,6 +44,8 @@ export interface SiteSettings {
   colorContactBg: string;
   colorContactText: string;
   colorContactCardBg: string;
+  colorContactIconBg: string;
+  colorContactIconColor: string;
   colorGalleryBg: string;
   colorGalleryText: string;
   fontHeading: string;
@@ -105,6 +107,8 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   colorContactBg: "#ffffff",
   colorContactText: "#0f172a",
   colorContactCardBg: "#eff6ff",
+  colorContactIconBg: "#2563eb",
+  colorContactIconColor: "#ffffff",
   colorGalleryBg: "#0f172a",
   colorGalleryText: "#f1f5f9",
   fontHeading: "Playfair Display",

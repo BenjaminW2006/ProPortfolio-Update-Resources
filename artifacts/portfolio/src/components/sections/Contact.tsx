@@ -5,7 +5,7 @@ import { useSiteSettings } from "@/context/SiteSettingsContext";
 export default function Contact() {
   const settings = useSiteSettings();
   const phoneRaw = settings.phone.replace(/\D/g, "");
-  const { colorContactBg, colorContactText, colorContactCardBg, colorAccent } = settings;
+  const { colorContactBg, colorContactText, colorContactCardBg, colorAccent, colorContactIconBg, colorContactIconColor } = settings;
 
   return (
     <section
@@ -48,9 +48,9 @@ export default function Contact() {
           >
             <div
               className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
-              style={{ backgroundColor: colorAccent }}
+              style={{ backgroundColor: colorContactIconBg }}
             >
-              <Phone className="w-5 h-5 text-white" />
+              <Phone className="w-5 h-5" style={{ color: colorContactIconColor }} />
             </div>
             <div>
               <p className="text-sm mb-0.5 opacity-60" style={{ color: colorContactText }}>Phone</p>
@@ -67,9 +67,9 @@ export default function Contact() {
           >
             <div
               className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
-              style={{ backgroundColor: colorAccent }}
+              style={{ backgroundColor: colorContactIconBg }}
             >
-              <Mail className="w-5 h-5 text-white" />
+              <Mail className="w-5 h-5" style={{ color: colorContactIconColor }} />
             </div>
             <div>
               <p className="text-sm mb-0.5 opacity-60" style={{ color: colorContactText }}>Email</p>
@@ -85,9 +85,9 @@ export default function Contact() {
           >
             <div
               className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
-              style={{ backgroundColor: colorAccent }}
+              style={{ backgroundColor: colorContactIconBg }}
             >
-              <MapPin className="w-5 h-5 text-white" />
+              <MapPin className="w-5 h-5" style={{ color: colorContactIconColor }} />
             </div>
             <div>
               <p className="text-sm mb-0.5 opacity-60" style={{ color: colorContactText }}>Service Area</p>

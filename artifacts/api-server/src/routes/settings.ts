@@ -55,6 +55,8 @@ const SiteSettingsSchema = z.object({
   colorContactBg: hexColor.default("#ffffff"),
   colorContactText: hexColor.default("#0f172a"),
   colorContactCardBg: hexColor.default("#eff6ff"),
+  colorContactIconBg: hexColor.default("#2563eb"),
+  colorContactIconColor: hexColor.default("#ffffff"),
   colorGalleryBg: hexColor.default("#0f172a"),
   colorGalleryText: hexColor.default("#f1f5f9"),
   fontHeading: z.string().default("Playfair Display"),
