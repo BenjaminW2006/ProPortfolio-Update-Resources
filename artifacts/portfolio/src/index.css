@@ -11,6 +11,20 @@
   --site-header: #0f172a;
   --site-tile-bg: #0f172a;
   --site-tile-border: #2563eb;
+  --site-hero-bg: #0f172a;
+  --site-hero-text: #f1f5f9;
+  --site-services-bg: #f8fafc;
+  --site-services-text: #0f172a;
+  --site-services-card-bg: #ffffff;
+  --site-about-bg: #ffffff;
+  --site-about-text: #0f172a;
+  --site-contact-bg: #ffffff;
+  --site-contact-text: #0f172a;
+  --site-contact-card-bg: #eff6ff;
+  --site-contact-icon-bg: #2563eb;
+  --site-contact-icon-color: #ffffff;
+  --site-gallery-bg: #0f172a;
+  --site-gallery-text: #f1f5f9;
   --font-heading: 'Playfair Display', serif;
   --font-body: 'Inter', sans-serif;
 }

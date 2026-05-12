@@ -152,7 +152,7 @@ export default function GalleryPage({ category }: { category?: string }) {
   const isLoading = projectsLoading;
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: colorGalleryBg, color: colorGalleryText }}>
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: "var(--site-gallery-bg)", color: "var(--site-gallery-text)" }}>
       <Navbar />
 
       <main className="flex-1 pt-28 pb-24">

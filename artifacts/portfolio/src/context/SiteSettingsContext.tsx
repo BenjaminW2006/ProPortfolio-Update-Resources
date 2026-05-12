@@ -208,7 +208,30 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     root.style.setProperty("--site-header", settings.colorHeader);
     root.style.setProperty("--site-tile-bg", settings.colorTileBg);
     root.style.setProperty("--site-tile-border", settings.colorTileBorder);
-  }, [settings.colorBg, settings.colorText, settings.colorAccent, settings.colorHeader, settings.colorTileBg, settings.colorTileBorder]);
+    root.style.setProperty("--site-hero-bg", settings.colorHeroBg);
+    root.style.setProperty("--site-hero-text", settings.colorHeroText);
+    root.style.setProperty("--site-services-bg", settings.colorServicesBg);
+    root.style.setProperty("--site-services-text", settings.colorServicesText);
+    root.style.setProperty("--site-services-card-bg", settings.colorServicesCardBg);
+    root.style.setProperty("--site-about-bg", settings.colorAboutBg);
+    root.style.setProperty("--site-about-text", settings.colorAboutText);
+    root.style.setProperty("--site-contact-bg", settings.colorContactBg);
+    root.style.setProperty("--site-contact-text", settings.colorContactText);
+    root.style.setProperty("--site-contact-card-bg", settings.colorContactCardBg);
+    root.style.setProperty("--site-contact-icon-bg", settings.colorContactIconBg);
+    root.style.setProperty("--site-contact-icon-color", settings.colorContactIconColor);
+    root.style.setProperty("--site-gallery-bg", settings.colorGalleryBg);
+    root.style.setProperty("--site-gallery-text", settings.colorGalleryText);
+  }, [
+    settings.colorBg, settings.colorText, settings.colorAccent, settings.colorHeader,
+    settings.colorTileBg, settings.colorTileBorder,
+    settings.colorHeroBg, settings.colorHeroText,
+    settings.colorServicesBg, settings.colorServicesText, settings.colorServicesCardBg,
+    settings.colorAboutBg, settings.colorAboutText,
+    settings.colorContactBg, settings.colorContactText, settings.colorContactCardBg,
+    settings.colorContactIconBg, settings.colorContactIconColor,
+    settings.colorGalleryBg, settings.colorGalleryText,
+  ]);
 
   useEffect(() => {
     const load = (family: string) => {

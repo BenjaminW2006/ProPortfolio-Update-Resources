@@ -1769,7 +1769,7 @@ function EdToggle({ label, value, onChange }: { label: string; value: boolean; o
   );
 }
 
-function EditorNavbarPanel({ form, setForm, iframePath }: { form: SiteSettings; setForm: SetForm; iframePath: string }) {
+function EditorNavbarPanel({ form, setForm, iframePath = "/" }: { form: SiteSettings; setForm: SetForm; iframePath?: string }) {
   const upd = (fn: (f: SiteSettings) => SiteSettings) => setForm((f) => (f ? fn(f) : f));
 
   // The background visible behind the navbar changes per page
