@@ -1885,6 +1885,38 @@ function EditorAboutPanel({ form, setForm }: { form: SiteSettings; setForm: SetF
   );
 }
 
+function EditorGalleryPanel({ form, setForm }: { form: SiteSettings; setForm: SetForm }) {
+  const updGallery = (idx: number, field: "label" | "description", value: string) =>
+    setForm((f) => {
+      if (!f) return f;
+      const galleries = f.galleries.map((g, i) => i === idx ? { ...g, [field]: value } : g);
+      return { ...f, galleries };
+    });
+
+  return (
+    <div className="space-y-5">
+      <div className="space-y-3">
+        <p className="text-slate-500 text-[10px] font-semibold uppercase tracking-widest">Page Header</p>
+        {edField("Page Title", form.galleryPageTitle, (v) => setForm((f) => f ? { ...f, galleryPageTitle: v } : f))}
+        {edField("Page Subtitle", form.galleryPageSubtitle, (v) => setForm((f) => f ? { ...f, galleryPageSubtitle: v } : f))}
+      </div>
+
+      {form.galleries.length > 0 && (
+        <div className="space-y-4 border-t border-slate-800 pt-4">
+          <p className="text-slate-500 text-[10px] font-semibold uppercase tracking-widest">Gallery Tiles</p>
+          {form.galleries.map((g, idx) => (
+            <div key={g.key} className="space-y-2 bg-slate-800/50 rounded-lg p-3">
+              <p className="text-slate-400 text-[10px] font-semibold uppercase tracking-wider">{g.key}</p>
+              {edField("Tile Label", g.label, (v) => updGallery(idx, "label", v))}
+              {edField("Description", g.description, (v) => updGallery(idx, "description", v))}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 type ColorKey = keyof Pick<SiteSettings,
   "colorBg" | "colorText" | "colorAccent" | "colorHeader" |
   "colorHeroBg" | "colorHeroText" |
@@ -2092,6 +2124,7 @@ function EditorView({ onExit }: { onExit: () => void }) {
     { id: "hero", label: "Hero" },
     { id: "services", label: "Services" },
     { id: "about", label: "About" },
+    { id: "gallery", label: "Gallery" },
     { id: "colors", label: "Colors" },
     { id: "typography", label: "Fonts" },
   ];
@@ -2182,6 +2215,7 @@ function EditorView({ onExit }: { onExit: () => void }) {
           {activePanel === "hero" && <EditorHeroPanel form={form} setForm={setForm} />}
           {activePanel === "services" && <EditorServicesPanel form={form} setForm={setForm} />}
           {activePanel === "about" && <EditorAboutPanel form={form} setForm={setForm} />}
+          {activePanel === "gallery" && <EditorGalleryPanel form={form} setForm={setForm} />}
           {activePanel === "colors" && <EditorColorsPanel form={form} setForm={setForm} />}
           {activePanel === "typography" && <EditorTypographyPanel form={form} setForm={setForm} />}
         </div>

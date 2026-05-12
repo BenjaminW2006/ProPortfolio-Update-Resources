@@ -51,6 +51,8 @@ export interface SiteSettings {
   heroCta1Text: string;
   heroCta2Text: string;
   sectionOrder: string[];
+  galleryPageTitle: string;
+  galleryPageSubtitle: string;
   showHero: boolean;
   showGalleries: boolean;
   showServices: boolean;
@@ -109,6 +111,8 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   fontBody: "Inter",
   heroCta1Text: "Get a Quote",
   heroCta2Text: "View Our Work",
+  galleryPageTitle: "Our Work",
+  galleryPageSubtitle: "Browse our completed project galleries.",
   sectionOrder: ["hero", "services", "about"],
   showHero: true,
   showGalleries: true,

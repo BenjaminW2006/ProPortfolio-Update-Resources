@@ -61,6 +61,8 @@ const SiteSettingsSchema = z.object({
   fontBody: z.string().default("Inter"),
   heroCta1Text: z.string().default("Get a Quote"),
   heroCta2Text: z.string().default("View Our Work"),
+  galleryPageTitle: z.string().default("Our Work"),
+  galleryPageSubtitle: z.string().default("Browse our completed project galleries."),
   sectionOrder: z.array(z.string()).default(["hero", "services", "about"]),
   showHero: z.boolean().default(true),
   showGalleries: z.boolean().default(true),

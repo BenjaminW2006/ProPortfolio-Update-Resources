@@ -129,7 +129,7 @@ function GalleryIndex({
 }
 
 export default function GalleryPage({ category }: { category?: string }) {
-  const { galleries = [], companyName } = useSiteSettings();
+  const { galleries = [], colorGalleryBg, colorGalleryText, galleryPageTitle, galleryPageSubtitle } = useSiteSettings();
 
   const { data: allProjects = [], isLoading: projectsLoading } = useQuery<Project[]>({
     queryKey: ["projects"],
@@ -146,14 +146,10 @@ export default function GalleryPage({ category }: { category?: string }) {
     ? allProjects.filter((p) => p.category === category)
     : allProjects;
 
-  const heading = gallery ? gallery.label : "Our Work";
-  const sub = gallery
-    ? gallery.description
-    : `Browse our completed project galleries.`;
+  const heading = gallery ? gallery.label : galleryPageTitle;
+  const sub = gallery ? gallery.description : galleryPageSubtitle;
 
   const isLoading = projectsLoading;
-
-  const { colorGalleryBg, colorGalleryText } = useSiteSettings();
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: colorGalleryBg, color: colorGalleryText }}>
@@ -172,10 +168,8 @@ export default function GalleryPage({ category }: { category?: string }) {
 
           <div className="mb-10">
             <h1 className="text-4xl md:text-5xl font-bold font-serif">{heading}</h1>
-            {!category && (
-              <p className="text-slate-400 mt-3 text-lg">
-                {`Browse completed projects from ${companyName}.`}
-              </p>
+            {!category && sub && (
+              <p className="text-slate-400 mt-3 text-lg">{sub}</p>
             )}
             {gallery?.description && (
               <p className="text-slate-400 mt-3 text-lg">{gallery.description}</p>
