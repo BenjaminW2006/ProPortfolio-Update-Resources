@@ -51,7 +51,7 @@ export default function Navbar() {
   return (
     <div className={`fixed top-0 left-0 right-0 z-50 flex justify-center pt-4 px-4 ${isEditorMode ? "group/nav" : ""}`}>
       <div
-        className={`w-full max-w-2xl rounded-2xl backdrop-blur-md transition-all duration-300 ${
+        className={`relative w-full max-w-2xl rounded-2xl backdrop-blur-md transition-all duration-300 ${
           isScrolled ? "shadow-xl shadow-black/30" : "shadow-lg shadow-black/20"
         } ${
           isEditorMode
@@ -64,6 +64,19 @@ export default function Navbar() {
             : "color-mix(in srgb, var(--site-header) 88%, transparent)",
         }}
       >
+        {/* Editor-mode overlay button — floats over the pill, links show through */}
+        {/* The pill needs relative positioning so absolute inset-0 works */}
+        {isEditorMode && (
+          <button
+            onClick={focusNavbar}
+            className="absolute inset-0 z-[101] flex items-center justify-end pr-3 opacity-0 group-hover/nav:opacity-100 transition-opacity duration-150"
+          >
+            <span className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-2.5 py-1 rounded-md shadow-lg">
+              <Pencil className="w-3 h-3" />
+              Edit Navbar
+            </span>
+          </button>
+        )}
         <div className="flex items-center justify-between px-4 py-2.5">
           <Link href="/" className="min-w-0">
             <span className="flex items-center gap-2 text-white font-semibold tracking-wide cursor-pointer hover:opacity-90 transition-opacity min-w-0">
@@ -81,44 +94,24 @@ export default function Navbar() {
             </span>
           </Link>
 
-          {/* Desktop links — always visible; edit button appended in editor mode */}
+          {/* Desktop links */}
           <div className="hidden sm:flex items-center gap-1 shrink-0">
             {navLinks.map((link) => (
               <Link key={link.href} href={link.href}>
                 <span className={linkClass(link.href)}>{link.label}</span>
               </Link>
             ))}
-            {isEditorMode && (
-              <button
-                onClick={focusNavbar}
-                className="opacity-0 group-hover/nav:opacity-100 transition-opacity duration-150 ml-1 flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-2.5 py-1 rounded-md shadow-lg"
-              >
-                <Pencil className="w-3 h-3" />
-                Edit Navbar
-              </button>
-            )}
           </div>
 
-          {/* Mobile hamburger — unchanged; edit button overlaid in editor mode */}
-          <div className="sm:hidden flex items-center gap-1.5 shrink-0">
-            {isEditorMode && (
-              <button
-                onClick={focusNavbar}
-                className="opacity-0 group-hover/nav:opacity-100 transition-opacity duration-150 flex items-center gap-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-2 py-1 rounded-md shadow-lg"
-              >
-                <Pencil className="w-3 h-3" />
-                Edit
-              </button>
-            )}
-            <button
-              className="flex items-center justify-center w-8 h-8 rounded-md text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
-              onClick={() => setMenuOpen((prev) => !prev)}
-              aria-label={menuOpen ? "Close menu" : "Open menu"}
-              aria-expanded={menuOpen}
-            >
-              {menuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-            </button>
-          </div>
+          {/* Mobile hamburger */}
+          <button
+            className="sm:hidden shrink-0 flex items-center justify-center w-8 h-8 rounded-md text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
+            onClick={() => setMenuOpen((prev) => !prev)}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+          >
+            {menuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+          </button>
         </div>
 
         {/* Mobile dropdown */}
