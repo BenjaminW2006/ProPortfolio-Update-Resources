@@ -1769,8 +1769,17 @@ function EdToggle({ label, value, onChange }: { label: string; value: boolean; o
   );
 }
 
-function EditorNavbarPanel({ form, setForm }: { form: SiteSettings; setForm: SetForm }) {
+function EditorNavbarPanel({ form, setForm, iframePath }: { form: SiteSettings; setForm: SetForm; iframePath: string }) {
   const upd = (fn: (f: SiteSettings) => SiteSettings) => setForm((f) => (f ? fn(f) : f));
+
+  // The background visible behind the navbar changes per page
+  const pageBgConfig: { label: string; key: keyof SiteSettings } =
+    iframePath.startsWith("/gallery")
+      ? { label: "Page Background (Gallery)", key: "colorGalleryBg" }
+      : iframePath.startsWith("/contact")
+      ? { label: "Page Background (Contact)", key: "colorContactBg" }
+      : { label: "Page Background (Home)", key: "colorHeroBg" };
+
   return (
     <div className="space-y-5 divide-y divide-slate-800">
       {/* Logo */}
@@ -1783,9 +1792,9 @@ function EditorNavbarPanel({ form, setForm }: { form: SiteSettings; setForm: Set
       <div className="pt-4 space-y-3">
         <p className="text-slate-500 text-[10px] font-semibold uppercase tracking-widest">Colors</p>
         <ColorRow
-          label="Header Background"
-          value={form.colorHeroBg}
-          onChange={(v) => upd((f) => ({ ...f, colorHeroBg: v }))}
+          label={pageBgConfig.label}
+          value={form[pageBgConfig.key] as string}
+          onChange={(v) => upd((f) => ({ ...f, [pageBgConfig.key]: v }))}
         />
         <ColorRow
           label="Navbar Pill"
@@ -2218,7 +2227,7 @@ function EditorView({ onExit }: { onExit: () => void }) {
 
         {/* Panel content */}
         <div className="flex-1 overflow-y-auto p-4">
-          {activePanel === "navbar" && <EditorNavbarPanel form={form} setForm={setForm} />}
+          {activePanel === "navbar" && <EditorNavbarPanel form={form} setForm={setForm} iframePath={iframePath} />}
           {activePanel === "hero" && <EditorHeroPanel form={form} setForm={setForm} />}
           {activePanel === "services" && <EditorServicesPanel form={form} setForm={setForm} />}
           {activePanel === "about" && <EditorAboutPanel form={form} setForm={setForm} />}
