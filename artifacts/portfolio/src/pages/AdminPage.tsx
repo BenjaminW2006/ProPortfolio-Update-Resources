@@ -810,106 +810,11 @@ function ProjectManageView({ projectId, onBack }: { projectId: number; onBack: (
   );
 }
 
-function TileCoverUpload({ slot, label }: { slot: string; label: string }) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [uploading, setUploading] = useState(false);
-  const [progress, setProgress] = useState(0);
-
-  const { data: images = [] } = useQuery<ImageSlot[]>({
-    queryKey: ["tile-images"],
-    queryFn: async () => {
-      const res = await apiCall("/api/images");
-      if (!res.ok) return [];
-      return res.json();
-    },
-    staleTime: 0,
-  });
-
-  const current = images.find((img) => img.slot === slot) ?? null;
-
-  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      toast({ title: "Invalid file", description: "Please select an image.", variant: "destructive" });
-      return;
-    }
-    setUploading(true);
-    setProgress(0);
-    try {
-      const objectPath = await uploadFile(file, setProgress);
-      const res = await apiMutation(`/api/images/${slot}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ objectPath }),
-      });
-      if (!res.ok) throw new Error("Failed to save tile cover");
-      queryClient.invalidateQueries({ queryKey: ["tile-images"] });
-      toast({ title: `${label} tile cover updated!` });
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Upload failed";
-      toast({ title: "Upload failed", description: msg, variant: "destructive" });
-    } finally {
-      setUploading(false);
-      setProgress(0);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    }
-  };
-
-  const removeCover = async () => {
-    try {
-      await apiMutation(`/api/images/${slot}`, { method: "DELETE" });
-      queryClient.invalidateQueries({ queryKey: ["tile-images"] });
-      toast({ title: `${label} tile cover removed` });
-    } catch {
-      toast({ title: "Error", description: "Failed to remove cover.", variant: "destructive" });
-    }
-  };
-
+function GalleryTilePreview({ label }: { label: string }) {
   return (
-    <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
-      <div className="relative aspect-[4/3] bg-slate-900">
-        {current ? (
-          <img src={getImageUrl(current.objectPath)} alt={label} className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center text-slate-600 gap-2">
-            <ImageIcon className="w-10 h-10" />
-            <span className="text-xs">No cover set</span>
-          </div>
-        )}
-      </div>
-      <div className="p-4">
-        <p className="text-white font-semibold font-serif mb-3">{label} Gallery Cover</p>
-        <div className="flex gap-2 flex-wrap">
-          <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
-          <Button
-            variant="outline"
-            size="sm"
-            className="border-slate-600 text-slate-200 hover:bg-slate-700 hover:text-white"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploading}
-          >
-            {uploading ? (
-              <><Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />{progress}%</>
-            ) : (
-              <><Upload className="w-3.5 h-3.5 mr-2" />{current ? "Replace" : "Upload"}</>
-            )}
-          </Button>
-          {current && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-red-900/50 text-red-400 hover:bg-red-900/20 hover:text-red-300"
-              onClick={removeCover}
-            >
-              <Trash2 className="w-3.5 h-3.5 mr-2" />
-              Remove
-            </Button>
-          )}
-        </div>
-      </div>
+    <div className="bg-site-header rounded-2xl aspect-[4/3] flex flex-col items-center justify-center gap-2 px-4">
+      <p className="text-white font-bold font-serif text-xl text-center">{label}</p>
+      <p className="text-site-accent text-xs">View gallery →</p>
     </div>
   );
 }
@@ -1142,7 +1047,7 @@ function ProjectListView({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl">
             {galleryTiles.map((g) => (
               <div key={g.key} className="relative group">
-                <TileCoverUpload slot={`tile-${g.key}`} label={g.label} />
+                <GalleryTilePreview label={g.label} />
                 {confirmDeleteKey === g.key ? (
                   <div className="absolute top-2 right-2 flex items-center gap-1.5 bg-slate-900/90 border border-red-800/60 rounded-lg px-2.5 py-1.5 backdrop-blur-sm">
                     <span className="text-red-300 text-xs">Remove gallery?</span>

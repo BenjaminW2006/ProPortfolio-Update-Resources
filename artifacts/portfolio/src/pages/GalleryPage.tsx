@@ -17,10 +17,6 @@ interface Project {
   createdAt: string;
 }
 
-interface ImageSlot {
-  slot: string;
-  objectPath: string;
-}
 
 function getImageUrl(objectPath: string): string {
   return `/api/storage${objectPath}`;
@@ -90,24 +86,9 @@ function ProjectGrid({ projects }: { projects: Project[] }) {
 
 function GalleryIndex({
   galleries,
-  projects,
-  imageSlots,
 }: {
   galleries: Array<{ key: string; label: string; description: string }>;
-  projects: Project[];
-  imageSlots: ImageSlot[];
 }) {
-  function getCover(key: string): string | null {
-    const slotMatch = imageSlots.find((s) => s.slot === `tile-${key}`);
-    if (slotMatch) return getImageUrl(slotMatch.objectPath);
-    const projectMatch = projects.find((p) => p.category === key && p.coverObjectPath);
-    return projectMatch?.coverObjectPath ? getImageUrl(projectMatch.coverObjectPath) : null;
-  }
-
-  function getCount(key: string): number {
-    return projects.filter((p) => p.category === key).length;
-  }
-
   if (galleries.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-32 text-slate-600 gap-4">
@@ -120,45 +101,29 @@ function GalleryIndex({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-      {galleries.map((gallery, i) => {
-        const cover = getCover(gallery.key);
-        const count = getCount(gallery.key);
-        return (
-          <motion.div
-            key={gallery.key}
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: i * 0.12 }}
-          >
-            <Link href={`/gallery/${gallery.key}`}>
-              <span
-                className="group relative block aspect-[4/3] rounded-2xl overflow-hidden cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
-                aria-label={`Open ${gallery.label} gallery`}
-              >
-                {cover ? (
-                  <img
-                    src={cover}
-                    alt={gallery.label}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                ) : (
-                  <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-800" />
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent transition-opacity duration-300 group-hover:from-black/90" />
-                <div className="absolute inset-0 flex flex-col justify-end p-8">
-                  <h2 className="text-3xl md:text-4xl font-bold font-serif text-white mb-4 group-hover:-translate-y-1 transition-transform duration-300">
-                    {gallery.label}
-                  </h2>
-                  <span className="inline-flex items-center gap-2 text-site-accent text-sm font-medium group-hover:-translate-y-1 transition-transform duration-300 delay-[20ms]">
-                    {count > 0 ? `View ${count} project${count !== 1 ? "s" : ""}` : "View gallery"}
-                    <ChevronRight className="w-4 h-4" />
-                  </span>
-                </div>
+      {galleries.map((gallery, i) => (
+        <motion.div
+          key={gallery.key}
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: i * 0.12 }}
+        >
+          <Link href={`/gallery/${gallery.key}`}>
+            <span
+              className="group relative flex flex-col items-center justify-center aspect-[4/3] rounded-2xl overflow-hidden cursor-pointer bg-site-header focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 transition-opacity duration-300 hover:opacity-90"
+              aria-label={`Open ${gallery.label} gallery`}
+            >
+              <h2 className="text-3xl md:text-4xl font-bold font-serif text-white mb-3 group-hover:-translate-y-1 transition-transform duration-300">
+                {gallery.label}
+              </h2>
+              <span className="inline-flex items-center gap-1.5 text-site-accent text-sm font-medium group-hover:-translate-y-1 transition-transform duration-300 delay-[20ms]">
+                View gallery
+                <ChevronRight className="w-4 h-4" />
               </span>
-            </Link>
-          </motion.div>
-        );
-      })}
+            </span>
+          </Link>
+        </motion.div>
+      ))}
     </div>
   );
 }
@@ -170,16 +135,6 @@ export default function GalleryPage({ category }: { category?: string }) {
     queryKey: ["projects"],
     queryFn: async () => {
       const res = await fetch("/api/projects");
-      if (!res.ok) return [];
-      return res.json();
-    },
-    staleTime: 5 * 60 * 1000,
-  });
-
-  const { data: imageSlots = [] } = useQuery<ImageSlot[]>({
-    queryKey: ["tile-images"],
-    queryFn: async () => {
-      const res = await fetch("/api/images");
       if (!res.ok) return [];
       return res.json();
     },
@@ -240,11 +195,7 @@ export default function GalleryPage({ category }: { category?: string }) {
               <ProjectGrid projects={filteredProjects} />
             )
           ) : (
-            <GalleryIndex
-              galleries={galleries}
-              projects={allProjects}
-              imageSlots={imageSlots}
-            />
+            <GalleryIndex galleries={galleries} />
           )}
         </div>
       </main>
