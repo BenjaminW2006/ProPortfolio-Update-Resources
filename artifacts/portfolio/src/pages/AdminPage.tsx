@@ -1772,15 +1772,35 @@ function EdToggle({ label, value, onChange }: { label: string; value: boolean; o
 function EditorNavbarPanel({ form, setForm }: { form: SiteSettings; setForm: SetForm }) {
   const upd = (fn: (f: SiteSettings) => SiteSettings) => setForm((f) => (f ? fn(f) : f));
   return (
-    <div className="space-y-3">
-      {edField("Company Name", form.companyName, (v) => upd((f) => ({ ...f, companyName: v })))}
-      <div>
-        {edField("Mobile Acronym", form.navAcronym ?? "", (v) => upd((f) => ({ ...f, navAcronym: v })), toAcronym(form.companyName))}
-        <p className="text-slate-600 text-xs mt-1">Leave blank to auto-generate from company name.</p>
+    <div className="space-y-5 divide-y divide-slate-800">
+      {/* Logo */}
+      <div className="space-y-3">
+        <p className="text-slate-500 text-[10px] font-semibold uppercase tracking-widest">Logo</p>
+        <LogoUpload />
       </div>
-      {edField("Phone", form.phone, (v) => upd((f) => ({ ...f, phone: v })), "(555) 000-0000")}
-      {edField("Email", form.email, (v) => upd((f) => ({ ...f, email: v })), "hello@company.com")}
-      {edField("Service Area", form.serviceArea, (v) => upd((f) => ({ ...f, serviceArea: v })), "City, State")}
+
+      {/* Colors */}
+      <div className="pt-4 space-y-3">
+        <p className="text-slate-500 text-[10px] font-semibold uppercase tracking-widest">Colors</p>
+        <ColorRow
+          label="Navbar Background"
+          value={form.colorHeader}
+          onChange={(v) => upd((f) => ({ ...f, colorHeader: v }))}
+        />
+      </div>
+
+      {/* Text */}
+      <div className="pt-4 space-y-3">
+        <p className="text-slate-500 text-[10px] font-semibold uppercase tracking-widest">Info</p>
+        {edField("Company Name", form.companyName, (v) => upd((f) => ({ ...f, companyName: v })))}
+        <div>
+          {edField("Mobile Acronym", form.navAcronym ?? "", (v) => upd((f) => ({ ...f, navAcronym: v })), toAcronym(form.companyName))}
+          <p className="text-slate-600 text-xs mt-1">Leave blank to auto-generate from company name.</p>
+        </div>
+        {edField("Phone", form.phone, (v) => upd((f) => ({ ...f, phone: v })), "(555) 000-0000")}
+        {edField("Email", form.email, (v) => upd((f) => ({ ...f, email: v })), "hello@company.com")}
+        {edField("Service Area", form.serviceArea, (v) => upd((f) => ({ ...f, serviceArea: v })), "City, State")}
+      </div>
     </div>
   );
 }
@@ -1912,7 +1932,6 @@ function EditorColorsPanel({ form, setForm }: { form: SiteSettings; setForm: Set
     <div className="space-y-5 divide-y divide-slate-800">
       <ColorGroup title="Global">
         <ColorRow label="Accent / Buttons" value={form.colorAccent} onChange={(v) => upd("colorAccent", v)} />
-        <ColorRow label="Navbar Background" value={form.colorHeader} onChange={(v) => upd("colorHeader", v)} />
       </ColorGroup>
 
       <div className="pt-4 space-y-5 divide-y divide-slate-800">
@@ -1954,31 +1973,6 @@ function EditorColorsPanel({ form, setForm }: { form: SiteSettings; setForm: Set
         </div>
       </div>
 
-      {/* Mini preview — global accent + navbar */}
-      <div className="pt-4">
-        <p className="text-slate-500 text-xs mb-2">Navbar preview</p>
-        <div className="rounded-lg overflow-hidden border border-slate-700 text-xs select-none">
-          <div className="flex items-center justify-between px-3 py-2" style={{ backgroundColor: form.colorHeader }}>
-            <div className="flex items-center gap-1.5">
-              <div className="w-4 h-4 rounded" style={{ backgroundColor: form.colorAccent }} />
-              <span className="font-semibold" style={{ color: form.colorText }}>{form.companyName || "Your Business"}</span>
-            </div>
-            <div className="flex gap-2">
-              {["Home", "Gallery", "Contact"].map((item) => (
-                <span key={item} className="opacity-70" style={{ color: form.colorText }}>{item}</span>
-              ))}
-            </div>
-          </div>
-          <div className="px-4 py-3 flex gap-1.5" style={{ backgroundColor: form.colorHeroBg }}>
-            <span className="px-2.5 py-1 rounded font-semibold text-white" style={{ backgroundColor: form.colorAccent }}>
-              Get a Quote
-            </span>
-            <span className="px-2.5 py-1 rounded font-semibold border" style={{ borderColor: form.colorAccent, color: form.colorAccent, backgroundColor: form.colorHeroBg }}>
-              View Work
-            </span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
