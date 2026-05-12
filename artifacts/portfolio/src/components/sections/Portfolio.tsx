@@ -50,10 +50,6 @@ export default function Portfolio() {
     return projectMatch?.coverObjectPath ? getImageUrl(projectMatch.coverObjectPath) : null;
   }
 
-  function getCount(key: string): number {
-    return projects.filter((p) => p.category === key).length;
-  }
-
   return (
     <section id="portfolio" className="py-24 bg-site text-site">
       <div className="container mx-auto px-4 md:px-6">
@@ -61,7 +57,6 @@ export default function Portfolio() {
           {galleries.map((gallery, i) => {
             const slot = `tile-${gallery.key}`;
             const cover = getCover(gallery.key, slot);
-            const count = getCount(gallery.key);
 
             return (
               <motion.div
@@ -92,7 +87,7 @@ export default function Portfolio() {
                         {gallery.label}
                       </h2>
                       <span className="inline-flex items-center gap-2 text-site-accent text-sm font-medium group-hover:-translate-y-1 transition-transform duration-300 delay-[20ms]">
-                        {count > 0 ? `View ${count} project${count !== 1 ? "s" : ""}` : "View gallery"}
+                        View gallery
                         <ChevronRight className="w-4 h-4" />
                       </span>
                     </div>
