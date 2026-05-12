@@ -110,7 +110,7 @@ function GalleryIndex({
         >
           <Link href={`/gallery/${gallery.key}`}>
             <span
-              className="group relative flex flex-col items-center justify-center aspect-[4/3] rounded-2xl overflow-hidden cursor-pointer bg-site-header focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 transition-opacity duration-300 hover:opacity-90"
+              className="group relative flex flex-col items-center justify-center aspect-[4/3] rounded-2xl overflow-hidden cursor-pointer bg-site-tile border-4 border-site-tile focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 transition-opacity duration-300 hover:opacity-90"
               aria-label={`Open ${gallery.label} gallery`}
             >
               <h2 className="text-3xl md:text-4xl font-bold font-serif text-white mb-3 group-hover:-translate-y-1 transition-transform duration-300">

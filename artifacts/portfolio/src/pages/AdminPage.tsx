@@ -812,7 +812,7 @@ function ProjectManageView({ projectId, onBack }: { projectId: number; onBack: (
 
 function GalleryTilePreview({ label }: { label: string }) {
   return (
-    <div className="bg-site-header rounded-2xl aspect-[4/3] flex flex-col items-center justify-center gap-2 px-4">
+    <div className="bg-site-tile border-4 border-site-tile rounded-2xl aspect-[4/3] flex flex-col items-center justify-center gap-2 px-4">
       <p className="text-white font-bold font-serif text-xl text-center">{label}</p>
       <p className="text-site-accent text-xs">View gallery →</p>
     </div>
@@ -1192,7 +1192,9 @@ function SettingsView() {
     root.style.setProperty("--site-text", form.colorText);
     root.style.setProperty("--site-accent", form.colorAccent);
     root.style.setProperty("--site-header", form.colorHeader);
-  }, [form?.colorBg, form?.colorText, form?.colorAccent, form?.colorHeader]);
+    root.style.setProperty("--site-tile-bg", form.colorTileBg);
+    root.style.setProperty("--site-tile-border", form.colorTileBorder);
+  }, [form?.colorBg, form?.colorText, form?.colorAccent, form?.colorHeader, form?.colorTileBg, form?.colorTileBorder]);
 
   if (isLoading || !form) {
     return (
@@ -1376,7 +1378,9 @@ function SettingsView() {
             { label: "Text", key: "colorText" },
             { label: "Accent / Buttons", key: "colorAccent" },
             { label: "Header / Navbar", key: "colorHeader" },
-          ] as { label: string; key: "colorBg" | "colorText" | "colorAccent" | "colorHeader" }[]
+            { label: "Gallery Tile Background", key: "colorTileBg" },
+            { label: "Gallery Tile Border", key: "colorTileBorder" },
+          ] as { label: string; key: "colorBg" | "colorText" | "colorAccent" | "colorHeader" | "colorTileBg" | "colorTileBorder" }[]
         ).map(({ label, key }) => (
           <div key={key} className="flex items-center justify-between gap-4">
             <label className="text-slate-400 text-sm shrink-0">{label}</label>

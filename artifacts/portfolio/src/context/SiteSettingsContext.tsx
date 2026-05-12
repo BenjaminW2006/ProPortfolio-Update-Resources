@@ -32,6 +32,8 @@ export interface SiteSettings {
   colorText: string;
   colorAccent: string;
   colorHeader: string;
+  colorTileBg: string;
+  colorTileBorder: string;
   showHero: boolean;
   showGalleries: boolean;
   showServices: boolean;
@@ -72,6 +74,8 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   colorText: "#f1f5f9",
   colorAccent: "#2563eb",
   colorHeader: "#0f172a",
+  colorTileBg: "#0f172a",
+  colorTileBorder: "#2563eb",
   showHero: true,
   showGalleries: true,
   showServices: true,
@@ -128,7 +132,9 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     root.style.setProperty("--site-text", settings.colorText);
     root.style.setProperty("--site-accent", settings.colorAccent);
     root.style.setProperty("--site-header", settings.colorHeader);
-  }, [settings.colorBg, settings.colorText, settings.colorAccent, settings.colorHeader]);
+    root.style.setProperty("--site-tile-bg", settings.colorTileBg);
+    root.style.setProperty("--site-tile-border", settings.colorTileBorder);
+  }, [settings.colorBg, settings.colorText, settings.colorAccent, settings.colorHeader, settings.colorTileBg, settings.colorTileBorder]);
 
   useEffect(() => {
     if (settings.companyName) {

@@ -9,6 +9,8 @@
   --site-text: #f1f5f9;
   --site-accent: #2563eb;
   --site-header: #0f172a;
+  --site-tile-bg: #0f172a;
+  --site-tile-border: #2563eb;
 }
 
 .bg-site { background-color: var(--site-bg) !important; }
@@ -16,6 +18,8 @@
 .text-site-accent { color: var(--site-accent) !important; }
 .bg-site-accent { background-color: var(--site-accent) !important; }
 .border-site-accent { border-color: var(--site-accent) !important; }
+.bg-site-tile { background-color: var(--site-tile-bg) !important; }
+.border-site-tile { border-color: var(--site-tile-border) !important; }
 
 /* Service card icon – accent-tinted bg, accent-colored icon; inverts on group hover */
 .service-icon {

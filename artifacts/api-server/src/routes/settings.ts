@@ -43,6 +43,8 @@ const SiteSettingsSchema = z.object({
   colorText: hexColor.default("#f1f5f9"),
   colorAccent: hexColor.default("#2563eb"),
   colorHeader: hexColor.default("#0f172a"),
+  colorTileBg: hexColor.default("#0f172a"),
+  colorTileBorder: hexColor.default("#2563eb"),
   showHero: z.boolean().default(true),
   showGalleries: z.boolean().default(true),
   showServices: z.boolean().default(true),
@@ -70,6 +72,8 @@ const DEFAULT_SETTINGS: SiteSettings = {
   colorText: "#f1f5f9",
   colorAccent: "#2563eb",
   colorHeader: "#0f172a",
+  colorTileBg: "#0f172a",
+  colorTileBorder: "#2563eb",
   galleries: [
     { key: "interior", label: "Interior", description: "Indoor projects and finished spaces" },
     { key: "exterior", label: "Exterior", description: "Outdoor work and curb appeal projects" },
