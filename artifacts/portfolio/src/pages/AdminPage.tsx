@@ -2245,7 +2245,19 @@ export default function AdminPage() {
   const { isLoaded, isSignedIn } = useAuth();
   const { signOut } = useClerk();
   const [, setLocation] = useLocation();
-  const [view, setView] = useState<View>({ type: "list" });
+  const [view, setViewRaw] = useState<View>(() => {
+    try {
+      const saved = sessionStorage.getItem("admin-view");
+      if (saved === "editor") return { type: "editor" };
+      if (saved === "settings") return { type: "settings" };
+    } catch {}
+    return { type: "list" };
+  });
+
+  const setView = (next: View) => {
+    try { sessionStorage.setItem("admin-view", next.type); } catch {}
+    setViewRaw(next);
+  };
   const { companyName } = useSiteSettings();
   const queryClient = useQueryClient();
 
