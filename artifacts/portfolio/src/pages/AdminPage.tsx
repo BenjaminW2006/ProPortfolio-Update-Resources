@@ -1783,7 +1783,12 @@ function EditorNavbarPanel({ form, setForm }: { form: SiteSettings; setForm: Set
       <div className="pt-4 space-y-3">
         <p className="text-slate-500 text-[10px] font-semibold uppercase tracking-widest">Colors</p>
         <ColorRow
-          label="Navbar Background"
+          label="Header Background"
+          value={form.colorHeroBg}
+          onChange={(v) => upd((f) => ({ ...f, colorHeroBg: v }))}
+        />
+        <ColorRow
+          label="Navbar Pill"
           value={form.colorHeader}
           onChange={(v) => upd((f) => ({ ...f, colorHeader: v }))}
         />
