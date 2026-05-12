@@ -1805,18 +1805,6 @@ function EditorNavbarPanel({ form, setForm, iframePath = "/" }: { form: SiteSett
         />
       </div>
 
-      {/* Text */}
-      <div className="pt-4 space-y-3">
-        <p className="text-slate-500 text-[10px] font-semibold uppercase tracking-widest">Info</p>
-        {edField("Company Name", form.companyName, (v) => upd((f) => ({ ...f, companyName: v })))}
-        <div>
-          {edField("Mobile Acronym", form.navAcronym ?? "", (v) => upd((f) => ({ ...f, navAcronym: v })), toAcronym(form.companyName))}
-          <p className="text-slate-600 text-xs mt-1">Leave blank to auto-generate from company name.</p>
-        </div>
-        {edField("Phone", form.phone, (v) => upd((f) => ({ ...f, phone: v })), "(555) 000-0000")}
-        {edField("Email", form.email, (v) => upd((f) => ({ ...f, email: v })), "hello@company.com")}
-        {edField("Service Area", form.serviceArea, (v) => upd((f) => ({ ...f, serviceArea: v })), "City, State")}
-      </div>
     </div>
   );
 }
