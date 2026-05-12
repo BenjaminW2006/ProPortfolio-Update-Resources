@@ -34,6 +34,18 @@ export interface SiteSettings {
   colorHeader: string;
   colorTileBg: string;
   colorTileBorder: string;
+  colorHeroBg: string;
+  colorHeroText: string;
+  colorServicesBg: string;
+  colorServicesText: string;
+  colorServicesCardBg: string;
+  colorAboutBg: string;
+  colorAboutText: string;
+  colorContactBg: string;
+  colorContactText: string;
+  colorContactCardBg: string;
+  colorGalleryBg: string;
+  colorGalleryText: string;
   fontHeading: string;
   fontBody: string;
   heroCta1Text: string;
@@ -81,6 +93,18 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   colorHeader: "#0f172a",
   colorTileBg: "#0f172a",
   colorTileBorder: "#2563eb",
+  colorHeroBg: "#0f172a",
+  colorHeroText: "#f1f5f9",
+  colorServicesBg: "#f8fafc",
+  colorServicesText: "#0f172a",
+  colorServicesCardBg: "#ffffff",
+  colorAboutBg: "#ffffff",
+  colorAboutText: "#0f172a",
+  colorContactBg: "#ffffff",
+  colorContactText: "#0f172a",
+  colorContactCardBg: "#eff6ff",
+  colorGalleryBg: "#0f172a",
+  colorGalleryText: "#f1f5f9",
   fontHeading: "Playfair Display",
   fontBody: "Inter",
   heroCta1Text: "Get a Quote",

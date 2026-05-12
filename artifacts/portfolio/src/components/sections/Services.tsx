@@ -3,11 +3,15 @@ import { useSiteSettings } from "@/context/SiteSettingsContext";
 import { EditorSection } from "@/components/editor/EditorSection";
 
 export default function Services() {
-  const { services, servicesHeading, servicesSubtitle } = useSiteSettings();
+  const { services, servicesHeading, servicesSubtitle, colorServicesBg, colorServicesText, colorServicesCardBg } = useSiteSettings();
 
   return (
     <EditorSection section="services">
-      <section id="services" className="py-24 bg-slate-50">
+      <section
+        id="services"
+        className="py-24"
+        style={{ backgroundColor: colorServicesBg, color: colorServicesText }}
+      >
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <motion.h2
@@ -15,7 +19,8 @@ export default function Services() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
-              className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 font-serif"
+              className="text-3xl md:text-4xl font-bold mb-4 font-serif"
+              style={{ color: colorServicesText }}
             >
               {servicesHeading}
             </motion.h2>
@@ -24,7 +29,8 @@ export default function Services() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-lg text-slate-600"
+              className="text-lg opacity-70"
+              style={{ color: colorServicesText }}
             >
               {servicesSubtitle}
             </motion.p>
@@ -38,10 +44,14 @@ export default function Services() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: (index % 4) * 0.1 }}
-                className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow group w-full sm:w-72"
+                className="p-8 rounded-2xl shadow-sm border hover:shadow-md transition-shadow group w-full sm:w-72"
+                style={{
+                  backgroundColor: colorServicesCardBg,
+                  borderColor: `${colorServicesText}18`,
+                }}
               >
-                <h3 className="text-xl font-bold text-slate-900 mb-3">{service.title}</h3>
-                <p className="text-slate-600 leading-relaxed">{service.description}</p>
+                <h3 className="text-xl font-bold mb-3" style={{ color: colorServicesText }}>{service.title}</h3>
+                <p className="leading-relaxed opacity-70" style={{ color: colorServicesText }}>{service.description}</p>
               </motion.div>
             ))}
           </div>

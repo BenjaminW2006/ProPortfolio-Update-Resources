@@ -1865,53 +1865,103 @@ function EditorAboutPanel({ form, setForm }: { form: SiteSettings; setForm: SetF
   );
 }
 
-type ColorKey = "colorBg" | "colorText" | "colorAccent" | "colorHeader" | "colorTileBg" | "colorTileBorder";
+type ColorKey = keyof Pick<SiteSettings,
+  "colorBg" | "colorText" | "colorAccent" | "colorHeader" |
+  "colorHeroBg" | "colorHeroText" |
+  "colorServicesBg" | "colorServicesText" | "colorServicesCardBg" |
+  "colorAboutBg" | "colorAboutText" |
+  "colorContactBg" | "colorContactText" | "colorContactCardBg" |
+  "colorGalleryBg" | "colorGalleryText" | "colorTileBg" | "colorTileBorder"
+>;
+
+function ColorRow({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="flex items-center justify-between gap-2">
+      <label className="text-slate-400 text-xs flex-1 min-w-0 truncate">{label}</label>
+      <div className="flex items-center gap-1.5 shrink-0">
+        <input
+          type="color"
+          value={value || "#000000"}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-7 h-7 rounded border border-slate-600 bg-slate-700 cursor-pointer p-0.5 shrink-0"
+        />
+        <Input
+          value={value || ""}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-[5.5rem] bg-slate-800 border-slate-700 text-white font-mono text-xs h-7"
+        />
+      </div>
+    </div>
+  );
+}
+
+function ColorGroup({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-3">
+      <p className="text-slate-500 text-[10px] font-semibold uppercase tracking-widest pt-1">{title}</p>
+      {children}
+    </div>
+  );
+}
 
 function EditorColorsPanel({ form, setForm }: { form: SiteSettings; setForm: SetForm }) {
   const upd = (key: ColorKey, value: string) =>
     setForm((f) => (f ? { ...f, [key]: value } : f));
-  const colorFields: { label: string; key: ColorKey }[] = [
-    { label: "Page Background", key: "colorBg" },
-    { label: "Text Color", key: "colorText" },
-    { label: "Accent / Buttons", key: "colorAccent" },
-    { label: "Header / Navbar", key: "colorHeader" },
-    { label: "Gallery Tile Bg", key: "colorTileBg" },
-    { label: "Gallery Tile Border", key: "colorTileBorder" },
-  ];
-  return (
-    <div className="space-y-4">
-      {colorFields.map(({ label, key }) => (
-        <div key={key} className="flex items-center justify-between gap-2">
-          <label className="text-slate-400 text-xs flex-1 min-w-0 truncate">{label}</label>
-          <div className="flex items-center gap-1.5 shrink-0">
-            <input
-              type="color"
-              value={form[key] ?? "#000000"}
-              onChange={(e) => upd(key, e.target.value)}
-              className="w-7 h-7 rounded border border-slate-600 bg-slate-700 cursor-pointer p-0.5 shrink-0"
-            />
-            <Input
-              value={form[key] ?? ""}
-              onChange={(e) => upd(key, e.target.value)}
-              className="w-[5.5rem] bg-slate-800 border-slate-700 text-white font-mono text-xs h-7"
-            />
-          </div>
-        </div>
-      ))}
 
-      {/* Live mini-preview */}
-      <div className="pt-1">
-        <p className="text-slate-500 text-xs mb-2">Preview</p>
+  return (
+    <div className="space-y-5 divide-y divide-slate-800">
+      <ColorGroup title="Global">
+        <ColorRow label="Accent / Buttons" value={form.colorAccent} onChange={(v) => upd("colorAccent", v)} />
+        <ColorRow label="Navbar Background" value={form.colorHeader} onChange={(v) => upd("colorHeader", v)} />
+      </ColorGroup>
+
+      <div className="pt-4 space-y-5 divide-y divide-slate-800">
+        <ColorGroup title="Hero Section">
+          <ColorRow label="Background" value={form.colorHeroBg} onChange={(v) => upd("colorHeroBg", v)} />
+          <ColorRow label="Text" value={form.colorHeroText} onChange={(v) => upd("colorHeroText", v)} />
+        </ColorGroup>
+
+        <div className="pt-4">
+          <ColorGroup title="Services Section">
+            <ColorRow label="Background" value={form.colorServicesBg} onChange={(v) => upd("colorServicesBg", v)} />
+            <ColorRow label="Text" value={form.colorServicesText} onChange={(v) => upd("colorServicesText", v)} />
+            <ColorRow label="Card Background" value={form.colorServicesCardBg} onChange={(v) => upd("colorServicesCardBg", v)} />
+          </ColorGroup>
+        </div>
+
+        <div className="pt-4">
+          <ColorGroup title="About Section">
+            <ColorRow label="Background" value={form.colorAboutBg} onChange={(v) => upd("colorAboutBg", v)} />
+            <ColorRow label="Text" value={form.colorAboutText} onChange={(v) => upd("colorAboutText", v)} />
+          </ColorGroup>
+        </div>
+
+        <div className="pt-4">
+          <ColorGroup title="Gallery Page">
+            <ColorRow label="Background" value={form.colorGalleryBg} onChange={(v) => upd("colorGalleryBg", v)} />
+            <ColorRow label="Text" value={form.colorGalleryText} onChange={(v) => upd("colorGalleryText", v)} />
+            <ColorRow label="Tile Background" value={form.colorTileBg} onChange={(v) => upd("colorTileBg", v)} />
+            <ColorRow label="Tile Border" value={form.colorTileBorder} onChange={(v) => upd("colorTileBorder", v)} />
+          </ColorGroup>
+        </div>
+
+        <div className="pt-4">
+          <ColorGroup title="Contact Page">
+            <ColorRow label="Background" value={form.colorContactBg} onChange={(v) => upd("colorContactBg", v)} />
+            <ColorRow label="Text" value={form.colorContactText} onChange={(v) => upd("colorContactText", v)} />
+            <ColorRow label="Card Background" value={form.colorContactCardBg} onChange={(v) => upd("colorContactCardBg", v)} />
+          </ColorGroup>
+        </div>
+      </div>
+
+      {/* Mini preview — global accent + navbar */}
+      <div className="pt-4">
+        <p className="text-slate-500 text-xs mb-2">Navbar preview</p>
         <div className="rounded-lg overflow-hidden border border-slate-700 text-xs select-none">
-          <div
-            className="flex items-center justify-between px-3 py-2"
-            style={{ backgroundColor: form.colorHeader }}
-          >
+          <div className="flex items-center justify-between px-3 py-2" style={{ backgroundColor: form.colorHeader }}>
             <div className="flex items-center gap-1.5">
               <div className="w-4 h-4 rounded" style={{ backgroundColor: form.colorAccent }} />
-              <span className="font-semibold" style={{ color: form.colorText }}>
-                {form.companyName || "Your Business"}
-              </span>
+              <span className="font-semibold" style={{ color: form.colorText }}>{form.companyName || "Your Business"}</span>
             </div>
             <div className="flex gap-2">
               {["Home", "Gallery", "Contact"].map((item) => (
@@ -1919,36 +1969,13 @@ function EditorColorsPanel({ form, setForm }: { form: SiteSettings; setForm: Set
               ))}
             </div>
           </div>
-          <div className="px-4 py-4 space-y-2.5" style={{ backgroundColor: form.colorBg }}>
-            <div className="space-y-0.5">
-              <p className="font-bold text-sm leading-tight" style={{ color: form.colorText }}>Quality Work.</p>
-              <p className="opacity-60" style={{ color: form.colorText }}>Professional services tailored to your needs.</p>
-            </div>
-            <div className="flex gap-1.5 pt-0.5">
-              <span
-                className="px-2.5 py-1 rounded font-semibold"
-                style={{ backgroundColor: form.colorAccent, color: "#ffffff" }}
-              >
-                Get a Quote
-              </span>
-              <span
-                className="px-2.5 py-1 rounded font-semibold border"
-                style={{ borderColor: form.colorAccent, color: form.colorAccent }}
-              >
-                View Work
-              </span>
-            </div>
-            <div
-              className="flex gap-2 pt-1"
-            >
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="flex-1 h-10 rounded border"
-                  style={{ backgroundColor: form.colorTileBg, borderColor: form.colorTileBorder }}
-                />
-              ))}
-            </div>
+          <div className="px-4 py-3 flex gap-1.5" style={{ backgroundColor: form.colorHeroBg }}>
+            <span className="px-2.5 py-1 rounded font-semibold text-white" style={{ backgroundColor: form.colorAccent }}>
+              Get a Quote
+            </span>
+            <span className="px-2.5 py-1 rounded font-semibold border" style={{ borderColor: form.colorAccent, color: form.colorAccent, backgroundColor: form.colorHeroBg }}>
+              View Work
+            </span>
           </div>
         </div>
       </div>
