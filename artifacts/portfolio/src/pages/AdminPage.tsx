@@ -2085,6 +2085,8 @@ function EditorView({ onExit }: { onExit: () => void }) {
     }
   };
 
+  const [iframePath, setIframePath] = useState("/");
+
   const PANELS = [
     { id: "navbar", label: "Navbar" },
     { id: "hero", label: "Hero" },
@@ -2092,6 +2094,12 @@ function EditorView({ onExit }: { onExit: () => void }) {
     { id: "about", label: "About" },
     { id: "colors", label: "Colors" },
     { id: "typography", label: "Fonts" },
+  ];
+
+  const PAGES = [
+    { path: "/", label: "Home" },
+    ...(form?.showGalleries ? [{ path: "/gallery", label: "Gallery" }] : []),
+    { path: "/contact", label: "Contact" },
   ];
 
   if (!form) {
@@ -2106,7 +2114,7 @@ function EditorView({ onExit }: { onExit: () => void }) {
     <div className="flex h-screen bg-slate-950 overflow-hidden">
       {/* Left: live site iframe */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Minimal browser-like toolbar */}
+        {/* Toolbar */}
         <div className="h-10 bg-slate-900 border-b border-slate-700 flex items-center gap-2 px-3 shrink-0">
           <button
             onClick={onExit}
@@ -2115,9 +2123,24 @@ function EditorView({ onExit }: { onExit: () => void }) {
             <ArrowLeft className="w-3.5 h-3.5" />
             Exit Editor
           </button>
-          <div className="flex-1 bg-slate-800 rounded px-3 py-1 text-xs text-slate-500 font-mono truncate">
-            {window.location.origin}{basePath}
+
+          {/* Page navigation tabs */}
+          <div className="flex items-center gap-0.5 flex-1 justify-center">
+            {PAGES.map((page) => (
+              <button
+                key={page.path}
+                onClick={() => setIframePath(page.path)}
+                className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+                  iframePath === page.path
+                    ? "bg-slate-700 text-white"
+                    : "text-slate-400 hover:text-white hover:bg-slate-800"
+                }`}
+              >
+                {page.label}
+              </button>
+            ))}
           </div>
+
           <Button
             size="sm"
             className="h-7 text-xs px-4 bg-blue-600 hover:bg-blue-700 shrink-0 rounded-md"
@@ -2130,7 +2153,7 @@ function EditorView({ onExit }: { onExit: () => void }) {
         </div>
         <iframe
           ref={iframeRef}
-          src={`${basePath}/?editor=1`}
+          src={`${basePath}${iframePath}?editor=1`}
           className="flex-1 w-full border-0 bg-white"
           title="Site Preview"
         />
